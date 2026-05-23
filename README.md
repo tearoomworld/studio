@@ -41,6 +41,8 @@ npm run dev
 
 Open http://localhost:3000/login → sign in with your owner email and password.
 
+**Production:** https://studio-rosy-mu.vercel.app/login (email + password — redeploy on Vercel after auth changes).
+
 ## Environment variables
 
 | Variable | Required | Notes |
