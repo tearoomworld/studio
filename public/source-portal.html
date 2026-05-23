@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Source · Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0D1821;
+    --ink-2: #1f2d3a;
+    --muted: #5a6573;
+    --faint: #8c95a0;
+    --fainter: #b8bec6;
+    --hair: #e6e8eb;
+    --hair-2: #eff1f3;
+    --bg: #ffffff;
+    --paper: #ffffff;
+    --soft: #f7f8f8;
+    --softer: #fafbfb;
+    --sidebar: #fafbfb;
+    --sage: #BFCC94;
+    --sage-deep: #97a570;
+    --sage-soft: #e9eed8;
+    --blush: #E6AACE;
+    --blush-soft: #f6e2ee;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
+
+    --font: "Calibre", "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    line-height: 1.47;
+    height: 100vh;
+    overflow: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 256px 1fr;
+    height: 100vh;
+  }
+  @media (max-width: 800px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--sidebar);
+    border-right: 1px solid var(--hair-2);
+    padding: 16px 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .back-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; margin-bottom: 14px;
+    font-size: 12px; color: var(--muted);
+    border-radius: 6px;
+    transition: background 0.12s;
+  }
+  .back-link:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
+  .portal-brand {
+    padding: 8px 8px 18px 8px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .portal-brand-logo {
+    display: inline-flex; align-items: center; gap: 12px;
+    line-height: 1;
+  }
+  .portal-brand-logo.kindred {
+    font-family: "Fraunces", Georgia, serif;
+    color: #b85e25;
+    font-size: 30px; font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+  .portal-brand-logo.kindred::before {
+    content: "";
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #E29449;
+  }
+  .portal-brand-logo.kindred em { font-style: italic; color: #E29449; }
+  .portal-brand-sub {
+    font-size: 11px; color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .nav-group { margin-bottom: 18px; }
+  .nav-group-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0 8px 6px 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 9px; border-radius: 7px;
+    color: var(--ink-2); font-size: 13.5px;
+    font-weight: 500; cursor: pointer; width: 100%;
+    text-align: left; border: none; background: transparent;
+    letter-spacing: -0.005em;
+    transition: background 0.12s;
+  }
+  .nav-item:hover { background: rgba(0,0,0,0.04); }
+  .nav-item.active { background: rgba(0,0,0,0.06); color: var(--ink); }
+  .nav-item-icon {
+    width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-item-icon { color: var(--ink); }
+  .nav-item-count {
+    margin-left: auto;
+    font-size: 11px; color: var(--muted);
+    background: rgba(0,0,0,0.05); padding: 1px 6px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .sidebar-foot {
+    margin-top: auto; padding: 16px 8px 4px;
+    border-top: 1px solid var(--hair-2);
+    font-size: 11px; color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Main */
+  .main {
+    overflow-y: auto;
+    height: 100vh;
+    background: var(--bg);
+  }
+  .main-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 36px 48px 80px;
+  }
+  @media (max-width: 700px) { .main-inner { padding: 28px 24px 60px; } }
+  .iframe-full {
+    height: 100%; width: 100%;
+    border: none; display: block;
+    opacity: 0; transition: opacity 0.22s ease;
+  }
+  .iframe-full.loaded { opacity: 1; }
+  .iframe-shell {
+    height: 100vh;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .iframe-wrap {
+    flex: 1; position: relative; overflow: hidden;
+    background: var(--bg);
+  }
+  .iframe-loading {
+    position: absolute; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5; pointer-events: none;
+    transition: opacity 0.18s ease;
+  }
+  .iframe-loading.gone { opacity: 0; }
+  .iframe-loading-text {
+    font-size: 12px; color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .iframe-loading-text::before {
+    content: ""; display: inline-block;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--sage);
+    margin-right: 10px;
+    vertical-align: 0px;
+    animation: pulse-load 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse-load {
+    0%, 100% { opacity: 0.3; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+  .iframe-bar {
+    padding: 10px 16px;
+    background: var(--soft);
+    border-bottom: 1px solid var(--hair-2);
+    font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .iframe-bar a {
+    color: var(--ink); font-weight: 500;
+    border: 1px solid var(--hair);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px;
+  }
+  .iframe-bar a:hover { background: var(--paper); }
+
+  .pane { display: none; }
+  .pane.on { display: block; }
+  .pane.iframe-pane.on { display: flex; flex-direction: column; height: 100vh; }
+
+  .pane-head {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .pane-eyebrow {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 8px;
+  }
+  .pane-title {
+    font-size: 32px; font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 10px;
+  }
+  .pane-sub {
+    font-size: 15px; color: var(--ink-2);
+    line-height: 1.55; max-width: 620px;
+  }
+
+  /* Progress topline */
+  .progress-top {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 20px;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 20px; align-items: center;
+  }
+  .progress-top-stats { display: flex; gap: 28px; }
+  .progress-stat-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .progress-stat-value {
+    font-size: 24px; font-weight: 700;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-stat-value .dim { color: var(--fainter); font-weight: 400; }
+  .progress-top-bar {
+    width: 220px; height: 6px; background: var(--soft);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress-top-bar-fill {
+    height: 100%; background: var(--sage-deep);
+    transition: width 0.4s ease;
+  }
+
+  /* Phases */
+  .phases { display: flex; flex-direction: column; gap: 10px; }
+  .phase {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .phase-head {
+    padding: 18px 22px;
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer; user-select: none;
+    transition: background 0.15s;
+  }
+  .phase-head:hover { background: var(--softer); }
+  .phase-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--soft); color: var(--ink-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .phase.done .phase-num {
+    background: var(--sage); color: var(--ink);
+  }
+  .phase-info { flex: 1; }
+  .phase-title {
+    font-size: 15px; font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+  .phase-when { font-size: 12px; color: var(--muted); }
+  .phase-count {
+    font-size: 11.5px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    background: var(--soft); padding: 3px 9px;
+    border-radius: 4px;
+  }
+  .phase-chevron {
+    color: var(--fainter); font-size: 16px;
+    transition: transform 0.2s;
+  }
+  .phase.open .phase-chevron { transform: rotate(90deg); }
+  .phase-body {
+    display: none;
+    padding: 0 22px 22px 70px;
+    border-top: 1px solid var(--hair-2);
+  }
+  .phase.open .phase-body { display: block; }
+  .phase-desc {
+    font-size: 13.5px; color: var(--ink-2);
+    line-height: 1.6;
+    padding: 14px 0 4px;
+    margin-bottom: 12px;
+  }
+  .phase-group { margin-top: 14px; }
+  .phase-group-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 8px;
+  }
+  .task {
+    display: flex; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid var(--hair-2);
+    cursor: pointer;
+  }
+  .task:last-child { border-bottom: none; }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--hair);
+    flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff;
+    transition: all 0.12s;
+  }
+  .task.done .task-check { background: var(--sage); border-color: var(--sage-deep); }
+  .task.done .task-check::after { content: "✓"; color: var(--ink); font-size: 11px; font-weight: 700; }
+  .task-body { flex: 1; min-width: 0; }
+  .task-text {
+    font-size: 13.5px; color: var(--ink);
+    line-height: 1.5; font-weight: 500;
+  }
+  .task.done .task-text { color: var(--muted); text-decoration: line-through; }
+  .task-note {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.5; margin-top: 4px;
+  }
+  .task-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .task-tag {
+    font-size: 9.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 2px 7px; border-radius: 3px;
+    background: var(--soft); color: var(--muted);
+  }
+  .task-tag.must { background: var(--blush-soft); color: var(--ink-2); }
+  .task-tag.nice { background: var(--sage-soft); color: var(--sage-deep); }
+  .task-tag.later { background: var(--soft); color: var(--muted); }
+  .task-tag.agent { background: var(--ink); color: var(--sage); }
+  .task-tag.agent::before { content: "✨ "; }
+  .task-link {
+    font-size: 11.5px; color: var(--muted);
+    margin-top: 4px;
+    display: inline-block;
+    border-bottom: 1px dotted var(--hair);
+  }
+  .task-link:hover { color: var(--ink); border-color: var(--ink); }
+  .task-prompt {
+    background: var(--ink); color: #f5f5f7;
+    border-radius: 8px; padding: 14px 14px 12px;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11.5px; line-height: 1.6;
+    white-space: pre-wrap; overflow-x: auto;
+    position: relative;
+  }
+  .task-prompt::before {
+    content: "claude code prompt";
+    position: absolute; top: -8px; left: 12px;
+    background: var(--ink); color: var(--sage);
+    padding: 2px 7px; border-radius: 3px;
+    font-family: var(--font); font-size: 9px;
+    font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .task-prompt.bash::before { content: "terminal"; }
+  .task-prompt.sql::before { content: "supabase sql"; }
+  .task-prompt.env::before { content: ".env.local"; }
+
+  /* Tab strips for audit + agents */
+  .strip-tabs {
+    display: flex; gap: 4px; margin-bottom: 22px;
+    background: var(--soft); padding: 4px; border-radius: 10px;
+    width: fit-content; flex-wrap: wrap;
+  }
+  .strip-tab {
+    padding: 7px 14px; border-radius: 7px;
+    background: transparent; color: var(--muted);
+    border: none; font-size: 12.5px; font-weight: 500;
+    cursor: pointer;
+  }
+  .strip-tab.active {
+    background: var(--paper); color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .strip-pane { display: none; }
+  .strip-pane.on { display: block; }
+
+  /* Risk cards */
+  .risk {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-left: 3px solid var(--hair);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 12px;
+  }
+  .risk.high { border-left-color: var(--ink); }
+  .risk.medium { border-left-color: var(--muted); }
+  .risk.low { border-left-color: var(--fainter); }
+  .risk-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .risk-level {
+    font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 3px 8px; border-radius: 3px;
+  }
+  .risk-level.high { background: var(--ink); color: #fff; }
+  .risk-level.medium { background: var(--soft); color: var(--ink); border: 1px solid var(--hair); }
+  .risk-level.low { background: transparent; color: var(--muted); border: 1px solid var(--hair); }
+  .risk-title {
+    font-size: 16px; font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+  .risk-body {
+    font-size: 13.5px; color: var(--ink-2);
+    line-height: 1.6;
+  }
+  .risk-body strong { color: var(--ink); font-weight: 600; }
+  .risk-body code {
+    font-family: var(--mono); font-size: 12px;
+    background: var(--soft); padding: 1px 5px;
+    border-radius: 4px; color: var(--ink);
+  }
+  .risk-fix {
+    margin-top: 12px; padding: 12px 14px;
+    background: var(--soft); border-radius: 8px;
+    font-size: 13px; line-height: 1.55;
+  }
+  .risk-fix::before {
+    content: "FIX  ·  "; font-size: 10px; font-weight: 700;
+    color: var(--ink); letter-spacing: 0.06em;
+  }
+
+  /* Schema */
+  .schema-table {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .schema-table-head {
+    background: var(--soft);
+    padding: 12px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .schema-table-head strong {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .schema-pill {
+    font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 2px 8px; border-radius: 3px;
+  }
+  .schema-pill.v1 { background: var(--ink); color: #fff; }
+  .schema-pill.v2 { background: var(--soft); color: var(--ink); border: 1px solid var(--hair); }
+  .schema-pill.add { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+  .schema-pill.dormant { background: var(--blush-soft); color: var(--ink-2); }
+  .schema-row {
+    display: grid; grid-template-columns: 220px 140px 1fr;
+    gap: 16px; padding: 9px 18px; align-items: center;
+    border-top: 1px solid var(--hair-2);
+    font-size: 12.5px;
+  }
+  .schema-row code {
+    font-family: var(--mono); font-size: 12px; color: var(--ink);
+    background: var(--soft); padding: 2px 6px; border-radius: 4px;
+  }
+  .schema-row .type {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+  .schema-row .note { color: var(--ink-2); line-height: 1.5; }
+
+  /* Flow */
+  .flow {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 26px;
+    margin-bottom: 12px;
+  }
+  .flow h4 {
+    font-size: 16px; font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-bottom: 14px;
+  }
+  .flow-step {
+    display: grid; grid-template-columns: 32px 1fr;
+    gap: 14px; padding: 12px 0; align-items: flex-start;
+  }
+  .flow-step + .flow-step { border-top: 1px solid var(--hair-2); }
+  .flow-step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--soft); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+  }
+  .flow-step-body strong {
+    display: block; font-size: 13.5px;
+    margin-bottom: 3px;
+  }
+  .flow-step-body span {
+    font-size: 12.5px; color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Agents */
+  .card-paper {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 12px;
+  }
+  .card-paper h4 {
+    font-size: 15px; font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .card-paper p {
+    font-size: 13px; color: var(--ink-2);
+    line-height: 1.55; margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Portal sidebar -->
+  <aside class="sidebar">
+    <a href="index.html" class="back-link">← Studio</a>
+    <div class="portal-brand">
+      <div class="portal-brand-logo" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: var(--ink); text-transform: lowercase; font-size: 32px; font-weight: 400; letter-spacing: -0.035em;">source<span style="color: var(--sage-deep);">.</span></div>
+      <div class="portal-brand-sub">Prototype · Atlanta events marketplace</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Build</div>
+      <button class="nav-item active" data-pane="buildplan">
+        <span class="nav-item-icon">▤</span>
+        Build Plan
+        <span class="nav-item-count" id="portal-phase-count">0/8</span>
+      </button>
+      <button class="nav-item" data-pane="audit">
+        <span class="nav-item-icon">○</span>
+        v1→v2 Audit
+      </button>
+      <button class="nav-item" data-pane="agents">
+        <span class="nav-item-icon">✦</span>
+        Agents + Skills
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Assets</div>
+      <button class="nav-item" data-pane="deck">
+        <span class="nav-item-icon">▢</span>
+        Deck
+      </button>
+      <button class="nav-item" data-pane="pitch">
+        <span class="nav-item-icon">▢</span>
+        Pitch
+      </button>
+      <button class="nav-item" data-pane="webmock">
+        <span class="nav-item-icon">▢</span>
+        Web Mock
+      </button>
+      <button class="nav-item" data-pane="mobilemock">
+        <span class="nav-item-icon">▢</span>
+        Mobile Mock
+      </button>
+    </div>
+
+    <div class="sidebar-foot">
+      <strong>Marathon motion</strong><br/>
+      Content + Atlanta presence.<br/>
+      No formal sales tool needed.
+    </div>
+  </aside>
+
+  <!-- Portal main -->
+  <main class="main">
+
+    <!-- BUILD PLAN -->
+    <div class="pane on" id="pane-buildplan">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Source · Build</div>
+          <h1 class="pane-title">The build plan.</h1>
+          <p class="pane-sub">Eight weeks from accounts paperwork to live in both app stores. Click any phase to expand its tasks and copy-paste prompts. The longest part isn't coding — it's the unsexy unlock work in week 2 (meeting 10 atlanta hosts in person) and the Apple review cycle in weeks 6-8.</p>
+        </div>
+
+        <div class="progress-top">
+          <div class="progress-top-stats">
+            <div>
+              <div class="progress-stat-label">Phases done</div>
+              <div class="progress-stat-value" id="phases-done">0<span class="dim">/8</span></div>
+            </div>
+            <div>
+              <div class="progress-stat-label">Tasks done</div>
+              <div class="progress-stat-value" id="tasks-done">0<span class="dim">/—</span></div>
+            </div>
+            <div>
+              <div class="progress-stat-label">Estimated</div>
+              <div class="progress-stat-value">~8<span class="dim">wks</span></div>
+            </div>
+          </div>
+          <div class="progress-top-bar"><div class="progress-top-bar-fill" id="top-bar" style="width: 0%"></div></div>
+        </div>
+
+        <div class="phases" id="phases"></div>
+      </div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="pane" id="pane-audit">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Source · Audit</div>
+          <h1 class="pane-title">v1 → v2 compatibility audit.</h1>
+          <p class="pane-sub">Risks specific to Source's marketplace mechanics. Multi-city schema, Stripe Connect, App Store IAP boundaries, Capacitor wrap — all locked in week 1 so v2 (attendee accounts, event series, multi-city) ships as an additive release.</p>
+        </div>
+
+      <div class="strip-tabs">
+        <button class="strip-tab active" onclick="auditShow('risks', this)">Lock-in risks</button>
+        <button class="strip-tab" onclick="auditShow('schema', this)">Data model</button>
+        <button class="strip-tab" onclick="auditShow('arch', this)">v2 architecture</button>
+        <button class="strip-tab" onclick="auditShow('deploy', this)">Deployment</button>
+      </div>
+
+      <div class="strip-pane on" id="audit-risks">
+        <div class="risk high">
+          <div class="risk-head">
+            <span class="risk-level high">Contract</span>
+            <div class="risk-title">The eight Source compatibility rules.</div>
+          </div>
+          <div class="risk-body">
+            Follow these during v1 and v2 (attendee accounts, event series, multi-city) ships as an additive release with no migration and no breaking native-app changes.<br/><br/>
+            <ol style="margin-left: 20px; line-height: 1.75;">
+              <li><strong>Every event row has a <code>city</code> from day one.</strong> v1 writes <code>'atlanta'</code>; v2 unlocks the column.</li>
+              <li><strong>Every event row has a nullable <code>series_id</code> from day one.</strong> v1 always null. v2 lights up event series.</li>
+              <li><strong><code>users.user_type</code> allows <code>'attendee'</code> from day one.</strong> v1 only creates <code>'host'</code> + <code>'founder'</code>.</li>
+              <li><strong>Tickets store <code>buyer_email</code> + nullable <code>user_id</code>.</strong> v2 stitches anonymous purchases to accounts retroactively.</li>
+              <li><strong>Every UI surface checks a feature flag.</strong> v2 surfaces ship dark behind <code>city.flags.attendee_accounts</code>.</li>
+              <li><strong>Stripe Connect from day one, not later.</strong> Can't add Connect to a marketplace after launch. Approval takes 3-7 days.</li>
+              <li><strong>Native shell stays thin.</strong> Capacitor wraps the web app. Native code only for: push, share, deep links.</li>
+              <li><strong>App Store IAP boundary clearly drawn.</strong> Physical event tickets exempt; digital subscriptions are not.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="risk high">
+          <div class="risk-head">
+            <span class="risk-level high">High</span>
+            <div class="risk-title">Multi-city must exist in schema from day one.</div>
+          </div>
+          <div class="risk-body">
+            <strong>Today:</strong> Source is Atlanta-only. Tempting to hard-code "atlanta" in the UI.<br/><br/>
+            <strong>Why it breaks v2:</strong> The moment you list your first Austin event, every query that filters events needs to learn about cities. Doing this with live money and active hosts means downtime hosts can't tolerate.
+            <div class="risk-fix">v1 schema: every event row has <code>city text not null default 'atlanta'</code>. URLs include <code>/atl/event/[slug]</code> from day one. When Nashville opens, you add an enum value, not a migration.</div>
+          </div>
+        </div>
+
+        <div class="risk high">
+          <div class="risk-head">
+            <span class="risk-level high">High</span>
+            <div class="risk-title">Stripe Connect can't be retrofitted to a marketplace.</div>
+          </div>
+          <div class="risk-body">
+            <strong>Why it breaks v1:</strong> Regular Stripe routes payment to you and you owe hosts manually. Connect routes payment splits automatically at purchase. Switching mid-stream means refunding every ticket and re-onboarding every host.
+            <div class="risk-fix">Week 1: form LLC, then submit Stripe Connect application immediately. By week 3 (checkout build), Connect is approved.</div>
+          </div>
+        </div>
+
+        <div class="risk high">
+          <div class="risk-head">
+            <span class="risk-level high">High</span>
+            <div class="risk-title">App Store IAP rules are existential if misread.</div>
+          </div>
+          <div class="risk-body">
+            <strong>Apple's policy:</strong> "Real-world experience" tickets are exempt from IAP. Digital subscriptions and content are not.<br/><br/>
+            <strong>Why it's load-bearing:</strong> v2 features like "follow a host for $4.99/month" or "premium attendee accounts" are digital subscriptions. Those must use Apple's IAP (30% cut, 15% after year one). A single misclassified product flow can get the entire app pulled.
+            <div class="risk-fix">v1 ships with Stripe-only checkout for tickets to physical events. Zero digital subscriptions in v1. v2 designs any digital product knowing it has to live behind IAP — separate code paths, separate revenue accounting.</div>
+          </div>
+        </div>
+
+        <div class="risk medium">
+          <div class="risk-head">
+            <span class="risk-level medium">Medium</span>
+            <div class="risk-title">Capacitor wrap is fine — until v2 needs deep native.</div>
+          </div>
+          <div class="risk-body">
+            <strong>Why it might matter:</strong> If v2 wants background notifications, complex camera, AR previews, or offline mode, Capacitor strains and you might need React Native.
+            <div class="risk-fix">v1 architect: use platform-agnostic data fetching, avoid CSS that doesn't translate to RN styles, keep component tree shallow. v2 question gets answered in month 3.</div>
+          </div>
+        </div>
+
+        <div class="risk medium">
+          <div class="risk-head">
+            <span class="risk-level medium">Medium</span>
+            <div class="risk-title">Native app updates ship on Apple's schedule, not yours.</div>
+          </div>
+          <div class="risk-body">
+            <strong>Why it matters before v2:</strong> Any bug fix touching the native shell needs app store review (1-7 days). Web app code can hot-fix via Vercel; native bits cannot.
+            <div class="risk-fix">Native shell does the minimum (push, share, deep links). Everything else lives in web. CI check that flags new native code.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="strip-pane" id="audit-schema">
+        <div class="schema-table">
+          <div class="schema-table-head">
+            <strong>users</strong>
+            <span class="schema-pill v1">v1 active</span>
+            <span class="schema-pill v2">extended in v2</span>
+          </div>
+          <div class="schema-row"><code>user_type</code><span class="type">enum</span><span class="note">v1: 'host' · 'founder'  ·  v2: + 'attendee'</span></div>
+          <div class="schema-row"><code>stripe_connect_account_id</code><span class="type">text</span><span class="note">marketplace payouts (hosts only)</span></div>
+        </div>
+
+        <div class="schema-table">
+          <div class="schema-table-head">
+            <strong>events</strong>
+            <span class="schema-pill v1">v1 active</span>
+          </div>
+          <div class="schema-row"><code>city</code><span class="type">text not null</span><span class="note">v1: 'atlanta'  ·  v2: + austin, nashville</span></div>
+          <div class="schema-row"><code>series_id</code><span class="type">uuid nullable</span><span class="note">v1: always null  ·  v2: points to event_series</span></div>
+          <div class="schema-row"><code>ticket_price_cents</code><span class="type">int</span><span class="note">money in cents always</span></div>
+        </div>
+
+        <div class="schema-table">
+          <div class="schema-table-head">
+            <strong>tickets</strong>
+            <span class="schema-pill v1">v1 active</span>
+          </div>
+          <div class="schema-row"><code>buyer_email</code><span class="type">text not null</span><span class="note">v1 always writes</span></div>
+          <div class="schema-row"><code>user_id</code><span class="type">uuid nullable</span><span class="note">v2: stitches anonymous tickets to accounts</span></div>
+          <div class="schema-row"><code>fee_cents</code><span class="type">int</span><span class="note">10% + $0.99 — source's cut</span></div>
+          <div class="schema-row"><code>pool_contribution_cents</code><span class="type">int</span><span class="note">25% of fee → quarterly pool</span></div>
+        </div>
+
+        <div class="schema-table">
+          <div class="schema-table-head">
+            <strong>event_series</strong>
+            <span class="schema-pill dormant">dormant in v1</span>
+            <span class="schema-pill v2">activates in v2</span>
+          </div>
+          <div class="schema-row"><code>title</code><span class="type">text</span><span class="note">"Tuesday Jazz Nights"</span></div>
+          <div class="schema-row"><code>cadence</code><span class="type">text</span><span class="note">weekly · monthly · ad-hoc</span></div>
+        </div>
+
+        <div class="schema-table">
+          <div class="schema-table-head">
+            <strong>attendee_profiles</strong>
+            <span class="schema-pill dormant">dormant in v1</span>
+            <span class="schema-pill v2">activates in v2</span>
+          </div>
+          <div class="schema-row"><code>user_id</code><span class="type">uuid fk</span><span class="note">links to users where type='attendee'</span></div>
+          <div class="schema-row"><code>followed_host_ids</code><span class="type">uuid[]</span><span class="note">who they follow</span></div>
+        </div>
+
+        <div class="schema-table">
+          <div class="schema-table-head">
+            <strong>pool_quarters</strong>
+            <span class="schema-pill v1">v1 active</span>
+          </div>
+          <div class="schema-row"><code>city</code><span class="type">text not null</span><span class="note">v2: one pool per quarter per city</span></div>
+          <div class="schema-row"><code>award_rationale</code><span class="type">text</span><span class="note">published publicly when awarded</span></div>
+        </div>
+      </div>
+
+      <div class="strip-pane" id="audit-arch">
+        <div class="flow">
+          <h4>The v2 attendee flow</h4>
+          <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><strong>Anonymous buyer purchases ticket as usual</strong><span>v1 behavior unchanged. Email captured, ticket emailed with QR code.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><strong>Post-event email asks: "save this for later?"</strong><span>24h after event ends, soft CTA to create a free account. Optional.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><strong>Account creation = magic link</strong><span>30 seconds. Ticket history backfills automatically — all past anonymous tickets show up.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><strong>Personalized discovery feed unlocks</strong><span>Signed-in attendees see a feed ranked by followed hosts, series, interest tags.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-body"><strong>Event series pages aggregate recurring events</strong><span>"First Sunday Brunch" becomes a followable series.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">6</div><div class="flow-step-body"><strong>Multi-city expansion</strong><span>Flip a city flag. Host onboarding opens in the new city. Atlanta data unchanged.</span></div></div>
+        </div>
+      </div>
+
+      <div class="strip-pane" id="audit-deploy">
+        <div class="flow">
+          <h4>Deployment sequence</h4>
+          <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><strong>Ship v1 to both app stores</strong><span>20 active atlanta hosts + 500 paid tickets. Schema additions in place.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><strong>Build v2 on a parallel branch while v1 operates</strong><span>v2-attendees branch. v1 hot-fixes ship to main.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><strong>Shadow-launch attendee accounts to atlanta</strong><span>Flip <code>flags.attendee_accounts = true</code> for atlanta city row. Announce via post-event emails.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><strong>Add event series once 10+ hosts ask for it</strong><span>Flip per-host. Small ramp, not big bang.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-body"><strong>Multi-city: austin OR nashville, not both</strong><span>6-8 weeks per new city. Don't fork attention.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">6</div><div class="flow-step-body"><strong>Open calls last — they need attendee critical mass</strong><span>Only ship when one city has 500+ active attendees.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">7</div><div class="flow-step-body"><strong>Ticket pricing stays 10%+$0.99 forever</strong><span>New revenue from optional features in IAP territory.</span></div></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- AGENTS -->
+    <div class="pane" id="pane-agents">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Source · Agents</div>
+          <h1 class="pane-title">Agents + Claude Skills.</h1>
+          <p class="pane-sub">Where AI does the real work in Source. Host-facing agents (listing polisher, onboarding, pricing). Founder-facing agents (content generator, host scouting). Claude Skills that encode the editorial aesthetic. Safety rails for marketplace integrity.</p>
+        </div>
+
+      <div class="strip-tabs">
+        <button class="strip-tab active" onclick="agentsShow('product', this)">In-product agents</button>
+        <button class="strip-tab" onclick="agentsShow('founder', this)">Founder-facing</button>
+        <button class="strip-tab" onclick="agentsShow('skills', this)">Claude Skills</button>
+        <button class="strip-tab" onclick="agentsShow('rails', this)">Safety rails</button>
+      </div>
+
+      <div class="strip-pane on" id="agents-product">
+        <div class="card-paper">
+          <h4>Event description polisher</h4>
+          <p>The #1 quality lever on the marketplace. Host writes 1-2 sentences; agent drafts a richer listing in Source's voice. Host reviews + edits before save.</p>
+          <div class="task-prompt">Build an event description polisher at apps/hosts/app/api/polish-listing/route.ts. Input: {raw_title, raw_description, event_type}. Output: {polished_title, polished_description, suggested_tags}. Claude API with Source's voice rules: lowercase, editorial, no marketing speak. Preserve all factual details. Show in "review + edit" UI before saving.</div>
+        </div>
+
+        <div class="card-paper">
+          <h4>Host onboarding agent</h4>
+          <p>Walks new hosts through Stripe Connect setup, first event creation, ticket pricing. Conversational > 5-step forms.</p>
+        </div>
+
+        <div class="card-paper">
+          <h4>Ticket pricing suggester</h4>
+          <p>Based on similar atlanta events, suggests a price band. Host always overrides.</p>
+        </div>
+
+        <div class="card-paper">
+          <h4>Post-event recap email</h4>
+          <p>24h after event ends, agent drafts a 2-sentence recap from host's notes + photos. Asks for rating. Never fabricates moments.</p>
+        </div>
+      </div>
+
+      <div class="strip-pane" id="agents-founder">
+        <div class="card-paper">
+          <h4>Content idea generator</h4>
+          <p>Based on this week's atlanta events: 3 IG caption ideas + 2 TikTok hooks. You edit and ship. The agent doesn't post — you do.</p>
+          <div class="task-prompt">Build a content idea generator at apps/admin/app/api/content-ideas/route.ts. Weekly cron, Monday morning. Fetch events from past 7 days + next 7 days. Claude API drafts 3 IG captions + 2 TikTok hooks based on actual events. Saved to content_drafts table. Voice rules: lowercase, specific, no marketing speak. Never fabricate. Empty output for empty weeks.</div>
+        </div>
+
+        <div class="card-paper">
+          <h4>Host scouting agent</h4>
+          <p>Scrapes public atlanta event listings (IG explore, Eventbrite atl, Partiful) and surfaces hosts you don't know about. The agent never sends a message — that's your job, in person or DM.</p>
+        </div>
+
+        <div class="card-paper">
+          <h4>Weekly atlanta state-of-the-marketplace digest</h4>
+          <p>Monday mornings. What worked this week, hosts at risk, top-rated events. Terse, actionable, no fluff.</p>
+        </div>
+
+        <div class="card-paper">
+          <h4>Post-event sentiment summarizer</h4>
+          <p>All ratings + comments summarized in one paragraph for the host. Helps them improve. Helps you spot patterns across the marketplace.</p>
+        </div>
+      </div>
+
+      <div class="strip-pane" id="agents-skills">
+        <div class="card-paper">
+          <h4>source-component</h4>
+          <p>Editorial aesthetic: Helvetica Neue everywhere, all lowercase, sharp corners (max 4px), hairline borders, no shadows. Triggered for any UI work.</p>
+          <div class="task-prompt">Create .claude/skills/source-component/SKILL.md. Font: Helvetica Neue. All interface text lowercase via CSS. Color tokens: --ink #0a0a0a, --bg #ffffff, --soft #f4f4f2, --hair #e8e8e8. Border radii max 4px. No shadows, no gradients. Spacing scale: 4/8/12/16/20/24/32/40. Anti-patterns: emoji, pastel, rounded buttons, drop shadows, marketing copy, exclamation points.</div>
+        </div>
+
+        <div class="card-paper">
+          <h4>source-voice</h4>
+          <p>Lowercase. No exclamation marks. Concrete over abstract. Banned: "platform", "experiences", "curated", "leverage". Preferred: specific times, places, people.</p>
+        </div>
+
+        <div class="card-paper">
+          <h4>source-supabase</h4>
+          <p>Marketplace schema + RLS patterns. The eight compatibility rules. Stripe Connect specifics.</p>
+        </div>
+      </div>
+
+      <div class="strip-pane" id="agents-rails">
+        <div class="card-paper">
+          <h4>Pre-flight host listing check</h4>
+          <p>Profanity, scam keywords, mismatched dates. Deterministic, fast. Blocks publish until host fixes.</p>
+        </div>
+
+        <div class="card-paper">
+          <h4>Automatic refund hold</h4>
+          <p>If host hasn't completed Stripe Connect onboarding when their event happens, ticket payouts are held until they finish. Protects buyers, motivates hosts.</p>
+        </div>
+
+        <div class="card-paper">
+          <h4>Per-agent cost budget</h4>
+          <p>Same as Kindred. Per-endpoint daily cap. Slack alerts at 80%. Solo founder protection.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+    <!-- ASSET PANES — iframes for existing files -->
+    <div class="pane iframe-pane" id="pane-deck">
+      <div class="iframe-shell">
+        <div class="iframe-bar">
+          <span>Deck (source-deck.html)</span>
+          <a href="source-deck.html" target="_blank">Open in new tab ↗</a>
+        </div>
+        <div class="iframe-wrap">
+          <div class="iframe-loading"><div class="iframe-loading-text">loading</div></div>
+          <iframe class="iframe-full" src="about:blank" data-src="source-deck.html" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane iframe-pane" id="pane-pitch">
+      <div class="iframe-shell">
+        <div class="iframe-bar">
+          <span>Pitch (source-pitch.html)</span>
+          <a href="source-pitch.html" target="_blank">Open in new tab ↗</a>
+        </div>
+        <div class="iframe-wrap">
+          <div class="iframe-loading"><div class="iframe-loading-text">loading</div></div>
+          <iframe class="iframe-full" src="about:blank" data-src="source-pitch.html" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane iframe-pane" id="pane-webmock">
+      <div class="iframe-shell">
+        <div class="iframe-bar">
+          <span>Web mock (source-web.html)</span>
+          <a href="source-web.html" target="_blank">Open in new tab ↗</a>
+        </div>
+        <div class="iframe-wrap">
+          <div class="iframe-loading"><div class="iframe-loading-text">loading</div></div>
+          <iframe class="iframe-full" src="about:blank" data-src="source-web.html" data-eager="true" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane iframe-pane" id="pane-mobilemock">
+      <div class="iframe-shell">
+        <div class="iframe-bar">
+          <span>Mobile mock (source-mobile.html)</span>
+          <a href="source-mobile.html" target="_blank">Open in new tab ↗</a>
+        </div>
+        <div class="iframe-wrap">
+          <div class="iframe-loading"><div class="iframe-loading-text">loading</div></div>
+          <iframe class="iframe-full" src="about:blank" data-src="source-mobile.html" data-eager="true" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+const sourcePlan = [
+    {
+      id: "phase1",
+      title: "week 1 · foundation",
+      icon: "1", tone: "peach",
+      desc: "goal: tools installed, the app running locally, all three vercel projects deploying. apple developer + stripe verification submitted now so they process in the background while you build (both take weeks).",
+      groups: [
+        {
+          label: "accounts + paperwork (start day 1 — these take weeks)",
+          items: [
+            { t: "apple developer program enrollment ($99/year). identity verification can take 1-3 weeks.", tag: "must", link: "https://developer.apple.com/programs/" },
+            { t: "google play developer account ($25 one-time). identity verification 1-2 days.", tag: "must", link: "https://play.google.com/console/signup" },
+            { t: "stripe atlas or LLC formation in georgia. needed before stripe connect approval.", tag: "must", link: "https://stripe.com/atlas" },
+            { t: "stripe connect application. submit once LLC is formed. takes 3-7 business days for marketplace approval.", tag: "must", note: "source is a marketplace — you need stripe connect, not regular stripe. plan ahead." },
+            { t: "github + vercel + supabase + resend + anthropic + cloudflare accounts", tag: "must" },
+            { t: "buy source.app or source-atl.com (or whatever final domain you land on)", tag: "must" },
+          ]
+        },
+        {
+          label: "scaffold the monorepo",
+          items: [
+            { t: "open claude code in an empty folder. paste the scaffolding prompt below.", tag: "must",
+              prompt: "create a next.js 15 monorepo using pnpm workspaces with this structure:\n\nsource/\n├── apps/\n│   ├── web/     # marketing + browsing (the public app — feed, event detail, search)\n│   ├── hosts/   # where hosts post + manage events (auth gated)\n│   └── admin/   # private founder dashboard (sales, ops, support)\n├── packages/\n│   ├── ui/      # shared components, design tokens (helvetica neue, lowercase, sharp corners)\n│   ├── db/      # supabase client + generated types\n│   └── lib/     # shared utilities (date helpers, currency helpers, env validation)\n├── package.json (workspace root)\n├── pnpm-workspace.yaml\n├── turbo.json\n├── .gitignore\n└── README.md\n\nuse typescript strict mode everywhere. set up tailwind in each app, sharing config from packages/ui/tailwind.config.ts. configure each app to run on a different port (web:3000, hosts:3001, admin:3002). enforce lowercase styling globally via tailwind plugin. generate placeholder home pages. initialize git." },
+            { t: "push the empty monorepo to github + import as three vercel projects (one per app)", tag: "must" },
+            { t: "configure dns: source.app → web, host.source.app → hosts, admin.source.app → admin", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase2",
+      title: "week 2 · real content",
+      icon: "2", tone: "sage",
+      desc: "goal: the app stops being a demo. real atlanta events, real photos, real copy. this is the week you go out and actually meet 5-10 atlanta hosts and ask if they'd post on source.",
+      groups: [
+        {
+          label: "database schema (one careful day)",
+          items: [
+            { t: "in supabase sql editor, run the schema script below", tag: "must",
+              promptSql: "-- run in supabase sql editor — source v1 schema with dormant v2 tables\n\ncreate extension if not exists \"uuid-ossp\";\n\n-- users (v1: host + founder | v2: + attendee)\ncreate table users (\n  id uuid primary key default uuid_generate_v4(),\n  email text unique not null,\n  name text,\n  user_type text not null check (user_type in ('host','founder','attendee')),\n  stripe_customer_id text,\n  stripe_connect_account_id text,  -- only set for hosts\n  created_at timestamptz default now()\n);\n\n-- venues (v1 active — where events happen)\ncreate table venues (\n  id uuid primary key default uuid_generate_v4(),\n  host_id uuid references users(id),\n  name text not null,\n  address text,\n  city text default 'atlanta',\n  profile jsonb default '{}',\n  flags jsonb default '{\"event_series\": false, \"multi_city\": false}',\n  created_at timestamptz default now()\n);\n\n-- events (v1 active)\ncreate table events (\n  id uuid primary key default uuid_generate_v4(),\n  venue_id uuid references venues(id),\n  host_id uuid references users(id),\n  title text not null,\n  description text,\n  starts_at timestamptz not null,\n  ends_at timestamptz,\n  ticket_price_cents int default 0,\n  ticket_capacity int,\n  ticket_count_sold int default 0,\n  cover_image_url text,\n  status text default 'draft',  -- draft · published · live · ended · canceled\n  series_id uuid,  -- v2: dormant in v1\n  city text default 'atlanta',  -- v2: multi-city support already in schema\n  created_at timestamptz default now()\n);\n\n-- tickets (v1 active)\ncreate table tickets (\n  id uuid primary key default uuid_generate_v4(),\n  event_id uuid references events(id),\n  buyer_user_id uuid references users(id),\n  buyer_email text not null,  -- guest checkout supported via email only\n  price_paid_cents int not null,\n  fee_cents int not null,        -- source's cut (10% + $0.99)\n  pool_contribution_cents int not null,  -- 25% of fee goes to the pool\n  stripe_payment_intent_id text,\n  status text default 'paid',  -- paid · refunded · canceled\n  qr_code text,\n  checked_in_at timestamptz,\n  created_at timestamptz default now()\n);\n\n-- attendee_profiles (DORMANT in v1 — v2 lets attendees create profiles to follow hosts/series)\ncreate table attendee_profiles (\n  id uuid primary key default uuid_generate_v4(),\n  user_id uuid references users(id) on delete cascade,\n  display_name text,\n  bio text,\n  interests text[],\n  followed_host_ids uuid[],\n  created_at timestamptz default now()\n);\n\n-- event_series (DORMANT in v1 — v2 lets hosts group events into a recurring series)\ncreate table event_series (\n  id uuid primary key default uuid_generate_v4(),\n  host_id uuid references users(id),\n  title text not null,\n  description text,\n  cadence text,  -- weekly · monthly · ad-hoc\n  created_at timestamptz default now()\n);\n\n-- pool (v1 active — the quarterly host prize)\ncreate table pool_quarters (\n  id uuid primary key default uuid_generate_v4(),\n  quarter text not null,  -- '2026-Q1', '2026-Q2'\n  total_cents int default 0,\n  winning_host_id uuid references users(id),\n  awarded_at timestamptz\n);\n\n-- ratings (v1 active — drives the pool)\ncreate table event_ratings (\n  id uuid primary key default uuid_generate_v4(),\n  event_id uuid references events(id),\n  rater_email text not null,\n  rating int check (rating between 1 and 5),\n  comment text,\n  created_at timestamptz default now()\n);\n\n-- consent log (v1 active, extended in v2)\ncreate table consent_log (\n  id uuid primary key default uuid_generate_v4(),\n  subject_type text not null,\n  subject_id uuid not null,\n  consent_type text not null,\n  granted_at timestamptz default now(),\n  revoked_at timestamptz\n);\n\n-- sales pipeline (your founder dashboard)\ncreate table leads (\n  id uuid primary key default uuid_generate_v4(),\n  venue_name text,\n  host_name text,\n  host_email text,\n  stage text default 'cold',\n  notes text,\n  last_contact_at timestamptz,\n  created_at timestamptz default now()\n);\n\ncreate table emails_sent (\n  id uuid primary key default uuid_generate_v4(),\n  lead_id uuid references leads(id),\n  template_key text,\n  subject text,\n  body text,\n  tactic_tags text[],\n  sent_at timestamptz default now(),\n  opened_at timestamptz,\n  replied_at timestamptz,\n  reply_classification text\n);" },
+            { t: "enable RLS on all tables. hosts only see their own venues/events/tickets. attendees only see their own tickets.", tag: "must",
+              prompt: "add supabase row-level security policies for source. rules:\n\n1. users: read own row. founders read all.\n2. venues: host reads/writes own. founders read all. anyone reads published venue names (public surface area).\n3. events: host writes own. anyone reads published events. founders read all.\n4. tickets: buyer reads own (by email or user_id). host reads tickets for their events. founders read all.\n5. event_ratings: anyone reads. authenticated users insert one rating per event.\n6. pool_quarters: anyone reads. only founders write.\n7. attendee_profiles, event_series: enable RLS, deny all (v2 will add policies).\n8. leads, emails_sent: only founders.\n\nwrite the SQL with comments above each policy. output as one script." },
+          ]
+        },
+        {
+          label: "seed real atlanta events (the unsexy unlock)",
+          items: [
+            { t: "go to 10 actual atlanta events this week. take photos. talk to the host afterwards.", tag: "must", note: "this is the only week you should be spending more time in the field than at the laptop." },
+            { t: "transcribe each event into the events table by hand. real titles, real descriptions, real photos.", tag: "must" },
+            { t: "ask each host: 'would you list this event on source for free if i set it up?' — track yes/no/maybe in leads table", tag: "must", note: "this is the actual product validation step. if you can't get 5 yeses, don't build week 3." },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase3",
+      title: "week 3 · accounts + tickets",
+      icon: "3", tone: "lav",
+      desc: "goal: people can sign in and buy a ticket. money is involved, so everything is tested twice. by friday: a real ticket purchase end-to-end with stripe in test mode.",
+      groups: [
+        {
+          label: "magic-link auth",
+          items: [
+            { t: "build supabase magic-link login for buyers + hosts. one shared codebase, different post-login routes by user_type.", tag: "must",
+              prompt: "build magic-link login for source web + hosts apps using @supabase/ssr in next.js 15 app router.\n\n- apps/web: login flow for ticket buyers. post-login → /tickets (their tickets) or back to the event they were trying to buy.\n- apps/hosts: login flow for hosts. post-login → /dashboard (their event manager).\n- shared middleware in packages/lib that refreshes the session, but allows anonymous browsing on web (you can browse events without logging in — only checkout requires auth).\n\nmagic-link email template should match source's editorial aesthetic: helvetica neue, all lowercase, sharp corners, plenty of whitespace. tone: 'your sign-in link, source.'" },
+            { t: "test guest checkout: a buyer who's never had an account can buy a ticket with just an email. account auto-created on first purchase.", tag: "must" },
+          ]
+        },
+        {
+          label: "stripe checkout + connect",
+          items: [
+            { t: "implement stripe connect: each host has an express connect account. fees auto-split on every purchase (90% to host, 10% to source, plus $0.99 flat).", tag: "must",
+              prompt: "implement stripe connect for source's ticket marketplace.\n\n1. when a host signs up, create a stripe connect express account. store account_id on users.stripe_connect_account_id.\n2. host completes onboarding via stripe's hosted onboarding link.\n3. when a ticket is purchased: create a stripe paymentintent with transfer_data.destination = host's connect account. application_fee_amount = (10% of ticket price + $0.99) in cents.\n4. 25% of the fee goes to the pool — track in pool_contribution_cents on the ticket row.\n5. webhook handler at /api/webhooks/stripe handles payment_intent.succeeded → mark ticket paid + generate QR code (use 'qrcode' npm package).\n6. handle refunds: payment_intent.refunded → mark ticket refunded.\n\ntest in stripe test mode end-to-end before touching live keys.\n\n.env: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" },
+            { t: "QR-code generation + check-in flow. host opens an event on their phone, scans tickets at the door.", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase4",
+      title: "week 4 · hosts, the pool + admin",
+      icon: "4", tone: "peach",
+      desc: "goal: hosts can sign up, get paid, and post. the pool runs. and you get a private place to operate the business. by end of week 4 you should be able to onboard a host without your help.",
+      groups: [
+        {
+          label: "host onboarding + dashboard",
+          items: [
+            { t: "host onboarding flow: name → venue → connect stripe → first event draft. 5 steps max, can save and return.", tag: "must" },
+            { t: "host dashboard at host.source.app: events list, ticket sales, payout history, pool standings.", tag: "must" },
+            { t: "event listing form: title, description, photo, date/time, ticket price, capacity. minimal — source's aesthetic demands restraint.", tag: "must" },
+          ]
+        },
+        {
+          label: "the pool (do this right — it's the differentiator)",
+          items: [
+            { t: "pool quarter accumulator: cron job that totals pool_contribution_cents per quarter, displays running tally on every host dashboard", tag: "must" },
+            { t: "ratings flow: post-event, ticket buyers get an email asking 'how was it?' (1-5 stars + optional comment). drives the pool.", tag: "must" },
+            { t: "end-of-quarter award flow: founder reviews top-rated hosts, picks the winner, marks pool_quarters.winning_host_id, triggers payout via stripe transfer.", tag: "must", note: "human in the loop on awarding — not automated. you want to actually celebrate the winner." },
+          ]
+        },
+        {
+          label: "your private admin dashboard",
+          items: [
+            { t: "admin.source.app: lightweight founder dashboard — events this week, tickets sold, pool balance, hosts onboarded.", tag: "must", note: "source has no sales process (gtm is content + atlanta presence + word of mouth) — admin is for operational visibility, not a sales tool." },
+            { t: "field notes module — log atlanta events you attended, what you observed, host names, follow-ups.", tag: "must",
+              note: "the input layer for source's editorial muscle. raw observations become content ideas, then captions, then host outreach." },
+            { t: "content drafts module — paste IG/TikTok ideas, draft captions, mark posted/unposted. claude api can suggest captions from recent events.", tag: "agent" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase5",
+      title: "week 5 · becoming a real app",
+      icon: "5", tone: "sage",
+      desc: "goal: the finished web app gets wrapped into real iphone + android apps using capacitor. by friday: the app installs from a .ipa / .apk on your phone.",
+      groups: [
+        {
+          label: "capacitor wrap",
+          items: [
+            { t: "install capacitor in apps/web. configure iOS + android shells.", tag: "must",
+              promptBash: "cd apps/web\npnpm add @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android\nnpx cap init source com.source.app --web-dir=.next/static\nnpx cap add ios\nnpx cap add android" },
+            { t: "build the native shells. test on a real device (not just simulator).", tag: "must" },
+            { t: "configure deep links so a tap on a source.app event URL opens the native app if installed.", tag: "must" },
+            { t: "add native-only nice-to-haves: push notifications for ticket purchases, share sheet for event listings.", tag: "nice" },
+          ]
+        },
+        {
+          label: "polish for the app store",
+          items: [
+            { t: "app icon design (the most reviewed asset you'll ever make — get this right)", tag: "must" },
+            { t: "launch screen + splash assets at every required size", tag: "must" },
+            { t: "screenshot generation for app store + play store (use figma + real data)", tag: "must" },
+            { t: "privacy policy + terms (source.app/privacy + source.app/terms — both required for submission)", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase6",
+      title: "weeks 6–8 · submit + launch",
+      icon: "6", tone: "lav",
+      desc: "goal: submit to both stores, work the review loop, launch together. apple review can take 1-7 days per cycle; budget for 2-3 cycles.",
+      groups: [
+        {
+          label: "submission",
+          items: [
+            { t: "iOS: archive in xcode, upload via transporter, submit for review through app store connect", tag: "must" },
+            { t: "android: signed AAB upload to play console, submit for review", tag: "must" },
+            { t: "respond to apple's questions within 24h. they will have questions. answer warmly + technically.", tag: "must", note: "common rejections: missing privacy policy, account-deletion endpoint not visible, sample login credentials not provided. fix and resubmit fast." },
+          ]
+        },
+        {
+          label: "launch — both stores, same day",
+          items: [
+            { t: "soft launch with 5 hosts you've personally onboarded. one event each, real tickets sold.", tag: "must" },
+            { t: "watch live the first weekend. be at one of the events. take notes on every friction point.", tag: "must" },
+            { t: "fix the top 3 issues in week 7. push hot-fix release if needed.", tag: "must" },
+            { t: "public announcement on instagram + atlanta event newsletters. modest, not hype-y.", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase7",
+      title: "phase 7 · post-launch (months 1-3)",
+      icon: "7", tone: "peach",
+      desc: "goal: get to 20 active hosts + 500 paid tickets. tune the pool. understand what brings buyers back. don't add features yet — observe.",
+      groups: [
+        {
+          label: "operations",
+          items: [
+            { t: "weekly host check-in: 15-min calls with every active host", tag: "must" },
+            { t: "monthly atlanta event report: what's working, what's not, what hosts are asking for", tag: "must" },
+            { t: "track top 3 metrics on a single dashboard: new hosts, paid tickets, pool size", tag: "must" },
+            { t: "first pool award ceremony: in-person, photographed, celebrated. this is your seasonal marketing moment.", tag: "must" },
+          ]
+        },
+        {
+          label: "what NOT to do post-launch",
+          items: [
+            { t: "don't add v2 features (event series, multi-city) until v1 has compounded for 90 days", tag: "must", note: "the temptation will be intense. resist. let the data tell you what to build next, not your roadmap." },
+            { t: "don't expand to a second city until atlanta has 50+ active hosts", tag: "must" },
+            { t: "don't lower the ticket fee 'to grow faster'. you'll never raise it back. price stability = trust.", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase8",
+      title: "phase 8 · agents + claude skills",
+      icon: "✨", tone: "lav",
+      desc: "goal: where AI does the real work (not decoration). built throughout, formalized here. unlike kindred (where agents drive sales outreach), source's agents help hosts make better events.",
+      groups: [
+        {
+          label: "host-facing agents",
+          items: [
+            { t: "event description polisher · host writes 1-2 sentences, agent drafts a richer listing in source's voice", tag: "agent",
+              note: "the #1 quality lever on the marketplace. most hosts can't write listings. give them a 1-tap upgrade.",
+              prompt: "build an event description polisher at apps/hosts/app/api/polish-listing/route.ts. input: {raw_title, raw_description, event_type}. output: {polished_title, polished_description, suggested_tags}.\n\nuse claude api with a system prompt encoding source's voice: lowercase, editorial, no exclamation marks, no marketing speak, specific over abstract. preserve any factual details the host wrote — never invent.\n\nshow the polished version in a 'review + edit' UI before saving. host can accept, edit, or revert. log the original + polished version for future fine-tuning." },
+            { t: "host onboarding agent · walks new hosts through stripe connect setup, first event creation, ticket pricing", tag: "agent",
+              note: "conversational onboarding > 5-step forms. hosts get stuck on stripe — an agent unsticks them in minutes." },
+            { t: "ticket pricing suggester · based on similar atlanta events, suggest a price band", tag: "agent",
+              note: "hosts overprice (no buyers) or underprice (leave money on the table). agent looks at similar past events and recommends. host always overrides." },
+          ]
+        },
+        {
+          label: "buyer-facing agents",
+          items: [
+            { t: "search by vibe · 'something low-key on a friday in east atlanta' → ranked event list", tag: "agent",
+              note: "this is the future of discovery. don't ship it in v1 — but architect for it (event embeddings stored at write time)." },
+            { t: "post-event recap email · agent drafts a 2-sentence recap based on host's notes + photos, asks for rating", tag: "agent",
+              prompt: "build a post-event recap email composer. trigger: 24h after event ends.\n\n1. fetch event details + host's post-event notes (optional field) + any uploaded photos.\n2. claude api drafts: 'recap of [event name]' + 2 sentences referencing specifics from the host's notes.\n3. include 1-5 star rating buttons (each is a one-click mailto: with subject 'rating: N').\n4. one-click unsubscribe.\n5. send via resend from notifications.source.app subdomain.\n\nnever fabricate moments. if host left no notes, draft from event metadata only ('thanks for coming to [event] at [venue]')." },
+          ]
+        },
+        {
+          label: "founder-facing agents",
+          items: [
+            { t: "weekly atlanta state-of-the-marketplace digest · sent to you monday mornings", tag: "agent",
+              note: "what worked this week, what didn't, which hosts are at risk of churning, which events overperformed. composed by claude from the past 7 days of activity. designed for solo-founder context — terse, actionable, no fluff." },
+            { t: "content idea generator · based on this week's atlanta events", tag: "agent",
+              note: "input: the events that happened or are happening. output: 3 ig caption ideas + 2 tiktok hooks. you edit and ship. the agent doesn't post — you do.",
+              prompt: "build a content idea generator at apps/admin/app/api/content-ideas/route.ts. weekly cron, triggers monday morning. \n\n1. fetch events from the past 7 days (with attendance, photos, ratings) and the next 7 days (upcoming).\n2. claude api drafts 3 instagram caption options and 2 tiktok hook ideas based on the actual events.\n3. saved to a new content_drafts table for the founder to review in the content tab.\n4. captions should follow source's voice rules: lowercase, specific, no marketing speak, editorial.\n\nnever fabricate event details. only riff on the real data. if a week has no events, output is empty — no synthetic content." },
+            { t: "host scouting agent · finds atlanta hosts you should meet (not yet automate outreach)", tag: "agent",
+              note: "scrapes public atlanta event listings (instagram explore page, eventbrite atl, partiful, etc) and surfaces hosts you don't yet know about. you decide if they're worth reaching out to. the agent never sends a message — that's your job, in person or via DM." },
+            { t: "post-event sentiment summarizer", tag: "agent",
+              note: "after each event, all the ratings + comments get summarized in one paragraph for the host. helps them improve faster. helps you spot pattern issues across the marketplace." },
+          ]
+        },
+        {
+          label: "claude skills (codebase consistency)",
+          items: [
+            { t: "skill: source-component · enforces the editorial aesthetic on every generated component", tag: "agent",
+              prompt: "create a claude skill at .claude/skills/source-component/SKILL.md that encodes source's design system:\n\n1. font: helvetica neue everywhere. no serif fonts.\n2. all interface text is lowercase. transform via css, never hardcoded.\n3. color tokens: --ink #0a0a0a, --bg #ffffff, --soft #f4f4f2, --hair #e8e8e8. no other colors except photo placeholders.\n4. border radii: max 4px. usually 0. sharp corners are the brand.\n5. no shadows. no gradients. hairline borders only.\n6. spacing scale: 4/8/12/16/20/24/32/40/56/80 px. nothing in between.\n7. typography hierarchy: 44/32/24/18/15/13/11/10 px. use --t-mega through --t-cap.\n8. type ramp: editorial weights 500 for display, 400 for body, 500 for caps with letter-spacing.\n9. animations: 200ms ease. fades only, never bounces.\n10. anti-patterns: emoji, pastel colors, rounded buttons, drop shadows, marketing-speak copy, exclamation points.\n\ntrigger: any UI work on the source codebase." },
+            { t: "skill: source-voice · the lowercase editorial tone rules", tag: "agent",
+              prompt: "create .claude/skills/source-voice/SKILL.md for source's copywriting voice:\n\n1. lowercase interface text everywhere. headlines too.\n2. no exclamation marks. ever.\n3. concrete over abstract. 'jazz on a tuesday' beats 'memorable musical experiences'.\n4. confident, never hyped. 'these are the events we'd go to.' not 'discover amazing events!'.\n5. avoid 'platform', 'community' (the abstract noun), 'experiences', 'curated', 'leverage'.\n6. prefer: 'source', 'host', 'event', 'ticket', 'tonight', 'this weekend', specific times, specific places, specific people.\n7. addressing the host: warm, professional, brief. like a good editor.\n8. addressing the buyer: like a friend who knows the city.\n\ntrigger: any user-facing copy in source." },
+            { t: "skill: source-supabase · marketplace schema + RLS patterns + dormant-tables philosophy", tag: "agent" },
+          ]
+        },
+        {
+          label: "safety rails",
+          items: [
+            { t: "pre-flight check on every host listing: profanity, scam keywords, mismatched dates", tag: "agent" },
+            { t: "automatic refund hold if host hasn't completed stripe connect onboarding when their event happens", tag: "must" },
+            { t: "per-agent cost budget + slack alerts at 80% spend", tag: "must" },
+          ]
+        },
+      ]
+    },
+  ];
+
+const COMPANY = 'source';
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+function renderPhases() {
+  const container = document.getElementById('phases');
+  const saved = JSON.parse(localStorage.getItem(`build-checks-${COMPANY}`) || '{}');
+
+  let totalTasks = 0, doneTasks = 0, phasesDone = 0;
+
+  container.innerHTML = sourcePlan.map(phase => {
+    const taskCount = phase.groups.reduce((n, g) => n + g.items.length, 0);
+    const phaseDone = phase.groups.reduce((n, g) => n + g.items.filter((it, i) => saved[`${phase.id}-${g.label}-${i}`]).length, 0);
+    totalTasks += taskCount;
+    doneTasks += phaseDone;
+    const allPhaseDone = (phaseDone === taskCount && taskCount > 0);
+    if (allPhaseDone) phasesDone++;
+
+    const groupsHtml = phase.groups.map(group => `
+      <div class="phase-group">
+        <div class="phase-group-label">${escapeHtml(group.label)}</div>
+        ${group.items.map((item, i) => {
+          const key = `${phase.id}-${group.label}-${i}`;
+          const isDone = !!saved[key];
+          let extras = '';
+          if (item.note) extras += `<div class="task-note">${escapeHtml(item.note)}</div>`;
+          if (item.link) extras += `<a class="task-link" href="${item.link}" target="_blank" rel="noopener">${escapeHtml(item.link.replace(/^https?:\/\//, '').replace(/\/$/, ''))} ↗</a><br/>`;
+          if (item.prompt)     extras += `<div class="task-prompt">${escapeHtml(item.prompt)}</div>`;
+          if (item.promptBash) extras += `<div class="task-prompt bash">${escapeHtml(item.promptBash)}</div>`;
+          if (item.promptSql)  extras += `<div class="task-prompt sql">${escapeHtml(item.promptSql)}</div>`;
+          if (item.promptEnv)  extras += `<div class="task-prompt env">${escapeHtml(item.promptEnv)}</div>`;
+          return `
+            <div class="task ${isDone ? 'done' : ''}" data-key="${escapeHtml(key)}">
+              <div class="task-check"></div>
+              <div class="task-body">
+                <div class="task-text">${escapeHtml(item.t)}</div>
+                ${extras}
+                ${item.tag ? `<div class="task-meta"><span class="task-tag ${item.tag}">${item.tag.replace('-', ' ')}</span></div>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `).join('');
+
+    return `
+      <div class="phase ${allPhaseDone ? 'done' : ''}" data-phase="${phase.id}">
+        <div class="phase-head" onclick="phaseToggle('${phase.id}')">
+          <div class="phase-num">${escapeHtml(phase.icon)}</div>
+          <div class="phase-info">
+            <div class="phase-title">${escapeHtml(phase.title)}</div>
+            <div class="phase-when">${escapeHtml(phase.desc.slice(0, 110))}${phase.desc.length > 110 ? '…' : ''}</div>
+          </div>
+          <div class="phase-count">${phaseDone}/${taskCount}</div>
+          <div class="phase-chevron">›</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-desc">${escapeHtml(phase.desc)}</div>
+          ${groupsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('phases-done').innerHTML = `${phasesDone}<span class="dim">/8</span>`;
+  document.getElementById('tasks-done').innerHTML = `${doneTasks}<span class="dim">/${totalTasks}</span>`;
+  document.getElementById('top-bar').style.width = totalTasks ? `${(doneTasks/totalTasks)*100}%` : '0%';
+  document.getElementById('portal-phase-count').textContent = `${phasesDone}/8`;
+
+  // Save totals so the Studio shell can read them
+  localStorage.setItem(`build-totals-${COMPANY}`, JSON.stringify({ total: totalTasks, phases: phasesDone }));
+
+  container.querySelectorAll('.task').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('a, .task-prompt')) return;
+      const key = el.dataset.key;
+      const saved = JSON.parse(localStorage.getItem(`build-checks-${COMPANY}`) || '{}');
+      saved[key] = !saved[key];
+      localStorage.setItem(`build-checks-${COMPANY}`, JSON.stringify(saved));
+      renderPhases();
+    });
+  });
+}
+
+function phaseToggle(id) {
+  const el = document.querySelector(`.phase[data-phase="${id}"]`);
+  if (el) el.classList.toggle('open');
+}
+
+function auditShow(slice, btn) {
+  btn.parentElement.querySelectorAll('.strip-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#pane-audit .strip-pane').forEach(p => p.classList.toggle('on', p.id === `audit-${slice}`));
+}
+
+function agentsShow(slice, btn) {
+  btn.parentElement.querySelectorAll('.strip-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#pane-agents .strip-pane').forEach(p => p.classList.toggle('on', p.id === `agents-${slice}`));
+}
+
+// Sidebar nav with lazy iframe load + load-state handling
+document.querySelectorAll('.nav-item[data-pane]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.pane;
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === `pane-${target}`));
+    // Lazy-load iframes on click
+    const iframe = document.querySelector(`#pane-${target} iframe[data-src]`);
+    if (iframe && iframe.src.endsWith('about:blank')) {
+      const loader = iframe.closest('.iframe-wrap')?.querySelector('.iframe-loading');
+      iframe.addEventListener('load', () => {
+        iframe.classList.add('loaded');
+        if (loader) loader.classList.add('gone');
+      }, { once: true });
+      iframe.src = iframe.dataset.src;
+    }
+    document.querySelector('.main').scrollTop = 0;
+  });
+});
+
+renderPhases();
+
+// Eager preload heavy iframes (source-web, source-mobile) in the background
+// after a short delay so the initial portal render isn't blocked
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.querySelectorAll('iframe[data-eager="true"]').forEach(iframe => {
+      if (iframe.src.endsWith('about:blank')) {
+        const loader = iframe.closest('.iframe-wrap')?.querySelector('.iframe-loading');
+        iframe.addEventListener('load', () => {
+          iframe.classList.add('loaded');
+          if (loader) loader.classList.add('gone');
+        }, { once: true });
+        iframe.src = iframe.dataset.src;
+      }
+    });
+  }, 400);
+});
+</script>
+
+</body>
+</html>

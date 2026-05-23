@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>source · pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0D1821;
+    --ink-2: #1f2d3a;
+    --muted: #5a6573;
+    --faint: #8c95a0;
+    --fainter: #b8bec6;
+    --hair: #e6e8eb;
+    --hair-2: #eff1f3;
+    --bg: #ffffff;
+    --soft: #f7f8f8;
+    --softer: #fafbfb;
+    --sage: #BFCC94;
+    --sage-deep: #97a570;
+    --sage-soft: #e9eed8;
+    --sans: "Helvetica Neue", "Inter", -apple-system, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: var(--sans); color: var(--ink); background: #050709;
+    -webkit-font-smoothing: antialiased; line-height: 1.4;
+    letter-spacing: -0.015em;
+    display: flex; align-items: center; justify-content: center;
+    text-transform: lowercase;
+  }
+
+  .deck { width: 100%; height: 100vh; position: relative; }
+  .slide {
+    position: absolute; inset: 0; background: var(--bg);
+    display: none; padding: 64px 90px 90px;
+    overflow-y: auto;
+    flex-direction: column; justify-content: center;
+  }
+  .slide.active { display: flex; }
+  @media (max-width: 768px) { .slide { padding: 32px 28px 80px; } }
+
+  .slide-num {
+    position: absolute; top: 28px; left: 36px;
+    font-size: 10.5px; color: var(--muted); letter-spacing: 0.12em;
+    font-weight: 400;
+  }
+  .slide-brand {
+    position: absolute; top: 28px; right: 36px;
+    font-size: 16px; font-weight: 400; letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .slide-brand::after { content: "."; color: var(--sage-deep); }
+
+  /* Nav */
+  .nav {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(13, 24, 33, 0.92);
+    padding: 8px 14px; border-radius: 999px;
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+  .nav button {
+    background: transparent; border: none; color: rgba(255,255,255,0.7);
+    font-family: inherit; font-size: 15px;
+    cursor: pointer; padding: 4px 6px; border-radius: 4px;
+    transition: color 0.15s;
+  }
+  .nav button:hover { color: #fff; }
+  .nav .dots { display: flex; gap: 5px; }
+  .nav .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .nav .dot.active { background: var(--sage); }
+  .nav .counter {
+    color: rgba(255,255,255,0.55); font-size: 10.5px;
+    letter-spacing: 0.06em; padding: 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Typography */
+  .eyebrow {
+    font-size: 11px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.14em;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: 76px; font-weight: 300;
+    letter-spacing: -0.045em;
+    line-height: 0.98; margin-bottom: 24px;
+  }
+  h1 .sage { color: var(--sage-deep); }
+  h2 {
+    font-size: 44px; font-weight: 300;
+    letter-spacing: -0.035em;
+    line-height: 1.05; margin-bottom: 24px;
+    max-width: 880px;
+  }
+  h2 em { font-style: normal; color: var(--sage-deep); }
+  h3 {
+    font-size: 14px; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 14px;
+  }
+  .lede {
+    font-size: 20px; font-weight: 300;
+    color: var(--ink-2);
+    line-height: 1.45; letter-spacing: -0.015em;
+    max-width: 720px; margin-bottom: 32px;
+  }
+  @media (max-width: 768px) {
+    h1 { font-size: 48px; }
+    h2 { font-size: 30px; }
+    .lede { font-size: 16px; margin-bottom: 24px; }
+  }
+
+  /* Slide 1 cover */
+  .cover { align-items: flex-start; }
+  .cover .wordmark {
+    font-size: 200px; font-weight: 300;
+    letter-spacing: -0.05em; line-height: 0.9;
+    margin-bottom: 24px;
+  }
+  .cover .wordmark::after { content: "."; color: var(--sage-deep); }
+  .cover .tagline {
+    font-size: 24px; font-weight: 300;
+    color: var(--muted);
+    letter-spacing: -0.02em;
+    max-width: 620px; margin-bottom: 36px;
+  }
+  .cover .signoff {
+    font-size: 13px; color: var(--muted); letter-spacing: 0;
+  }
+  .cover .signoff strong { color: var(--ink); font-weight: 500; }
+  @media (max-width: 768px) {
+    .cover .wordmark { font-size: 110px; }
+    .cover .tagline { font-size: 17px; }
+  }
+
+  /* Slide 2 problem */
+  .problem-cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; margin-top: 8px; max-width: 880px;
+  }
+  @media (max-width: 768px) { .problem-cols { grid-template-columns: 1fr; gap: 24px; } }
+  .problem-col {
+    border-left: 2px solid var(--sage); padding-left: 20px;
+  }
+  .problem-col .who {
+    font-size: 11px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--sage-deep); margin-bottom: 8px;
+  }
+  .problem-col .what {
+    font-size: 17px; font-weight: 400;
+    color: var(--ink-2); line-height: 1.5;
+    letter-spacing: -0.01em; margin-bottom: 12px;
+  }
+  .problem-col .quote {
+    font-size: 13px; color: var(--muted);
+    font-style: italic; line-height: 1.5;
+  }
+
+  /* Slide 3 solution */
+  .solution-quote {
+    font-size: 32px; font-weight: 300;
+    color: var(--ink); letter-spacing: -0.025em;
+    line-height: 1.25; max-width: 880px;
+    margin-bottom: 16px;
+    border-left: 3px solid var(--sage);
+    padding-left: 24px;
+  }
+  .solution-quote em { font-style: normal; color: var(--sage-deep); }
+  .solution-tag {
+    font-size: 12px; color: var(--muted);
+    letter-spacing: 0.04em; padding-left: 27px;
+  }
+
+  /* Slide 4 how it works */
+  .how-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px; margin-top: 8px; max-width: 1000px;
+  }
+  @media (max-width: 768px) { .how-row { grid-template-columns: 1fr; } }
+  .how-card {
+    border: 1px solid var(--hair);
+    border-radius: 12px;
+    padding: 26px 24px; background: var(--softer);
+  }
+  .how-card .step {
+    font-size: 11px; color: var(--sage-deep);
+    letter-spacing: 0.12em; font-weight: 500;
+    margin-bottom: 12px; text-transform: uppercase;
+  }
+  .how-card .title {
+    font-size: 20px; font-weight: 500;
+    margin-bottom: 10px; letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .how-card .body {
+    font-size: 13.5px; color: var(--ink-2);
+    line-height: 1.55; margin-bottom: 12px;
+  }
+  .how-card .detail {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.5;
+    padding-top: 10px;
+    border-top: 1px solid var(--hair);
+  }
+
+  /* Slide 5 market */
+  .market-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; max-width: 880px;
+    align-items: flex-start;
+  }
+  @media (max-width: 768px) { .market-row { grid-template-columns: 1fr; gap: 24px; } }
+  .market-num {
+    font-size: 88px; font-weight: 200;
+    letter-spacing: -0.04em;
+    color: var(--ink); line-height: 1; margin-bottom: 10px;
+  }
+  .market-num .sage { color: var(--sage-deep); }
+  .market-num .small { font-size: 32px; color: var(--muted); }
+  .market-label {
+    font-size: 12px; letter-spacing: 0.08em;
+    color: var(--muted); text-transform: uppercase;
+    font-weight: 500; margin-bottom: 14px;
+  }
+  .market-body {
+    font-size: 15px; color: var(--ink-2);
+    line-height: 1.6; max-width: 380px;
+  }
+
+  /* Slide 6 business model */
+  .money-row {
+    display: grid; grid-template-columns: 160px 1fr;
+    gap: 32px; padding: 22px 0;
+    border-bottom: 1px solid var(--hair);
+    align-items: baseline; max-width: 880px;
+  }
+  .money-row:last-child { border: none; }
+  .money-row .num {
+    font-size: 52px; font-weight: 300;
+    letter-spacing: -0.04em;
+    color: var(--ink); line-height: 1;
+  }
+  .money-row .num .small { font-size: 22px; color: var(--muted); }
+  .money-row .label {
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 6px; font-weight: 500;
+  }
+  .money-row .desc {
+    font-size: 14.5px; color: var(--ink-2); line-height: 1.5;
+  }
+
+  /* Slide 7 traction */
+  .traction-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 14px; max-width: 880px;
+  }
+  @media (max-width: 768px) { .traction-grid { grid-template-columns: 1fr; } }
+  .traction-card {
+    border: 1px solid var(--hair);
+    border-radius: 12px; padding: 22px 24px;
+  }
+  .traction-card .label {
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--sage-deep); text-transform: uppercase;
+    font-weight: 500; margin-bottom: 10px;
+  }
+  .traction-card .body {
+    font-size: 15px; color: var(--ink);
+    line-height: 1.5; letter-spacing: -0.01em;
+    font-weight: 400;
+  }
+  .traction-card .body .sub {
+    display: block; font-size: 12.5px; color: var(--muted);
+    margin-top: 6px; font-weight: 400;
+  }
+
+  /* Slide 8 wedge */
+  .wedge-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px; max-width: 920px;
+  }
+  @media (max-width: 768px) { .wedge-grid { grid-template-columns: 1fr; } }
+  .wedge-card {
+    padding: 26px 28px;
+    border: 1px solid var(--hair); border-radius: 12px;
+  }
+  .wedge-card.us { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .wedge-card .label {
+    font-size: 11px; letter-spacing: 0.1em;
+    font-weight: 500; margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .wedge-card.them .label { color: var(--muted); }
+  .wedge-card.us .label { color: var(--sage); }
+  .wedge-card p {
+    font-size: 14px; line-height: 1.55;
+    letter-spacing: -0.005em; margin-bottom: 10px;
+  }
+  .wedge-card p:last-child { margin-bottom: 0; }
+  .wedge-card.them p { color: var(--ink-2); }
+  .wedge-card.us p { color: rgba(255,255,255,0.85); }
+  .wedge-card p::before { content: "— "; color: var(--muted); }
+  .wedge-card.us p::before { color: var(--sage); }
+
+  /* Slide 9 roadmap */
+  .road-row {
+    display: grid; grid-template-columns: 140px 1fr;
+    gap: 28px; padding: 22px 0;
+    border-bottom: 1px solid var(--hair);
+    align-items: baseline; max-width: 880px;
+  }
+  .road-row:last-child { border: none; }
+  .road-when {
+    font-size: 13px; font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--sage-deep); text-transform: uppercase;
+  }
+  .road-content strong {
+    display: block; font-size: 18px; font-weight: 500;
+    color: var(--ink); margin-bottom: 6px;
+    letter-spacing: -0.015em;
+  }
+  .road-content span {
+    font-size: 13.5px; color: var(--muted); line-height: 1.55;
+  }
+
+  /* Slide 10 team */
+  .team-card-pitch {
+    display: grid; grid-template-columns: 96px 1fr;
+    gap: 28px; align-items: flex-start; max-width: 720px;
+  }
+  .team-avatar {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sage-soft), var(--sage));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 300;
+    color: var(--sage-deep); letter-spacing: -0.04em;
+  }
+  .team-name-row {
+    font-size: 28px; font-weight: 300;
+    letter-spacing: -0.025em; color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .team-role {
+    font-size: 13px; letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sage-deep); font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .team-bio {
+    font-size: 14.5px; color: var(--ink-2); line-height: 1.65;
+  }
+  .team-bio p { margin-bottom: 10px; }
+  .team-bio p:last-child { margin-bottom: 0; }
+
+  /* Slide 11 ask */
+  .ask-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; max-width: 1000px; margin-top: 8px;
+  }
+  @media (max-width: 768px) { .ask-grid { grid-template-columns: 1fr; } }
+  .ask-card {
+    background: var(--ink); color: #fff;
+    border-radius: 12px; padding: 28px 26px;
+  }
+  .ask-card .num {
+    font-size: 11px; letter-spacing: 0.1em;
+    color: var(--sage); margin-bottom: 14px; font-weight: 500;
+  }
+  .ask-card .who {
+    font-size: 22px; font-weight: 400;
+    letter-spacing: -0.02em; margin-bottom: 10px;
+  }
+  .ask-card .what {
+    font-size: 13.5px; color: rgba(255,255,255,0.75); line-height: 1.55;
+  }
+
+  /* Slide 12 close */
+  .close { align-items: flex-start; }
+  .close h1 { font-size: 88px; }
+  .close .signoff {
+    font-size: 16px; color: var(--muted);
+    margin-top: 36px; line-height: 1.6; max-width: 540px;
+  }
+  .close .signoff strong { color: var(--ink); font-weight: 500; }
+  .close .contact {
+    margin-top: 24px; font-size: 14px; color: var(--ink);
+    border-top: 1px solid var(--hair);
+    padding-top: 20px; max-width: 380px;
+  }
+  .close .contact div { padding: 4px 0; }
+  .close .contact .lab {
+    color: var(--muted); display: inline-block; width: 80px;
+  }
+
+  /* Animation */
+  .slide.active > *:not(.slide-num):not(.slide-brand) {
+    animation: rise 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+  }
+  .slide.active > *:nth-child(3) { animation-delay: 0.06s; }
+  .slide.active > *:nth-child(4) { animation-delay: 0.12s; }
+  .slide.active > *:nth-child(5) { animation-delay: 0.18s; }
+  .slide.active > *:nth-child(6) { animation-delay: 0.24s; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- 01 COVER -->
+  <section class="slide active cover" data-slide="1">
+    <div class="slide-num">01 — cover</div>
+    <div class="slide-brand">source</div>
+    <div class="wordmark">source</div>
+    <div class="tagline">an editorial events app for atlanta. find what's happening. buy a ticket. host the next one.</div>
+    <div class="signoff"><strong>diana</strong> · founder · atlanta · 2026</div>
+  </section>
+
+  <!-- 02 PROBLEM -->
+  <section class="slide" data-slide="2">
+    <div class="slide-num">02 — the problem</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">why this exists</div>
+    <h2>atlanta has a culture problem — it isn't a lack of events. it's a lack of <em>discovery</em>.</h2>
+    <p class="lede">listening sessions, supper clubs, art shows, small concerts. they're happening. they're great. and people find out about them after they're over — in screenshots, in someone else's story, in a group chat they weren't part of.</p>
+    <div class="problem-cols">
+      <div class="problem-col">
+        <div class="who">attendees</div>
+        <div class="what">the great stuff doesn't surface. eventbrite shows sponsored listings. instagram buries them in stories.</div>
+        <div class="quote">"i would've gone if i'd known."</div>
+      </div>
+      <div class="problem-col">
+        <div class="who">hosts</div>
+        <div class="what">they're posting on three platforms and it's still mostly friends-of-friends showing up. no growth, no analytics, no payout that doesn't take 9%.</div>
+        <div class="quote">"i love throwing it but i can't keep doing this for free."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 SOLUTION -->
+  <section class="slide" data-slide="3">
+    <div class="slide-num">03 — the product</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">what we built</div>
+    <div class="solution-quote">an events app for atlanta that treats events like <em>culture</em>, not commerce.</div>
+    <div class="solution-tag">editorial discovery · two-tap ticketing · host tools that don't feel like saas</div>
+    <p class="lede" style="margin-top: 40px;">source is a curated atlanta-only events app. native ios + android at launch. one place to find what's happening tonight, buy a ticket without ten layers of fees, and — if you're hosting — get the tools to make your next event bigger than your group chat.</p>
+  </section>
+
+  <!-- 04 HOW IT WORKS -->
+  <section class="slide" data-slide="4">
+    <div class="slide-num">04 — how it works</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">three motions, one app</div>
+    <h2>find. buy. host.</h2>
+    <div class="how-row">
+      <div class="how-card">
+        <div class="step">01 — find</div>
+        <div class="title">editorial discovery</div>
+        <div class="body">tonight, this week, by neighborhood, by vibe. real human curation, not algorithmic mush.</div>
+        <div class="detail">launch surfaces: tonight · this weekend · supper clubs · listening · art · neighborhood pages (cabbagetown, west end, virginia-highland).</div>
+      </div>
+      <div class="how-card">
+        <div class="step">02 — buy</div>
+        <div class="title">two-tap ticketing</div>
+        <div class="body">apple pay in two taps. no eventbrite-tier fees stacked on top.</div>
+        <div class="detail">10% platform fee + $0.99 flat (or pass-through to attendee). transparent on every listing.</div>
+      </div>
+      <div class="how-card">
+        <div class="step">03 — host</div>
+        <div class="title">host dashboard</div>
+        <div class="body">a tool for the people throwing it. attendee list, payouts, recap, repeat-event templates.</div>
+        <div class="detail">stripe connect for direct payouts (no waiting). quarterly host prize pool funded by platform fees — top-rated host wins.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 MARKET -->
+  <section class="slide" data-slide="5">
+    <div class="slide-num">05 — market</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">why atlanta first</div>
+    <h2>atlanta is the right wedge — culture-rich, mid-sized, underserved.</h2>
+    <div class="market-row">
+      <div>
+        <div class="market-label">atlanta metro population</div>
+        <div class="market-num">6.3<span class="small">M</span></div>
+        <div class="market-body">large enough to sustain a marketplace. small enough that hosts and attendees move in overlapping circles — word of mouth still works as a growth channel.</div>
+      </div>
+      <div>
+        <div class="market-label">events ticketing market · us</div>
+        <div class="market-num">$32<span class="small">B</span></div>
+        <div class="market-body">eventbrite, ticketmaster, partiful, posh, dice, etc. fragmented at the small-event end (under 500 attendees). that's the gap.</div>
+      </div>
+    </div>
+    <p class="lede" style="margin-top: 32px;">expansion order: atlanta → nashville → austin → new orleans. cities with strong local culture, walkable cores, and an active host class. multi-city architecture is in the v1 schema.</p>
+  </section>
+
+  <!-- 06 BUSINESS MODEL -->
+  <section class="slide" data-slide="6">
+    <div class="slide-num">06 — how it makes money</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">business model</div>
+    <h2>simple ticket fees. a quarter of every dollar goes back to hosts.</h2>
+    <div style="margin-top: 12px;">
+      <div class="money-row">
+        <div class="num">10<span class="small">%</span></div>
+        <div>
+          <div class="label">platform fee</div>
+          <div class="desc">on every ticket. paid by the host out of price, or passed to the attendee at checkout. transparent.</div>
+        </div>
+      </div>
+      <div class="money-row">
+        <div class="num">$0.99</div>
+        <div>
+          <div class="label">flat per-ticket</div>
+          <div class="desc">covers stripe + infrastructure. hosts can price into ticket cost. no surprise fees on either side.</div>
+        </div>
+      </div>
+      <div class="money-row">
+        <div class="num">25<span class="small">%</span></div>
+        <div>
+          <div class="label">of fees → quarterly host prize pool</div>
+          <div class="desc">top-rated atlanta host wins it every three months. our reputation depends on hosts winning, not on us extracting.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 TRACTION -->
+  <section class="slide" data-slide="7">
+    <div class="slide-num">07 — what exists today</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">where we are</div>
+    <h2>prototype built. atlanta network forming.</h2>
+    <div class="traction-grid">
+      <div class="traction-card">
+        <div class="label">product</div>
+        <div class="body">native ios + android prototype<span class="sub">find, buy, host flows clickable end-to-end. capacitor + react.</span></div>
+      </div>
+      <div class="traction-card">
+        <div class="label">brand</div>
+        <div class="body">complete identity, voice, marketing site<span class="sub">editorial direction settled. brand voice doc + content style guide ready.</span></div>
+      </div>
+      <div class="traction-card">
+        <div class="label">network</div>
+        <div class="body">~15 atlanta hosts on the warm list<span class="sub">friends-of-friends running real events. ready to be the first wave.</span></div>
+      </div>
+      <div class="traction-card">
+        <div class="label">build plan</div>
+        <div class="body">8 weeks to live in both app stores<span class="sub">supabase, stripe connect, capacitor wrap. clear path. no unknowns.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 WEDGE / COMPETITION -->
+  <section class="slide" data-slide="8">
+    <div class="slide-num">08 — why us, why now</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">the wedge</div>
+    <h2>everyone else built a marketplace. we're building a <em>magazine</em> that happens to sell tickets.</h2>
+    <div class="wedge-grid">
+      <div class="wedge-card them">
+        <div class="label">eventbrite · ticketmaster · partiful · dice</div>
+        <p>built for global scale. faceless infrastructure. extract value from the host.</p>
+        <p>"discover events" surfaces sponsored listings, then a search box.</p>
+        <p>no point of view. no city ever feels like itself.</p>
+        <p>fee stacks (service fee, processing, "all-in pricing" footnote) erode attendee trust.</p>
+      </div>
+      <div class="wedge-card us">
+        <div class="label">source</div>
+        <p>local-first. atlanta only at launch. one city done well before any second.</p>
+        <p>"tonight" is a real curated page someone wrote, not an algorithm.</p>
+        <p>host wins. quarterly prize means our incentives are aligned with theirs — not extractive.</p>
+        <p>one fee, transparent, every time. no stacking.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 ROADMAP -->
+  <section class="slide" data-slide="9">
+    <div class="slide-num">09 — roadmap</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">what's next</div>
+    <h2>v1 → v2 → second city, in that order.</h2>
+    <div style="margin-top: 12px;">
+      <div class="road-row">
+        <div class="road-when">v1 · fall '26</div>
+        <div class="road-content">
+          <strong>launch in atlanta</strong>
+          <span>find · buy · host. native ios + android. ~50 events listed week one. content from day one. first tickets sold month one.</span>
+        </div>
+      </div>
+      <div class="road-row">
+        <div class="road-when">v1.5 · winter</div>
+        <div class="road-content">
+          <strong>attendee accounts + event series</strong>
+          <span>save events. follow hosts. repeat-event templates. first quarterly host prize awarded.</span>
+        </div>
+      </div>
+      <div class="road-row">
+        <div class="road-when">v2 · spring '27</div>
+        <div class="road-content">
+          <strong>multi-city expansion</strong>
+          <span>nashville first. infrastructure already supports cities — flip a feature flag, hire one curator per city. open calls launch (hosts apply to throw curated source events).</span>
+        </div>
+      </div>
+      <div class="road-row">
+        <div class="road-when">long arc</div>
+        <div class="road-content">
+          <strong>the city network</strong>
+          <span>5-10 cities. recognizable editorial voice. the platform people in those cities use to find what's actually happening. hosts who win source's prize are local celebrities.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 TEAM -->
+  <section class="slide" data-slide="10">
+    <div class="slide-num">10 — team</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">who's building this</div>
+    <h2>solo founder. atlanta-grown.</h2>
+    <div class="team-card-pitch" style="margin-top: 12px;">
+      <div class="team-avatar">d</div>
+      <div>
+        <div class="team-name-row">diana</div>
+        <div class="team-role">founder · engineering + design</div>
+        <div class="team-bio">
+          <p>georgia tech, engineering and design. a few years in tech before this.</p>
+          <p>spent years helping friends-of-friends throw atlanta events — listening nights, supper clubs, art shows. saw the same problem every time: great event, no way to find it, no real tools to run it.</p>
+          <p>building source as one person with a clear point of view, because that's the wedge. solo founder = consistent editorial voice = a magazine, not a marketplace.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 ASK -->
+  <section class="slide" data-slide="11">
+    <div class="slide-num">11 — what i'm looking for</div>
+    <div class="slide-brand">source</div>
+    <div class="eyebrow">the ask</div>
+    <h2>three ways you can help right now.</h2>
+    <div class="ask-grid">
+      <div class="ask-card">
+        <div class="num">01</div>
+        <div class="who">host an event</div>
+        <div class="what">if you run anything in atlanta — a listening session, a supper club, a workshop — be one of the first 25 hosts on source at launch. you'd help shape the host tools by using them first.</div>
+      </div>
+      <div class="ask-card">
+        <div class="num">02</div>
+        <div class="who">attend an early demo</div>
+        <div class="what">join the first wave of testers. you'll see the product before launch, give feedback that actually shapes it, and have first-look access to events.</div>
+      </div>
+      <div class="ask-card">
+        <div class="num">03</div>
+        <div class="who">connect me to someone</div>
+        <div class="what">a host who needs better tools. a writer who knows atlanta culture. an investor who funds consumer apps with strong design. introductions go further than money right now.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 CLOSE -->
+  <section class="slide close" data-slide="12">
+    <div class="slide-num">12 — let's talk</div>
+    <div class="slide-brand">source</div>
+    <h1>building <span class="sage">now</span>.</h1>
+    <p class="lede">launching in atlanta this fall. native ios + android. content from day one. real hosts paying real fees in month one.</p>
+    <div class="signoff">
+      thank you for reading. <strong>source</strong> is being built with the city it's for in mind — atlanta has the culture, it deserves the tools.
+    </div>
+    <div class="contact">
+      <div><span class="lab">founder</span>diana</div>
+      <div><span class="lab">city</span>atlanta, ga</div>
+      <div><span class="lab">timeline</span>fall 2026 launch</div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Nav -->
+<div class="nav">
+  <button onclick="goSlide(-1)">←</button>
+  <div class="dots" id="dots"></div>
+  <span class="counter"><span id="n">01</span> / 12</span>
+  <button onclick="goSlide(1)">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const dotsContainer = document.getElementById('dots');
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('span');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => setSlide(i);
+    dotsContainer.appendChild(d);
+  }
+  const dots = document.querySelectorAll('.dot');
+  const n = document.getElementById('n');
+
+  let current = 0;
+  function setSlide(i) {
+    if (i < 0 || i >= total) return;
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = i;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    n.textContent = String(current + 1).padStart(2, '0');
+    slides[current].scrollTop = 0;
+  }
+  function goSlide(d) { setSlide(current + d); }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goSlide(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goSlide(-1); }
+  });
+</script>
+
+</body>
+</html>

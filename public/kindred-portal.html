@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kindred · Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0D1821;
+    --ink-2: #1f2d3a;
+    --muted: #5a6573;
+    --faint: #8c95a0;
+    --fainter: #b8bec6;
+    --hair: #e6e8eb;
+    --hair-2: #eff1f3;
+    --bg: #ffffff;
+    --paper: #ffffff;
+    --soft: #f7f8f8;
+    --softer: #fafbfb;
+    --sidebar: #fafbfb;
+    --sage: #BFCC94;
+    --sage-deep: #97a570;
+    --sage-soft: #e9eed8;
+    --blush: #E6AACE;
+    --blush-soft: #f6e2ee;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
+
+    --font: "Calibre", "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    line-height: 1.47;
+    height: 100vh;
+    overflow: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 256px 1fr;
+    height: 100vh;
+  }
+  @media (max-width: 800px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--sidebar);
+    border-right: 1px solid var(--hair-2);
+    padding: 16px 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .back-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; margin-bottom: 14px;
+    font-size: 12px; color: var(--muted);
+    border-radius: 6px;
+    transition: background 0.12s;
+  }
+  .back-link:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
+  .portal-brand {
+    padding: 8px 8px 18px 8px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .portal-brand-logo {
+    display: inline-flex; align-items: center; gap: 12px;
+    line-height: 1;
+  }
+  .portal-brand-logo.kindred {
+    font-family: "Fraunces", Georgia, serif;
+    color: #b85e25;
+    font-size: 30px; font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+  .portal-brand-logo.kindred::before {
+    content: "";
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #E29449;
+  }
+  .portal-brand-logo.kindred em { font-style: italic; color: #E29449; }
+  .portal-brand-sub {
+    font-size: 11px; color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .nav-group { margin-bottom: 18px; }
+  .nav-group-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0 8px 6px 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 9px; border-radius: 7px;
+    color: var(--ink-2); font-size: 13.5px;
+    font-weight: 500; cursor: pointer; width: 100%;
+    text-align: left; border: none; background: transparent;
+    letter-spacing: -0.005em;
+    transition: background 0.12s;
+  }
+  .nav-item:hover { background: rgba(0,0,0,0.04); }
+  .nav-item.active { background: rgba(0,0,0,0.06); color: var(--ink); }
+  .nav-item-icon {
+    width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-item-icon { color: var(--ink); }
+  .nav-item-count {
+    margin-left: auto;
+    font-size: 11px; color: var(--muted);
+    background: rgba(0,0,0,0.05); padding: 1px 6px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .sidebar-foot {
+    margin-top: auto; padding: 16px 8px 4px;
+    border-top: 1px solid var(--hair-2);
+    font-size: 11px; color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Main */
+  .main {
+    overflow-y: auto;
+    height: 100vh;
+    background: var(--bg);
+  }
+  .main-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 36px 48px 80px;
+  }
+  @media (max-width: 700px) { .main-inner { padding: 28px 24px 60px; } }
+  .iframe-full {
+    height: 100%; width: 100%;
+    border: none; display: block;
+    opacity: 0; transition: opacity 0.22s ease;
+  }
+  .iframe-full.loaded { opacity: 1; }
+  .iframe-shell {
+    height: 100vh;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .iframe-wrap {
+    flex: 1; position: relative; overflow: hidden;
+    background: var(--bg);
+  }
+  .iframe-loading {
+    position: absolute; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5; pointer-events: none;
+    transition: opacity 0.18s ease;
+  }
+  .iframe-loading.gone { opacity: 0; }
+  .iframe-loading-text {
+    font-size: 12px; color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .iframe-loading-text::before {
+    content: ""; display: inline-block;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--sage);
+    margin-right: 10px;
+    vertical-align: 0px;
+    animation: pulse-load 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse-load {
+    0%, 100% { opacity: 0.3; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+  .iframe-bar {
+    padding: 10px 16px;
+    background: var(--soft);
+    border-bottom: 1px solid var(--hair-2);
+    font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .iframe-bar a {
+    color: var(--ink); font-weight: 500;
+    border: 1px solid var(--hair);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px;
+  }
+  .iframe-bar a:hover { background: var(--paper); }
+
+  .pane { display: none; }
+  .pane.on { display: block; }
+  .pane.iframe-pane.on { display: flex; flex-direction: column; height: 100vh; }
+
+  .pane-head {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .pane-eyebrow {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 8px;
+  }
+  .pane-title {
+    font-size: 32px; font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 10px;
+  }
+  .pane-sub {
+    font-size: 15px; color: var(--ink-2);
+    line-height: 1.55; max-width: 620px;
+  }
+
+  /* Progress topline */
+  .progress-top {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 20px;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 20px; align-items: center;
+  }
+  .progress-top-stats { display: flex; gap: 28px; }
+  .progress-stat-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .progress-stat-value {
+    font-size: 24px; font-weight: 700;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-stat-value .dim { color: var(--fainter); font-weight: 400; }
+  .progress-top-bar {
+    width: 220px; height: 6px; background: var(--soft);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress-top-bar-fill {
+    height: 100%; background: var(--sage-deep);
+    transition: width 0.4s ease;
+  }
+
+  /* Phases */
+  .phases { display: flex; flex-direction: column; gap: 10px; }
+  .phase {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .phase-head {
+    padding: 18px 22px;
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer; user-select: none;
+    transition: background 0.15s;
+  }
+  .phase-head:hover { background: var(--softer); }
+  .phase-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--soft); color: var(--ink-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .phase.done .phase-num {
+    background: var(--sage); color: var(--ink);
+  }
+  .phase-info { flex: 1; }
+  .phase-title {
+    font-size: 15px; font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+  .phase-when { font-size: 12px; color: var(--muted); }
+  .phase-count {
+    font-size: 11.5px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    background: var(--soft); padding: 3px 9px;
+    border-radius: 4px;
+  }
+  .phase-chevron {
+    color: var(--fainter); font-size: 16px;
+    transition: transform 0.2s;
+  }
+  .phase.open .phase-chevron { transform: rotate(90deg); }
+  .phase-body {
+    display: none;
+    padding: 0 22px 22px 70px;
+    border-top: 1px solid var(--hair-2);
+  }
+  .phase.open .phase-body { display: block; }
+  .phase-desc {
+    font-size: 13.5px; color: var(--ink-2);
+    line-height: 1.6;
+    padding: 14px 0 4px;
+    margin-bottom: 12px;
+  }
+  .phase-group { margin-top: 14px; }
+  .phase-group-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 8px;
+  }
+  .task {
+    display: flex; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid var(--hair-2);
+    cursor: pointer;
+  }
+  .task:last-child { border-bottom: none; }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--hair);
+    flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff;
+    transition: all 0.12s;
+  }
+  .task.done .task-check { background: var(--sage); border-color: var(--sage-deep); }
+  .task.done .task-check::after { content: "✓"; color: var(--ink); font-size: 11px; font-weight: 700; }
+  .task-body { flex: 1; min-width: 0; }
+  .task-text {
+    font-size: 13.5px; color: var(--ink);
+    line-height: 1.5; font-weight: 500;
+  }
+  .task.done .task-text { color: var(--muted); text-decoration: line-through; }
+  .task-note {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.5; margin-top: 4px;
+  }
+  .task-meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .task-tag {
+    font-size: 9.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 2px 7px; border-radius: 3px;
+    background: var(--soft); color: var(--muted);
+  }
+  .task-tag.must { background: var(--blush-soft); color: var(--ink-2); }
+  .task-tag.nice { background: var(--sage-soft); color: var(--sage-deep); }
+  .task-tag.later { background: var(--soft); color: var(--muted); }
+  .task-tag.agent { background: var(--ink); color: var(--sage); }
+  .task-tag.agent::before { content: "✨ "; }
+  .task-link {
+    font-size: 11.5px; color: var(--muted);
+    margin-top: 4px;
+    display: inline-block;
+    border-bottom: 1px dotted var(--hair);
+  }
+  .task-link:hover { color: var(--ink); border-color: var(--ink); }
+  .task-prompt {
+    background: var(--ink); color: #f5f5f7;
+    border-radius: 8px; padding: 14px 14px 12px;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11.5px; line-height: 1.6;
+    white-space: pre-wrap; overflow-x: auto;
+    position: relative;
+  }
+  .task-prompt::before {
+    content: "claude code prompt";
+    position: absolute; top: -8px; left: 12px;
+    background: var(--ink); color: var(--sage);
+    padding: 2px 7px; border-radius: 3px;
+    font-family: var(--font); font-size: 9px;
+    font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .task-prompt.bash::before { content: "terminal"; }
+  .task-prompt.sql::before { content: "supabase sql"; }
+  .task-prompt.env::before { content: ".env.local"; }
+
+  /* Tab strips for audit + agents */
+  .strip-tabs {
+    display: flex; gap: 4px; margin-bottom: 22px;
+    background: var(--soft); padding: 4px; border-radius: 10px;
+    width: fit-content; flex-wrap: wrap;
+  }
+  .strip-tab {
+    padding: 7px 14px; border-radius: 7px;
+    background: transparent; color: var(--muted);
+    border: none; font-size: 12.5px; font-weight: 500;
+    cursor: pointer;
+  }
+  .strip-tab.active {
+    background: var(--paper); color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .strip-pane { display: none; }
+  .strip-pane.on { display: block; }
+
+  /* Risk cards */
+  .risk {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-left: 3px solid var(--hair);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 12px;
+  }
+  .risk.high { border-left-color: var(--ink); }
+  .risk.medium { border-left-color: var(--muted); }
+  .risk.low { border-left-color: var(--fainter); }
+  .risk-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .risk-level {
+    font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 3px 8px; border-radius: 3px;
+  }
+  .risk-level.high { background: var(--ink); color: #fff; }
+  .risk-level.medium { background: var(--soft); color: var(--ink); border: 1px solid var(--hair); }
+  .risk-level.low { background: transparent; color: var(--muted); border: 1px solid var(--hair); }
+  .risk-title {
+    font-size: 16px; font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+  .risk-body {
+    font-size: 13.5px; color: var(--ink-2);
+    line-height: 1.6;
+  }
+  .risk-body strong { color: var(--ink); font-weight: 600; }
+  .risk-body code {
+    font-family: var(--mono); font-size: 12px;
+    background: var(--soft); padding: 1px 5px;
+    border-radius: 4px; color: var(--ink);
+  }
+  .risk-fix {
+    margin-top: 12px; padding: 12px 14px;
+    background: var(--soft); border-radius: 8px;
+    font-size: 13px; line-height: 1.55;
+  }
+  .risk-fix::before {
+    content: "FIX  ·  "; font-size: 10px; font-weight: 700;
+    color: var(--ink); letter-spacing: 0.06em;
+  }
+
+  /* Schema */
+  .schema-table {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .schema-table-head {
+    background: var(--soft);
+    padding: 12px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .schema-table-head strong {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .schema-pill {
+    font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 2px 8px; border-radius: 3px;
+  }
+  .schema-pill.v1 { background: var(--ink); color: #fff; }
+  .schema-pill.v2 { background: var(--soft); color: var(--ink); border: 1px solid var(--hair); }
+  .schema-pill.add { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+  .schema-pill.dormant { background: var(--blush-soft); color: var(--ink-2); }
+  .schema-row {
+    display: grid; grid-template-columns: 220px 140px 1fr;
+    gap: 16px; padding: 9px 18px; align-items: center;
+    border-top: 1px solid var(--hair-2);
+    font-size: 12.5px;
+  }
+  .schema-row code {
+    font-family: var(--mono); font-size: 12px; color: var(--ink);
+    background: var(--soft); padding: 2px 6px; border-radius: 4px;
+  }
+  .schema-row .type {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+  .schema-row .note { color: var(--ink-2); line-height: 1.5; }
+
+  /* Flow */
+  .flow {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 26px;
+    margin-bottom: 12px;
+  }
+  .flow h4 {
+    font-size: 16px; font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-bottom: 14px;
+  }
+  .flow-step {
+    display: grid; grid-template-columns: 32px 1fr;
+    gap: 14px; padding: 12px 0; align-items: flex-start;
+  }
+  .flow-step + .flow-step { border-top: 1px solid var(--hair-2); }
+  .flow-step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--soft); color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+  }
+  .flow-step-body strong {
+    display: block; font-size: 13.5px;
+    margin-bottom: 3px;
+  }
+  .flow-step-body span {
+    font-size: 12.5px; color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Agents */
+  .card-paper {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 12px;
+  }
+  .card-paper h4 {
+    font-size: 15px; font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .card-paper p {
+    font-size: 13px; color: var(--ink-2);
+    line-height: 1.55; margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Portal sidebar -->
+  <aside class="sidebar">
+    <a href="index.html" class="back-link">← Studio</a>
+    <div class="portal-brand">
+      <div class="portal-brand-logo kindred">Kin<em>dred</em></div>
+      <div class="portal-brand-sub">Pre-build · Atlanta senior communities</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Build</div>
+      <button class="nav-item active" data-pane="buildplan">
+        <span class="nav-item-icon">▤</span>
+        Build Plan
+        <span class="nav-item-count" id="portal-phase-count">0/8</span>
+      </button>
+      <button class="nav-item" data-pane="audit">
+        <span class="nav-item-icon">○</span>
+        v1→v2 Audit
+      </button>
+      <button class="nav-item" data-pane="agents">
+        <span class="nav-item-icon">✦</span>
+        Agents + Skills
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Assets</div>
+      <button class="nav-item" data-pane="deck">
+        <span class="nav-item-icon">▢</span>
+        Deck
+      </button>
+      <button class="nav-item" data-pane="pitch">
+        <span class="nav-item-icon">▢</span>
+        Pitch
+      </button>
+      <button class="nav-item" data-pane="product">
+        <span class="nav-item-icon">▢</span>
+        Product Mock
+      </button>
+      <button class="nav-item" data-pane="website">
+        <span class="nav-item-icon">▢</span>
+        Website
+      </button>
+    </div>
+
+    <div class="sidebar-foot">
+      <strong>Sprint motion</strong><br/>
+      Build → cold email → pilot.<br/>
+      First paid customer is the goal.
+    </div>
+  </aside>
+
+  <!-- Portal main -->
+  <main class="main">
+
+    <!-- BUILD PLAN -->
+    <div class="pane on" id="pane-buildplan">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Kindred · Build</div>
+          <h1 class="pane-title">The build plan.</h1>
+          <p class="pane-sub">Eight phases from zero to launched. Click any phase to expand its tasks and copy-paste prompts. Checks save to your browser so you can track progress across sessions.</p>
+        </div>
+
+        <div class="progress-top">
+          <div class="progress-top-stats">
+            <div>
+              <div class="progress-stat-label">Phases done</div>
+              <div class="progress-stat-value" id="phases-done">0<span class="dim">/8</span></div>
+            </div>
+            <div>
+              <div class="progress-stat-label">Tasks done</div>
+              <div class="progress-stat-value" id="tasks-done">0<span class="dim">/—</span></div>
+            </div>
+            <div>
+              <div class="progress-stat-label">Estimated</div>
+              <div class="progress-stat-value">~5<span class="dim">wks</span></div>
+            </div>
+          </div>
+          <div class="progress-top-bar"><div class="progress-top-bar-fill" id="top-bar" style="width: 0%"></div></div>
+        </div>
+
+        <div class="phases" id="phases"></div>
+      </div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="pane" id="pane-audit">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Kindred · Audit</div>
+          <h1 class="pane-title">v1 → v2 compatibility audit.</h1>
+          <p class="pane-sub">Risks specific to Kindred's product mechanics. Done now so v2 (family-survey pen-pal matching) ships as an additive release with no migration pain.</p>
+        </div>
+
+        <div class="strip-tabs">
+          <button class="strip-tab active" onclick="auditShow('risks', this)">Lock-in risks</button>
+          <button class="strip-tab" onclick="auditShow('schema', this)">Data model</button>
+          <button class="strip-tab" onclick="auditShow('arch', this)">v2 architecture</button>
+          <button class="strip-tab" onclick="auditShow('deploy', this)">Deployment</button>
+        </div>
+
+        <div class="strip-pane on" id="audit-risks">
+          <div class="risk high">
+            <div class="risk-head">
+              <span class="risk-level high">Contract</span>
+              <div class="risk-title">The seven Kindred compatibility rules.</div>
+            </div>
+            <div class="risk-body">
+              Follow these during v1 and v2 ships as an additive release with no migration.
+              <ol style="margin-left: 20px; margin-top: 12px; line-height: 1.75;">
+                <li><strong>All v2 tables exist in v1.</strong> Empty but defined.</li>
+                <li><strong>Polymorphic columns are polymorphic from day one.</strong> <code>sessions.participant_a_type</code> holds <code>'community'</code> in v1, <code>'resident'</code> in v2.</li>
+                <li><strong>Every login is a typed user.</strong> <code>users.user_type</code> has <code>'director' | 'founder'</code> in v1; <code>'family'</code> added in v2.</li>
+                <li><strong>Every UI surface checks a feature flag.</strong> v2 surfaces ship dark behind <code>community.flags.pen_pals</code>.</li>
+                <li><strong>Email subdomains separated by purpose.</strong> <code>hello@kindred.care</code> for sales; <code>notifications.kindred.care</code> for transactional.</li>
+                <li><strong>Schema additions are nullable + defaulted.</strong> v1 code never writes them.</li>
+                <li><strong>No resident-level UI in v1.</strong> The home is the unit. Residents become first-class in v2.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="risk high">
+            <div class="risk-head">
+              <span class="risk-level high">High</span>
+              <div class="risk-title">Resident + family tables must exist in v1 (empty), or v2 needs a migration.</div>
+            </div>
+            <div class="risk-body">
+              <strong>Today:</strong> v1 doesn't have resident or family UI. Tempting to skip the tables entirely.<br/><br/>
+              <strong>Why that breaks v2:</strong> If sessions reference "community A vs community B" with no concept of attendees, you have zero behavioral data when v2 wants to suggest pen-pal matches. The tables need to exist so v2 can light up without ALTER TABLE on live data.
+              <div class="risk-fix">Create <code>residents</code>, <code>family_contacts</code>, and <code>session_attendees</code> tables in v1 schema. Hidden from AD UI. Zero rows. v2 starts writing to them when family surveys go out.</div>
+            </div>
+          </div>
+
+          <div class="risk high">
+            <div class="risk-head">
+              <span class="risk-level high">High</span>
+              <div class="risk-title">Auth must be designed for multi-type from day one.</div>
+            </div>
+            <div class="risk-body">
+              <strong>Today:</strong> Only ADs log in. Easy to call them "users" and move on.<br/><br/>
+              <strong>Why that breaks v2:</strong> v2 needs family logins. If v1's <code>users</code> table conflates "human who logs in" with "AD running this community," v2 has to retrofit auth checks and risk leaking community data to family members.
+              <div class="risk-fix">v1 schema: <code>users.user_type</code> column from day one. Allowed: <code>'director'</code>, <code>'founder'</code>. v2 adds <code>'family'</code>. Auth middleware checks user_type on every request.</div>
+            </div>
+          </div>
+
+          <div class="risk high">
+            <div class="risk-head">
+              <span class="risk-level high">High</span>
+              <div class="risk-title">Sessions need a stable shape v2 can extend, not replace.</div>
+            </div>
+            <div class="risk-body">
+              <strong>Today:</strong> A session is "community A met community B on Tuesday." Group-only.<br/><br/>
+              <strong>Why that breaks v2:</strong> v2 introduces 1:1 scheduled FaceTimes between two specific residents. If v1's <code>sessions</code> table is hard-wired to "two communities," v2 has to fork or rewrite.
+              <div class="risk-fix">Polymorphic <code>sessions</code> table: <code>session_type</code> (<code>'group'</code> in v1, <code>'pen_pal'</code> in v2), <code>participant_a_type/id</code> + <code>participant_b_type/id</code>. Same table handles both.</div>
+            </div>
+          </div>
+
+          <div class="risk medium">
+            <div class="risk-head">
+              <span class="risk-level medium">Medium</span>
+              <div class="risk-title">Communities need a profile field v2 will actually use.</div>
+            </div>
+            <div class="risk-body">
+              <strong>Why it matters:</strong> Pen-pal matching works best with community-level context (faith, region, language, vibe). Adding columns later means another migration.
+              <div class="risk-fix">v1 <code>communities</code> table has <code>profile jsonb</code> column. AD onboarding asks 3-4 light questions, stored as JSON.</div>
+            </div>
+          </div>
+
+          <div class="risk medium">
+            <div class="risk-head">
+              <span class="risk-level medium">Medium</span>
+              <div class="risk-title">Consent + privacy framework needs a stub in v1.</div>
+            </div>
+            <div class="risk-body">
+              <strong>Why it matters:</strong> Family surveys collect sensitive info. Need consent records, retention policy, deletion flow. ADs and EDs will ask.
+              <div class="risk-fix">v1 has <code>consent_log</code> table — just AD ToS entries. Same table extends in v2 to family consent, per-category opt-ins.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="strip-pane" id="audit-schema">
+          <div class="schema-table">
+            <div class="schema-table-head">
+              <strong>users</strong>
+              <span class="schema-pill v1">v1 active</span>
+              <span class="schema-pill v2">extended in v2</span>
+            </div>
+            <div class="schema-row"><code>id</code><span class="type">uuid</span><span class="note">primary key</span></div>
+            <div class="schema-row"><code>email</code><span class="type">text</span><span class="note">login identity</span></div>
+            <div class="schema-row"><code>user_type</code><span class="type">enum</span><span class="note">v1: 'director' · 'founder'  ·  v2: + 'family'</span></div>
+          </div>
+
+          <div class="schema-table">
+            <div class="schema-table-head">
+              <strong>communities</strong>
+              <span class="schema-pill v1">v1 active</span>
+            </div>
+            <div class="schema-row"><code>id</code><span class="type">uuid</span><span class="note"></span></div>
+            <div class="schema-row"><code>name</code><span class="type">text</span><span class="note">"A.G. Rhodes Atlanta"</span></div>
+            <div class="schema-row"><code>profile</code><span class="type">jsonb</span><span class="note">faith, region, languages, vibe — feeds v2 matching</span></div>
+            <div class="schema-row"><code>flags</code><span class="type">jsonb</span><span class="note">{ pen_pals: false } in v1</span></div>
+          </div>
+
+          <div class="schema-table">
+            <div class="schema-table-head">
+              <strong>residents</strong>
+              <span class="schema-pill dormant">dormant in v1</span>
+              <span class="schema-pill v2">activates in v2</span>
+            </div>
+            <div class="schema-row"><code>id</code><span class="type">uuid</span><span class="note">stable PK. table exists, no rows in v1.</span></div>
+            <div class="schema-row"><code>community_id</code><span class="type">uuid fk</span><span class="note">which home</span></div>
+            <div class="schema-row"><code>profile</code><span class="type">jsonb</span><span class="note">v2: populated by family survey</span></div>
+          </div>
+
+          <div class="schema-table">
+            <div class="schema-table-head">
+              <strong>family_contacts</strong>
+              <span class="schema-pill dormant">dormant in v1</span>
+              <span class="schema-pill v2">activates in v2</span>
+            </div>
+            <div class="schema-row"><code>id</code><span class="type">uuid</span><span class="note"></span></div>
+            <div class="schema-row"><code>resident_id</code><span class="type">uuid fk</span><span class="note">their loved one</span></div>
+            <div class="schema-row"><code>email</code><span class="type">text</span><span class="note">where survey links go</span></div>
+            <div class="schema-row"><code>survey_status</code><span class="type">text</span><span class="note">not_sent · sent · in_progress · complete</span></div>
+          </div>
+
+          <div class="schema-table">
+            <div class="schema-table-head">
+              <strong>sessions</strong>
+              <span class="schema-pill v1">v1 active</span>
+              <span class="schema-pill v2">extended in v2</span>
+            </div>
+            <div class="schema-row"><code>session_type</code><span class="type">enum</span><span class="note">v1: 'group'  ·  v2: + 'pen_pal'</span></div>
+            <div class="schema-row"><code>participant_a_type</code><span class="type">enum</span><span class="note">v1: 'community'  ·  v2: + 'resident'</span></div>
+            <div class="schema-row"><code>participant_a_id</code><span class="type">uuid</span><span class="note">polymorphic ref</span></div>
+          </div>
+
+          <div class="schema-table">
+            <div class="schema-table-head">
+              <strong>matches</strong>
+              <span class="schema-pill v2">v2 only</span>
+            </div>
+            <div class="schema-row"><code>resident_a_id</code><span class="type">uuid fk</span><span class="note">the pen-pal pair</span></div>
+            <div class="schema-row"><code>match_reasons</code><span class="type">jsonb</span><span class="note">["both school teachers", "shared faith"]</span></div>
+          </div>
+        </div>
+
+        <div class="strip-pane" id="audit-arch">
+          <div class="flow">
+            <h4>The v2 user flow</h4>
+            <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><strong>AD opts a resident into pen-pal program</strong><span>From the director dashboard, AD enables matching on Eleanor and enters family contact info (name + email).</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><strong>Family receives magic-link survey email</strong><span>~10 questions about Eleanor: life history, interests, conversation style. Saves progress.</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><strong>Matching engine generates candidates</strong><span>For each opted-in resident, surfaces top 3 candidates with explainable reasons. Rules-based + LLM-assisted.</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><strong>AD picks the match</strong><span>Human-in-the-loop. Engine optimizes for good options; AD picks the right one.</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-body"><strong>Pen-pals exchange voice notes, eventually FaceTime</strong><span>Async messages flow weekly. AD can schedule a live FaceTime in the dashboard.</span></div></div>
+          </div>
+        </div>
+
+        <div class="strip-pane" id="audit-deploy">
+          <div class="flow">
+            <h4>Deployment sequence</h4>
+            <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><strong>Ship v1. Get to 5 paying communities.</strong><span>Schema additions in place from day one (residents, family_contacts, consent_log all defined, empty).</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><strong>Build v2 on a parallel branch while v1 sells</strong><span>Long-running <code>v2-pen-pals</code> branch. v1 hot-fixes ship to main; v2 builds in parallel.</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><strong>Feature-flag every v2 surface</strong><span>When v2 merges to main, everything is dark behind <code>community.flags.pen_pals</code>. Flip per community.</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">4</div><div class="flow-step-body"><strong>Single-community alpha</strong><span>One pilot AD, flag flipped, two residents, one match end-to-end with you watching.</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">5</div><div class="flow-step-body"><strong>Pair-community beta</strong><span>Two communities, real cross-community match. AD runs session 2 without your help.</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">6</div><div class="flow-step-body"><strong>Roll out to existing v1 customers as a free upgrade</strong><span>Flip flags for all paying. Office hours for matching clinic.</span></div></div>
+            <div class="flow-step"><div class="flow-step-num">7</div><div class="flow-step-body"><strong>Price the new tier once it's sticky</strong><span>Watch which features new prospects ask about first. If v2 dominates, lead with it.</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENTS -->
+    <div class="pane" id="pane-agents">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Kindred · Agents</div>
+          <h1 class="pane-title">Agents + Claude Skills.</h1>
+          <p class="pane-sub">Where AI does the real work in Kindred. Copy-paste prompts for Claude Code. Claude Skills that encode design system and codebase conventions. Safety rails to prevent runaway agents.</p>
+        </div>
+
+        <div class="strip-tabs">
+          <button class="strip-tab active" onclick="agentsShow('product', this)">In-product</button>
+          <button class="strip-tab" onclick="agentsShow('founder', this)">Founder-facing</button>
+          <button class="strip-tab" onclick="agentsShow('skills', this)">Claude Skills</button>
+          <button class="strip-tab" onclick="agentsShow('rails', this)">Safety rails</button>
+        </div>
+
+        <div class="strip-pane on" id="agents-product">
+          <div class="card-paper">
+            <h4>Trivia + game-content generator</h4>
+            <p>Per-session, themed, age-appropriate. AD picks a theme, API generates 20 questions, cached so we never regenerate. The single most-used AI surface in the product.</p>
+            <div class="task-prompt">Build a trivia question generator in packages/lib/ai/trivia.ts that calls the Anthropic API. Function generateTrivia(theme, count = 20) generates trivia questions for residents 70+. Each question has id, question, choices (4), answer_index, difficulty. Use Claude with structured outputs. Cache in trivia_sets table. Topics: 1950s-60s music, classic films, geography, history. Never sensitive topics.</div>
+          </div>
+          <div class="card-paper">
+            <h4>Session-recap drafter</h4>
+            <p>AD writes 2 lines of notes after each session; agent drafts the warm recap email families can read in v2. AD edits + approves before any send.</p>
+            <div class="task-prompt">Build a session-recap drafter at apps/app/app/(authed)/sessions/[id]/recap/page.tsx. Server component fetches session + director_notes. Claude API drafts a warm, brief recap (3-4 sentences max). Never hallucinate moments not in the notes — if notes are sparse, the recap stays sparse.</div>
+          </div>
+        </div>
+
+        <div class="strip-pane" id="agents-founder">
+          <div class="card-paper">
+            <h4>Email tactic analyzer + A/B sister</h4>
+            <p>Every cold email gets analyzed against a curated 30-50 tactic library in real time. Suggests improvements. Generates A/B variants you can pick from before sending. The differentiator on the sales side.</p>
+            <div class="task-prompt">In apps/dashboard/app/compose/page.tsx, add a "Tactic analysis" panel. Every 2 seconds (debounced), send draft to /api/email-agent/analyze. Claude API: "Analyze this cold email and identify which tactics from the library it uses. Suggest 2-3 tactics it could add to improve reply rate." Return JSON with used_tactics, suggested_tactics, overall_score. Display in panel.</div>
+          </div>
+          <div class="card-paper">
+            <h4>Reply classifier</h4>
+            <p>Categorizes every inbound reply (yes/no/question/unsubscribe/wrong-person). Surfaces "questions" to your overview as "needs your reply now."</p>
+            <div class="task-prompt">Build a reply classifier in packages/lib/email-agent/classify-reply.ts. Input: original email + reply text. Output JSON: { intent, confidence, summary, suggested_next_step }. Use Claude with JSON mode. Few-shot examples in system prompt. If confidence less than 0.6, queue for manual review.</div>
+          </div>
+          <div class="card-paper">
+            <h4>Lead enrichment agent</h4>
+            <p>Paste "Sunrise Manor, Decatur GA" → agent finds AD name, email, recent programming, regional chain affiliation. Saves 10 minutes per lead.</p>
+          </div>
+          <div class="card-paper">
+            <h4>Weekly digest</h4>
+            <p>Monday 8am email to you: "Your best-performing tactic this week was X. Worst was Y." Vercel Cron triggers it.</p>
+          </div>
+        </div>
+
+        <div class="strip-pane" id="agents-skills">
+          <div class="card-paper">
+            <h4>kindred-component</h4>
+            <p>Encodes Kindred's design system: peach/serif palette, Fraunces serif, Inter body, warm tone. Triggered for any UI work in the Kindred codebase.</p>
+            <div class="task-prompt">Create a Claude Skill at .claude/skills/kindred-component/SKILL.md that encodes Kindred's design tokens. Include: color palette (--ink, --peach, --peach-deep, --sage, --cream), font usage (Fraunces serif for headlines, Inter sans for body), spacing scale, accessibility defaults (WCAG AA, focus rings), example patterns from the existing HTML mocks. Anti-patterns: no gradients on text, no purple, no "AI-generated startup" aesthetic. Trigger on any UI work.</div>
+          </div>
+          <div class="card-paper">
+            <h4>kindred-supabase</h4>
+            <p>Schema, RLS policies, the seven compatibility rules. Without this, every supabase question requires re-explaining the dormant-tables philosophy.</p>
+          </div>
+          <div class="card-paper">
+            <h4>kindred-voice</h4>
+            <p>Warm tone rules. Banned words ("cutting-edge", "revolutionary", "platform"). The founder voice + when to use the grandma story.</p>
+          </div>
+        </div>
+
+        <div class="strip-pane" id="agents-rails">
+          <div class="card-paper">
+            <h4>Spam pre-flight check</h4>
+            <p>Before any email leaves your domain: spam-trigger word check, caps ratio, exclamation count, link count, missing unsubscribe. Deterministic, not AI. Fast.</p>
+          </div>
+          <div class="card-paper">
+            <h4>Hallucination guard on the recap drafter</h4>
+            <p>Second-pass verification: "Given these notes, is every claim in the draft supported?" Unsupported phrases highlighted in yellow for AD to remove.</p>
+          </div>
+          <div class="card-paper">
+            <h4>Per-endpoint cost budget</h4>
+            <p>Every Anthropic call wrapped. Per-endpoint daily cap, per-user weekly cap. Slack alert at 80% spend. Solo founders have been bankrupted by runaway agents — non-negotiable.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSET PANES — iframes for existing files -->
+    <div class="pane iframe-pane" id="pane-deck">
+      <div class="iframe-shell">
+        <div class="iframe-bar">
+          <span>Deck (kindred-deck.html)</span>
+          <a href="kindred-deck.html" target="_blank">Open in new tab ↗</a>
+        </div>
+        <div class="iframe-wrap">
+          <div class="iframe-loading"><div class="iframe-loading-text">loading</div></div>
+          <iframe class="iframe-full" src="about:blank" data-src="kindred-deck.html" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane iframe-pane" id="pane-pitch">
+      <div class="iframe-shell">
+        <div class="iframe-bar">
+          <span>Pitch (pitch.html)</span>
+          <a href="pitch.html" target="_blank">Open in new tab ↗</a>
+        </div>
+        <div class="iframe-wrap">
+          <div class="iframe-loading"><div class="iframe-loading-text">loading</div></div>
+          <iframe class="iframe-full" src="about:blank" data-src="pitch.html" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane iframe-pane" id="pane-product">
+      <div class="iframe-shell">
+        <div class="iframe-bar">
+          <span>Product mock (demo.html)</span>
+          <a href="demo.html" target="_blank">Open in new tab ↗</a>
+        </div>
+        <div class="iframe-wrap">
+          <div class="iframe-loading"><div class="iframe-loading-text">loading</div></div>
+          <iframe class="iframe-full" src="about:blank" data-src="demo.html" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane iframe-pane" id="pane-website">
+      <div class="iframe-shell">
+        <div class="iframe-bar">
+          <span>Marketing site (website.html)</span>
+          <a href="website.html" target="_blank">Open in new tab ↗</a>
+        </div>
+        <div class="iframe-wrap">
+          <div class="iframe-loading"><div class="iframe-loading-text">loading</div></div>
+          <iframe class="iframe-full" src="about:blank" data-src="website.html" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+const kindredPlan =
+[
+    {
+      id: "phase1",
+      title: "Phase 1 · Project setup",
+      icon: "1", tone: "peach",
+      desc: "Goal: a deployable empty monorepo with all three apps wired to Vercel and a Supabase project waiting. Days 1–2. The fastest phase — mostly clicking buttons in dashboards and running a few terminal commands. Get this right and everything after is just filling in real code.",
+      groups: [
+        {
+          label: "Accounts (do this first, ~30 min)",
+          items: [
+            { t: "Create GitHub account (or use existing). Create a private repo called 'kindred'.", tag: "must", link: "https://github.com/new" },
+            { t: "Create Vercel account, sign in with GitHub.", tag: "must", link: "https://vercel.com/signup" },
+            { t: "Create Supabase account, create new project called 'kindred'. Save the database password somewhere safe.", tag: "must", link: "https://supabase.com/dashboard/sign-up", note: "Pick the region closest to your users (us-east-1 if Atlanta-based). Free tier is fine." },
+            { t: "Buy the domain kindred.care (Namecheap or Cloudflare).", tag: "must", link: "https://www.cloudflare.com/products/registrar/", note: "Cloudflare Registrar is at-cost, no markup. Worth the 5 min setup." },
+            { t: "Create Resend account for transactional email.", tag: "must", link: "https://resend.com/signup" },
+            { t: "Create Anthropic API account, generate API key.", tag: "must", link: "https://console.anthropic.com/" },
+            { t: "Install Node.js 20+, pnpm, and the Vercel CLI on your machine.", tag: "must" },
+          ]
+        },
+        {
+          label: "Scaffold the monorepo (~1 hour)",
+          items: [
+            { t: "Open Claude Code in an empty folder. Paste the scaffolding prompt below.", tag: "must",
+              prompt: "Create a Next.js 15 monorepo using pnpm workspaces with this structure:\n\nkindred/\n├── apps/\n│   ├── web/        # marketing site, Next.js 15 App Router, Tailwind\n│   ├── app/        # product app, Next.js 15 App Router, Tailwind\n│   └── dashboard/  # internal sales tool, Next.js 15 App Router, Tailwind\n├── packages/\n│   ├── ui/         # shared React components, exports from 'index.ts'\n│   ├── db/         # Supabase client + generated types\n│   └── lib/        # shared utilities (date helpers, env validation)\n├── package.json    # workspace root\n├── pnpm-workspace.yaml\n├── turbo.json      # turborepo for builds\n├── .gitignore\n└── README.md\n\nUse TypeScript strict mode everywhere. Set up Tailwind in each app, sharing config from packages/ui/tailwind.config.ts. Configure each app to run on a different port (web:3000, app:3001, dashboard:3002). Generate placeholder home pages that just say the app name. Initialize git and create the first commit." },
+            { t: "Once Claude finishes, run the dev commands to verify all three apps boot.", tag: "must",
+              promptBash: "cd kindred\npnpm install\npnpm dev   # should boot all three apps on ports 3000, 3001, 3002" },
+            { t: "Push the empty monorepo to GitHub.", tag: "must",
+              promptBash: "git remote add origin git@github.com:YOUR_USERNAME/kindred.git\ngit branch -M main\ngit push -u origin main" },
+          ]
+        },
+        {
+          label: "Connect Vercel + domain (~30 min)",
+          items: [
+            { t: "In Vercel dashboard, import the kindred GitHub repo three times — once per app. Set Root Directory to apps/web, apps/app, apps/dashboard respectively.", tag: "must", note: "Each Vercel project = one app folder. They all share the same git push." },
+            { t: "Add custom domains: kindred.care → web, app.kindred.care → app, dashboard.kindred.care → dashboard.", tag: "must" },
+            { t: "Configure DNS in Cloudflare to point each subdomain to Vercel's name servers (or use Vercel's recommended CNAMEs).", tag: "must" },
+            { t: "Confirm all three URLs load the placeholder pages.", tag: "must" },
+          ]
+        },
+        {
+          label: "Environment variables baseline (~15 min)",
+          items: [
+            { t: "Create .env.local in each app folder with Supabase keys. Pull from Supabase dashboard → Settings → API.", tag: "must",
+              promptEnv: "# apps/app/.env.local (and similarly for web/, dashboard/)\nNEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co\nNEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...\nSUPABASE_SERVICE_ROLE_KEY=eyJ...   # server-only, never expose\nANTHROPIC_API_KEY=sk-ant-...\nRESEND_API_KEY=re_..." },
+            { t: "Add the same env vars to each Vercel project (Settings → Environment Variables).", tag: "must" },
+            { t: "Add .env.local to .gitignore — never commit secrets.", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase2",
+      title: "Phase 2 · Database schema",
+      icon: "2", tone: "sage",
+      desc: "Goal: all v1 + dormant v2 tables defined in Supabase, RLS policies enforced, TypeScript types auto-generated. Days 3–4. Do this once, carefully — schema migrations are the most painful thing to redo. Refer to the v1→v2 Audit tab for the full schema spec.",
+      groups: [
+        {
+          label: "Define schema (~3 hours)",
+          items: [
+            { t: "In Supabase dashboard → SQL Editor, paste and run the schema creation script from the prompt below.", tag: "must",
+              promptSql: "-- Run in Supabase SQL Editor. Creates v1-active + v2-dormant tables.\n-- See v1→v2 Audit tab for the full column spec.\n\ncreate extension if not exists \"uuid-ossp\";\n\n-- users (v1 active, v2 extended)\ncreate table users (\n  id uuid primary key default uuid_generate_v4(),\n  email text unique not null,\n  name text,\n  user_type text not null check (user_type in ('director','founder','family')),\n  created_at timestamptz default now()\n);\n\n-- communities (v1 active)\ncreate table communities (\n  id uuid primary key default uuid_generate_v4(),\n  name text not null,\n  address text,\n  profile jsonb default '{}',\n  flags jsonb default '{\"pen_pals\": false}',\n  onboarding_state text default 'pilot',\n  created_at timestamptz default now()\n);\n\n-- user_communities (v1 many-to-many)\ncreate table user_communities (\n  user_id uuid references users(id) on delete cascade,\n  community_id uuid references communities(id) on delete cascade,\n  role text not null,\n  is_primary boolean default true,\n  primary key (user_id, community_id)\n);\n\n-- residents (DORMANT in v1 — table exists, no rows)\ncreate table residents (\n  id uuid primary key default uuid_generate_v4(),\n  community_id uuid references communities(id) on delete cascade,\n  first_name text,\n  photo_url text,\n  profile jsonb default '{}',\n  matching_enabled boolean default false,\n  created_at timestamptz default now(),\n  updated_at timestamptz default now()\n);\n\n-- family_contacts (DORMANT in v1)\ncreate table family_contacts (\n  id uuid primary key default uuid_generate_v4(),\n  resident_id uuid references residents(id) on delete cascade,\n  user_id uuid references users(id) on delete set null,\n  name text not null,\n  email text not null,\n  relationship text,\n  is_primary boolean default true,\n  survey_status text default 'not_sent'\n);\n\n-- sessions (v1 active, polymorphic shape)\ncreate table sessions (\n  id uuid primary key default uuid_generate_v4(),\n  session_type text not null default 'group',\n  participant_a_type text not null default 'community',\n  participant_a_id uuid not null,\n  participant_b_type text not null default 'community',\n  participant_b_id uuid not null,\n  scheduled_at timestamptz not null,\n  game_type text,\n  director_notes text,\n  attendee_count_a int,\n  attendee_count_b int,\n  created_at timestamptz default now()\n);\n\n-- session_attendees (DORMANT in v1)\ncreate table session_attendees (\n  session_id uuid references sessions(id) on delete cascade,\n  resident_id uuid references residents(id) on delete cascade,\n  engagement int check (engagement between 1 and 5),\n  highlights text,\n  primary key (session_id, resident_id)\n);\n\n-- spotlights (v1 active)\ncreate table spotlights (\n  id uuid primary key default uuid_generate_v4(),\n  session_id uuid references sessions(id) on delete cascade,\n  resident_id uuid references residents(id) on delete set null,\n  title text not null,\n  content text,\n  created_at timestamptz default now()\n);\n\n-- consent_log (v1 active, extended in v2)\ncreate table consent_log (\n  id uuid primary key default uuid_generate_v4(),\n  subject_type text not null,\n  subject_id uuid not null,\n  consent_type text not null,\n  granted_at timestamptz default now(),\n  revoked_at timestamptz\n);\n\n-- v2-only tables (define now, populate in v2)\ncreate table matches (\n  id uuid primary key default uuid_generate_v4(),\n  resident_a_id uuid references residents(id) on delete cascade,\n  resident_b_id uuid references residents(id) on delete cascade,\n  matched_by uuid references users(id),\n  match_score float,\n  match_reasons jsonb,\n  status text default 'suggested',\n  started_at timestamptz,\n  ended_at timestamptz\n);\n\ncreate table messages (\n  id uuid primary key default uuid_generate_v4(),\n  match_id uuid references matches(id) on delete cascade,\n  sender_resident_id uuid references residents(id),\n  media_type text,\n  media_url text,\n  transcript text,\n  delivered_at timestamptz default now(),\n  read_at timestamptz\n);\n\n-- sales pipeline (v1 active, your own use)\ncreate table leads (\n  id uuid primary key default uuid_generate_v4(),\n  community_name text not null,\n  contact_name text,\n  contact_email text,\n  contact_role text,\n  stage text default 'cold',\n  notes text,\n  last_contact_at timestamptz,\n  created_at timestamptz default now()\n);\n\n-- email log (for the learning email agent)\ncreate table emails_sent (\n  id uuid primary key default uuid_generate_v4(),\n  lead_id uuid references leads(id) on delete set null,\n  template_key text,\n  subject text,\n  body text,\n  tactic_tags text[],\n  sent_at timestamptz default now(),\n  opened_at timestamptz,\n  replied_at timestamptz,\n  reply_classification text\n);" },
+          ]
+        },
+        {
+          label: "Row-Level Security (RLS) policies (~2 hours)",
+          items: [
+            { t: "Enable RLS on every table. Add policies so ADs can only see their own community's data.", tag: "must",
+              prompt: "Add Supabase Row-Level Security policies for the kindred database. Rules:\n\n1. users: anyone can read their own row (auth.uid() = id). Founders (user_type='founder') can read all.\n2. communities: a user can read/write a community if they're in user_communities for it. Founders can read all.\n3. user_communities: same as communities — scope by membership.\n4. residents, family_contacts, sessions, session_attendees, spotlights: scope by community_id, with the community check going through user_communities.\n5. matches, messages: v2 — for now, just enable RLS and deny all (we'll write policies in v2).\n6. consent_log: insert-only for non-founders; founders can read all.\n7. leads, emails_sent: only founders can read/write.\n\nWrite the SQL and explain each policy in a comment above it. Output as a single SQL script I can paste into Supabase SQL editor." },
+            { t: "Test RLS by creating two test users + two communities. Verify user A cannot read user B's community data.", tag: "must" },
+          ]
+        },
+        {
+          label: "TypeScript types (~30 min)",
+          items: [
+            { t: "Generate TypeScript types from Supabase schema. Put them in packages/db/.", tag: "must",
+              promptBash: "npx supabase login\nnpx supabase link --project-ref YOUR_PROJECT_REF\nnpx supabase gen types typescript --linked > packages/db/types.ts" },
+            { t: "Create a typed Supabase client wrapper in packages/db/client.ts.", tag: "must",
+              prompt: "Create packages/db/client.ts that exports two functions: createBrowserClient() and createServerClient(). Use @supabase/ssr. Type the client with the Database type from ./types.ts. Export type helpers: type Community = Database['public']['Tables']['communities']['Row']; etc. for every table. Make sure it works with Next.js 15 App Router (cookies handled properly)." },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase3",
+      title: "Phase 3 · Authentication",
+      icon: "3", tone: "lav",
+      desc: "Goal: magic-link login for ADs and you, scoped to user_type. Days 5–7. This is the gnarliest plumbing — get it right and the rest is just rendering data. Use Supabase Auth, not a custom solution.",
+      groups: [
+        {
+          label: "Magic-link auth flow (~1 day)",
+          items: [
+            { t: "Build the login page in apps/app and apps/dashboard. Email input → magic link sent → click link → logged in.", tag: "must",
+              prompt: "Build a magic-link login flow for the Next.js 15 App Router app at apps/app. Use Supabase Auth with @supabase/ssr.\n\nFiles to create:\n- app/login/page.tsx — server component with the email form. Use server actions to call supabase.auth.signInWithOtp(). Show success message after submit.\n- app/auth/callback/route.ts — server route that exchanges the code for a session, then redirects to /.\n- app/auth/sign-out/route.ts — POST endpoint that signs out and redirects to /login.\n- middleware.ts — refreshes the session on every request, redirects unauthenticated users to /login for any path that isn't /login or /auth/*.\n- lib/auth.ts — helpers: getUser(), requireUser(), requireUserType(types: string[]).\n\nStyle the login page to match the existing demo.html design (cream background, Newsreader serif headers, peach accent button). One sentence above the form: 'Sign in to your Kindred dashboard.'" },
+            { t: "Replicate the same flow in apps/dashboard, but lock it to user_type='founder' only.", tag: "must" },
+            { t: "Customize the magic-link email template in Supabase dashboard → Authentication → Email Templates. Make it warm, not corporate.", tag: "must", note: "This is the first email a new AD will see from Kindred. Sets the tone." },
+          ]
+        },
+        {
+          label: "User onboarding (~half day)",
+          items: [
+            { t: "First-login flow: after AD verifies their email, prompt for community name + region + 'tell us about your home' (free text → goes into community.profile).", tag: "must" },
+            { t: "Insert the user into users table with user_type='director', insert their community, link them via user_communities.", tag: "must" },
+            { t: "For founder login (you): seed your account manually in Supabase with user_type='founder'.", tag: "must" },
+          ]
+        },
+        {
+          label: "Auth guards everywhere (~half day)",
+          items: [
+            { t: "In apps/app: every route under (authed)/* uses a layout that calls requireUser().", tag: "must" },
+            { t: "In apps/dashboard: every route uses requireUserType(['founder']).", tag: "must" },
+            { t: "Test by trying to access /home while logged out → should redirect to /login.", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase4",
+      title: "Phase 4 · Port the frontend",
+      icon: "4", tone: "peach",
+      desc: "Goal: every page in the HTML mockups is now a real React component reading real data from Supabase. Days 8–17 (the longest phase, ~2 weeks). Mechanical work but plenty of it. Cursor/Claude Code does most of this — you just review and approve.",
+      groups: [
+        {
+          label: "Port the marketing site (apps/web) — Days 8–9",
+          items: [
+            { t: "Drop the existing website.html content into Cursor and ask Claude to convert it to a Next.js page.", tag: "must",
+              prompt: "I have a marketing site as a single HTML file. Convert it to a Next.js 15 App Router page at apps/web/app/page.tsx. Rules:\n\n1. Keep the EXACT visual design — same fonts, colors, spacing, sections.\n2. Extract repeated patterns (hero, feature card, pricing tier, FAQ item) into components in apps/web/components/.\n3. Move the CSS into Tailwind classes where reasonable; keep any complex CSS in a CSS module.\n4. Make the 'Book a demo' button link to /book (route to be built later, just stub it).\n5. Make sure fonts (Fraunces + Inter) are loaded via next/font for performance.\n6. Add proper Next.js Metadata (title, description, og:image).\n\nHere's the HTML:\n[paste contents of website.html]" },
+            { t: "Add the founder story section (Georgia Tech, engineering+design, grandma caretaker).", tag: "must" },
+            { t: "Wire 'Book a demo' button to Cal.com embed.", tag: "must" },
+            { t: "Deploy preview to Vercel, share preview URL with one trusted friend for feedback.", tag: "must" },
+          ]
+        },
+        {
+          label: "Port the product app (apps/app) — Days 10–14",
+          items: [
+            { t: "Port the director dashboard home view. Show next session, partner community card, recent activity.", tag: "must",
+              prompt: "Port demo.html's director home view to apps/app/app/(authed)/home/page.tsx. It should:\n\n1. Be a server component that fetches the next upcoming session + partner community via supabase. Use the typed client from packages/db.\n2. Match the visual design of demo.html exactly.\n3. If no session is scheduled, show an empty state with a 'Schedule first session' button.\n4. The 'Start session' button on the next-session card links to /sessions/[id]/live.\n5. Use date-fns for human-readable timestamps ('in 2 days', '3 hours ago').\n\nHere's the HTML for reference:\n[paste director dashboard section of demo.html]" },
+            { t: "Port the in-call view. Big TV-friendly layout, video tiles, game overlay, captions.", tag: "must" },
+            { t: "Port the Spotlight queue page.", tag: "must" },
+            { t: "Port the Sessions list + history.", tag: "must" },
+            { t: "Build the Community Settings page (profile fields, partner preferences, schedule).", tag: "must" },
+            { t: "Reserve nav slot for future 'Pen-Pals' tab — render only when community.flags.pen_pals=true.", tag: "must" },
+          ]
+        },
+        {
+          label: "Port the sales dashboard (apps/dashboard) — Days 15–17",
+          items: [
+            { t: "Port the Overview, Pipeline, Compose, Demos tabs from sales.html.", tag: "must",
+              prompt: "Port sales.html to apps/dashboard, an internal tool for the founder only. Structure:\n\n- apps/dashboard/app/layout.tsx — sidebar nav matching sales.html exactly\n- apps/dashboard/app/page.tsx — Overview (stats, upcoming demos)\n- apps/dashboard/app/pipeline/page.tsx — leads table with stage chips\n- apps/dashboard/app/compose/page.tsx — email composer with template library\n- apps/dashboard/app/demos/page.tsx — booked demos with notes\n- apps/dashboard/app/integrations/page.tsx — integration setup status\n- apps/dashboard/app/build-plan/page.tsx — keep this (port the same content from sales.html)\n- apps/dashboard/app/audit/page.tsx — keep the v1→v2 audit page\n\nAll routes guarded by requireUserType(['founder']). Pipeline reads from the 'leads' table, Compose reads from 'emails_sent', etc.\n\nMatch the design of sales.html exactly. Keep all template text verbatim.\n\n[Attach sales.html]" },
+            { t: "Wire 'Add lead' form to insert into leads table.", tag: "must" },
+            { t: "Wire 'Send via Gmail' button to mailto: links (Gmail API integration comes in Phase 6).", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase5",
+      title: "Phase 5 · Integrations",
+      icon: "5", tone: "sage",
+      desc: "Goal: video calls work, scheduling works, transactional emails send, billing is ready. Days 18–24. Each integration is well-documented; mostly following docs + adapting their examples.",
+      groups: [
+        {
+          label: "Daily.co (video) — Days 18–19",
+          items: [
+            { t: "Sign up for Daily.co. Use their server-side SDK to create + manage rooms.", tag: "must", link: "https://docs.daily.co/" },
+            { t: "Build the /sessions/[id]/live page that creates a room when AD clicks 'Start session', joins both communities, and embeds the Daily prebuilt UI.", tag: "must",
+              prompt: "Integrate Daily.co video calls into the Kindred app. Goal: when an AD clicks 'Start session' on a scheduled session, both communities join a video call on their TVs.\n\nImplementation:\n1. Add a server action createDailyRoom(sessionId) that calls Daily's REST API to create a room. Store the room URL on the session record.\n2. Build /sessions/[id]/live as a client component using @daily-co/daily-react and DailyProvider.\n3. Use Daily's prebuilt UI initially (DailyIframe.createFrame) — we can customize later. Pass {showLeaveButton: false, showFullscreenButton: true, theme: {colors: {accent: '#E29449'}}}.\n4. The page should be designed for the TV: huge fonts, two-column layout (community A | community B), big controls.\n5. Captions on by default. Daily has built-in transcription via the captions API — wire it up.\n6. If the call disconnects, auto-reconnect within 10s without losing state.\n\nAdd .env.local: DAILY_API_KEY=..." },
+          ]
+        },
+        {
+          label: "Cal.com (scheduling) — Day 20",
+          items: [
+            { t: "Sign up for Cal.com. Create a 15-minute 'Kindred demo' event type.", tag: "must", link: "https://cal.com/signup" },
+            { t: "Embed Cal.com on the marketing site /book page + footer.", tag: "must" },
+            { t: "Set up Cal.com webhook to POST to /api/webhooks/cal-booking when someone books. Save booking to leads table as 'Demo booked' stage.", tag: "must",
+              prompt: "Set up a webhook handler at apps/dashboard/app/api/webhooks/cal-booking/route.ts that receives Cal.com booking events. When a 'booking.created' event arrives:\n\n1. Verify the webhook signature from Cal.com.\n2. Look up the lead by email. If they don't exist, create them with stage='demo_booked'.\n3. If they exist, update their stage to 'demo_booked' and set last_contact_at to now.\n4. Insert a record in a new bookings table (we'll add it: id, lead_id, scheduled_at, cal_booking_id, notes from booking form).\n5. Send Slack notification to founder (use Slack incoming webhook URL from env).\n6. Return 200 OK.\n\nHandle errors gracefully — log to console and return 200 even on internal errors (Cal.com retries indefinitely on non-200s)." },
+          ]
+        },
+        {
+          label: "Resend (transactional email) — Day 21",
+          items: [
+            { t: "Add notifications.kindred.care subdomain DNS records (SPF, DKIM, DMARC) in Cloudflare per Resend's setup guide.", tag: "must" },
+            { t: "Verify the domain in Resend dashboard.", tag: "must" },
+            { t: "Build email templates: magic link, pilot welcome, session reminder (24h before), session recap.", tag: "must",
+              prompt: "Set up Resend for transactional email. In packages/lib/email/:\n\n1. Create client.ts that exports a typed Resend client.\n2. Create templates/ directory with React Email templates (use @react-email/components): magicLink.tsx, pilotWelcome.tsx, sessionReminder.tsx, sessionRecap.tsx.\n3. Each template imports a shared <KindredEmailLayout/> component that has the brand header (peach dot + 'kindred' wordmark in Fraunces serif), cream background, footer with mailing address.\n4. Create sendEmail() function: takes {to, template, props}, sends from 'Kindred <hello@notifications.kindred.care>'.\n5. Log every send to emails_sent table (template_key, subject, body, sent_at).\n\nUse the warm, conversational tone of the existing sales templates in sales.html. Templates should NOT look corporate." },
+          ]
+        },
+        {
+          label: "Stripe (billing) — Days 22–23",
+          items: [
+            { t: "Create Stripe account, complete business verification.", tag: "must", link: "https://dashboard.stripe.com/register", note: "Verification takes a few days — start this early." },
+            { t: "Create three products in Stripe: Pilot ($249/mo), Growing ($449/mo), Network ($899/mo). Each with monthly + annual prices.", tag: "must" },
+            { t: "Build Stripe Checkout flow + customer portal embed.", tag: "must",
+              prompt: "Add Stripe subscription billing to Kindred. In apps/app:\n\n1. /settings/billing page — server component, shows current subscription status + 'Manage billing' button that opens Stripe Customer Portal in a new tab.\n2. /api/checkout/route.ts — POST endpoint that creates a Stripe Checkout Session for a given price_id, scoped to the AD's community.\n3. /api/webhooks/stripe/route.ts — handles customer.subscription.* events. Update the community's onboarding_state to 'paid' on successful subscription. Update flags accordingly.\n4. Add stripe_customer_id and stripe_subscription_id columns to communities table (migration).\n\n.env: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.\n\nDon't show billing UI until pilot ends. After 30 days, show a 'Continue with Kindred?' card linking to checkout." },
+          ]
+        },
+        {
+          label: "Anthropic API (game content) — Day 24",
+          items: [
+            { t: "Wire trivia question generation: AD picks a theme, API generates 20 questions, cached.", tag: "must",
+              prompt: "Build a trivia question generator in packages/lib/ai/trivia.ts that calls the Anthropic API:\n\n1. Function generateTrivia(theme: string, count: number = 20): generates trivia questions on the given theme using claude-sonnet-4-5.\n2. Each question has: id, question, choices (array of 4), answer_index, difficulty.\n3. Use structured outputs — system prompt asks Claude to respond only with valid JSON.\n4. Cache generated sets in a new trivia_sets table (theme, questions jsonb, created_at) so we don't regenerate the same theme.\n5. In the AD dashboard, add a 'Generate trivia' button on the session detail page. After generation, allow AD to preview + edit before saving.\n6. Questions should be appropriate for residents 70+ — emphasize topics like 1950s-60s music, classic films, geography, history. Never sensitive topics.\n\n.env: ANTHROPIC_API_KEY=sk-ant-..." },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase6",
+      title: "Phase 6 · Email agent (the learning sales backend)",
+      icon: "6", tone: "lav",
+      desc: "Goal: every cold email you send is logged, replies are classified, the agent learns which tactics work, and drafts get smarter over time. Days 25–28. This is the differentiator on the sales side — the part of the dashboard that no off-the-shelf CRM gives you.",
+      groups: [
+        {
+          label: "Gmail integration — Day 25",
+          items: [
+            { t: "Set up Gmail OAuth in Google Cloud Console. Add your founder Gmail as a test user.", tag: "must", link: "https://console.cloud.google.com/" },
+            { t: "Build /api/gmail/connect route that handles OAuth redirect + stores refresh token.", tag: "must",
+              prompt: "Add Gmail integration to apps/dashboard so the founder can send emails through their own Gmail account from the Compose tab.\n\n1. /api/gmail/connect/route.ts — initiates OAuth flow with scopes gmail.send + gmail.readonly.\n2. /api/gmail/callback/route.ts — receives the OAuth code, exchanges for refresh token, stores in users table (new column: gmail_refresh_token, encrypted at rest using Supabase Vault).\n3. /api/gmail/send/route.ts — POST endpoint that takes {to, subject, body, leadId, templateKey, tacticTags}. Uses the founder's refresh token to send via Gmail API. Logs the send to emails_sent.\n4. /api/gmail/sync-replies/route.ts — cron-triggered (runs hourly via Vercel Cron). Polls Gmail for new replies to sent emails. For each reply, classifies it (yes / no / question / unsubscribe / other) using Claude API, updates emails_sent.reply_classification.\n\nUpdate the Compose tab to use this instead of mailto: links." },
+          ]
+        },
+        {
+          label: "Tactic library — Day 26",
+          items: [
+            { t: "Create a curated library of 30-50 proven cold-email tactics with examples + when-to-use.", tag: "must",
+              prompt: "Create packages/lib/email-agent/tactics.ts that exports a typed array of cold-email tactics for B2B sales. Each tactic has: id, name, category (opener/social_proof/cta/length/tone), description, when_to_use, example_snippet, anti_pattern.\n\nResearch and include 30-50 well-known tactics from sources like:\n- 'Predictable Revenue' by Aaron Ross\n- Justin Welsh's cold email playbook\n- Steli Efti's Close.io blog\n- 'Founders Helping Founders' patterns\n- 'The Mom Test' by Rob Fitzpatrick (for tone)\n\nCategories should include: openers (personalization, observation, mutual connection, problem-stating), social proof (customer name-drop, founder credentials, numbers), CTAs (specific time ask, low-friction yes, optionality), length (one-line, 5-sentence, longer-form), tone (warm, direct, curious).\n\nDo not fabricate tactics — only include ones with established names/origins." },
+          ]
+        },
+        {
+          label: "Learning loop + dashboard — Days 27–28",
+          items: [
+            { t: "Build the 'Compose' tab integration: when drafting, agent suggests which tactics this email uses + which it's missing.", tag: "must",
+              prompt: "In apps/dashboard/app/compose/page.tsx, add a 'Tactic analysis' panel next to the email body. As the user types, every 2 seconds (debounced):\n\n1. Send the current draft to /api/email-agent/analyze.\n2. The route calls Claude API: 'Analyze this cold email and identify which tactics from the attached library it uses. Also suggest 2-3 tactics it could add to improve reply rate.' Pass the tactics.ts data as a JSON system prompt.\n3. Returns: { used_tactics: [{id, evidence}], suggested_tactics: [{id, why}], overall_score: 0-100 }.\n4. Display this in the panel with collapsible tactic descriptions.\n\nAlso add an 'A/B sister' button that asks Claude to rewrite the email using one different tactic. Show the two versions side by side, user picks which sends." },
+            { t: "Build the weekly digest: 'Your best tactic this week was X. Worst was Y.'", tag: "must",
+              prompt: "Build a weekly digest for the founder in apps/dashboard. Vercel Cron triggers /api/email-agent/weekly-digest every Monday at 8am.\n\n1. Query emails_sent for the last 7 days. Group by tactic_tags (each email can have multiple tags).\n2. For each tactic, compute: emails sent, reply rate, positive-reply rate.\n3. Send an email to founder via Resend with: top 3 performing tactics (with examples), bottom 3, total numbers (emails sent, demos booked from emails, conversion %).\n4. Also create a digest page at /dashboard/insights showing rolling 4-week trends with simple charts (use recharts).\n\nFlag any template whose reply rate is dropping more than 30% week-over-week as 'decaying' — needs refresh." },
+            { t: "Add safety rails: daily send cap (25), auto-pause sends to a lead after reply, unsubscribe handling, spam-trigger word check.", tag: "must" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase7",
+      title: "Phase 7 · Polish, content, launch",
+      icon: "7", tone: "peach",
+      desc: "Goal: the product is ready to put in front of paying customers. Days 29–32. Bug-fixing, content tightening, soft-launch readiness. Don't skip this phase — first impressions in this market are everything.",
+      groups: [
+        {
+          label: "Content + copy",
+          items: [
+            { t: "Founder story landed on website, in cold email template, on deck slide 2, in LinkedIn bio.", tag: "must" },
+            { t: "Privacy policy + terms of service drafted (use Termly or hire a lawyer for 1-hour review).", tag: "must", link: "https://termly.io/" },
+            { t: "Onboarding email sequence: welcome → setup help → first-session reminder → check-in.", tag: "must" },
+            { t: "Help docs at help.kindred.care (use Nextra or just markdown files in apps/web).", tag: "nice" },
+          ]
+        },
+        {
+          label: "QA pass",
+          items: [
+            { t: "End-to-end test: AD signs up → onboarding → schedules session → runs session → views recap.", tag: "must" },
+            { t: "Mobile responsive check on iPhone + Android (the product app TV view doesn't need mobile but the marketing site does).", tag: "must" },
+            { t: "Accessibility: keyboard nav, screen reader labels, captions on by default in calls.", tag: "must" },
+            { t: "Test on a real TV in a real facility before charging anyone.", tag: "must", note: "Non-negotiable. Conference room with the actual hardware they'll use. Find one bug per visit." },
+          ]
+        },
+        {
+          label: "Soft launch",
+          items: [
+            { t: "Flip your first pilot AD over from manual ops to the real product. Watch their first session in person.", tag: "must" },
+            { t: "Set up error tracking with Sentry (free tier).", tag: "must", link: "https://sentry.io/" },
+            { t: "Set up product analytics with PostHog (free tier).", tag: "must", link: "https://posthog.com/" },
+            { t: "Stripe live mode enabled. First paid invoice goes out.", tag: "must" },
+            { t: "Document the deploy process so future-you isn't lost: how to run migrations, roll back, restore backup.", tag: "must" },
+          ]
+        },
+        {
+          label: "v2 prep (parallel work, doesn't block launch)",
+          items: [
+            { t: "Create v2-pen-pals branch in GitHub. Start sketching the family survey UI in Figma.", tag: "later" },
+            { t: "Validate survey questions with 3 actual family members of pilot residents.", tag: "later" },
+            { t: "Plan the v2 launch announcement email (don't send until pilot has 4+ weeks of v1 data).", tag: "later" },
+          ]
+        },
+      ]
+    },
+    {
+      id: "phase8",
+      title: "Phase 8 · Agents & Claude Skills (the leverage layer)",
+      icon: "✨", tone: "lav",
+      desc: "Goal: identify where AI agents and Claude Skills actually create leverage (vs. just sprinkling AI for the demo). Built throughout phases 5–7, formalized here. Each item below is a discrete agent or skill — they're separate from the main app, can fail independently, and earn their keep on day one.",
+      groups: [
+        {
+          label: "Where agents earn their keep (high-value)",
+          items: [
+            { t: "Email-agent · tactic analyzer + A/B sister (built in Phase 6)", tag: "agent", note: "Every cold email you write gets analyzed against the tactic library in real time. Suggests improvements. Generates A/B variants. Already in Phase 6 — flagged here so you see it as part of the system." },
+            { t: "Reply classifier · routes every inbound to the right bucket", tag: "agent",
+              note: "Runs on every Gmail reply via the hourly cron from Phase 6. Outputs: yes / no / question / unsubscribe / not-a-fit / wrong-person / other. Saves to emails_sent.reply_classification. Surfaces 'questions' to your overview as 'needs your reply now.'",
+              prompt: "Build a reply classifier as a Claude API call in packages/lib/email-agent/classify-reply.ts. Input: original email + reply text. Output JSON: { intent: 'yes'|'no'|'question'|'unsubscribe'|'not_a_fit'|'wrong_person'|'other', confidence: 0-1, summary: string (1 sentence), suggested_next_step: string }.\n\nUse Claude with structured output (JSON mode). Include a few-shot example in the system prompt of each category. If confidence < 0.6, flag for manual review by saving to a queue table." },
+            { t: "Lead enrichment agent · turns a community name into a full lead row", tag: "agent",
+              note: "You paste 'Sunrise Manor, Decatur GA' → agent finds AD name, AD email, website, NAAP membership status, recent activity programming mentions, regional chain (if any). Saves 10 min of manual research per lead. Run before every cold outreach push.",
+              prompt: "Build a lead enrichment agent at apps/dashboard/app/api/enrich-lead/route.ts. Input: { community_name: string, city: string, state: string }. Steps:\n\n1. Use web_fetch via Claude API to find the community's website.\n2. Parse for: activities director name + email, executive director name, phone, address, number of beds (often public).\n3. Check for NAAP membership signal (link to naap.info or similar).\n4. Look for 'parent company' / 'managed by' to identify chain affiliation.\n5. Return a typed Lead object ready to insert into leads table.\n6. Cache results for 30 days (cheap LLM calls add up). Store under a `lead_enrichments` table keyed on community_name+city.\n\nUse claude-sonnet-4 with web_search tool. Set a hard 30-second timeout — if research takes longer, return partial results." },
+            { t: "Trivia & game-content generator · themed, never-repeating, age-appropriate", tag: "agent",
+              note: "Already wired in Phase 5. Worth re-emphasizing: this is the single most-used AI surface in the product. Bingo number callouts can stay deterministic, but trivia sets, story prompts, show-and-tell prompts should all flow through here.",
+              prompt: "Extend packages/lib/ai/trivia.ts with three more generators:\n\n1. generateStoryPrompts(theme, count) — open-ended prompts like 'Tell us about your first job' or 'A meal you'll never forget.' Return array of {prompt, follow_ups: string[]}.\n2. generateShowAndTellPrompts(theme, count) — 'Bring one object that...' style prompts.\n3. generateBingoCallTheme(theme) — for themed bingo sessions, generate the call words (e.g. for a '50s Music' theme, return 50 song titles, artists, or lyrics that map to the 75-number grid).\n\nAll outputs: age-appropriate (residents 70+), never sensitive (no death/war/illness unless gentle), warm in tone. Cache aggressively." },
+            { t: "Session-recap drafter · AD writes 2 lines, agent drafts the family-facing recap", tag: "agent",
+              note: "After each session, AD enters notes ('Eleanor talked about her granddaughter's wedding, Margaret shared her quilting story'). Agent drafts a warm recap email that can go to families (in v2) or just save for the AD's own records. AD edits + approves before send.",
+              prompt: "Build a session-recap drafter at apps/app/app/(authed)/sessions/[id]/recap/page.tsx. Server component that:\n\n1. Fetches the session + director_notes.\n2. Calls Claude API: 'Draft a warm, brief recap of this senior community session for an internal log (and future family-facing version). Tone: like a friend telling you about their grandmother's day. 3-4 sentences max. Mention 1-2 specific moments from the notes. Never use clinical language.'\n3. Renders the draft in an editable textarea. AD can edit + save to sessions.recap_text (add this column).\n4. Add a 'Regenerate' button that re-runs with slight temperature variance.\n\nKey constraint: never hallucinate moments not in the director_notes. If notes are sparse, the recap should be sparse." },
+          ]
+        },
+        {
+          label: "Claude Skills (codebase consistency leverage)",
+          items: [
+            { t: "Skill: kindred-component — generates new React components matching the existing design system", tag: "agent",
+              note: "A Claude Skill is a folder of best practices that Claude reads before working on a task. Create one at .claude/skills/kindred-component/ that codifies: spacing scale, color tokens, font usage, prose style, accessibility defaults. Every 'build me a new page' prompt becomes shorter + more consistent.",
+              prompt: "Create a Claude Skill for the Kindred codebase at .claude/skills/kindred-component/SKILL.md. The skill should encode the design system so Claude generates consistent components.\n\nContents should include:\n\n1. Color tokens (with their hex values and intended use): --ink, --peach, --peach-deep, --sage, --sage-deep, --cream, --lav, etc.\n2. Font usage rules: Newsreader serif for headlines and emphasis, Inter sans for body and UI.\n3. Spacing scale: 4/8/12/16/20/24/32/48/64/80 px.\n4. Border radius scale: 6/12/18/24/32/44 px.\n5. Accessibility defaults: WCAG AA contrast minimum, focus-visible rings, captions on by default for any video.\n6. Tone rules for any user-facing copy: warm, specific, never corporate, never patronizing toward elderly users.\n7. Pattern examples: how a card looks, how a button looks, how a form field looks (with code snippets pulled from the existing HTML files).\n8. Anti-patterns: no gradients on text, no purple, no 'AI-generated startup' aesthetic.\n\nFormat: SKILL.md with frontmatter describing when Claude should trigger this skill (any task involving building or modifying UI components in the Kindred codebase)." },
+            { t: "Skill: kindred-supabase — encodes schema rules + RLS patterns + dormant-tables philosophy", tag: "agent",
+              note: "Without this skill, every time you ask Claude to add a query you'll have to re-explain RLS scoping and the v1↔v2 compatibility rules. With it, Claude already knows.",
+              prompt: "Create a Claude Skill at .claude/skills/kindred-supabase/SKILL.md that encodes the Kindred database conventions:\n\n1. The schema (link to packages/db/schema.sql).\n2. RLS philosophy: every table is scoped by community_id via user_communities. Reads use auth.uid(); writes verify the user's community membership.\n3. The seven v1↔v2 compatibility rules (copy from the audit).\n4. Polymorphic patterns: sessions use participant_a_type + participant_a_id. Never assume a session is community-to-community even though v1 only writes those.\n5. Dormant tables: residents, family_contacts, session_attendees — schema exists, NO queries should write to them in v1 code. If a feature 'needs' to write to these, flag it as a v2 feature and stop.\n6. Feature flag pattern: every UI surface for a v2 feature should be gated by community.flags.pen_pals (jsonb access in queries).\n\nTrigger conditions: any task involving writing Supabase queries, adding tables, or writing RLS policies." },
+            { t: "Skill: kindred-voice — tone & copy rules for any user-facing text", tag: "agent",
+              note: "The most subtle leverage. Your brand voice is consistent across mockups — encode it before you write a single React component or you'll lose it the moment Claude generates copy from scratch.",
+              prompt: "Create a Claude Skill at .claude/skills/kindred-voice/SKILL.md that captures the Kindred voice:\n\n1. Tone: warm, specific, never corporate. Avoid 'we believe', 'we're passionate about'. Prefer concrete sensory details.\n2. Audience awareness: ADs are caregivers — don't talk down. Older residents are intelligent — don't infantilize. Families are grieving (anticipatory or current) — don't over-cheerful.\n3. Banned words/phrases: 'cutting-edge', 'revolutionary', 'platform' (it's a 'tool'), 'engagement' (it's 'time together'), 'leverage', 'utilize', 'world-class', 'AI-powered' (just describe what it does).\n4. Preferred patterns: short sentences. Italics for emphasis (matches the visual design). Em-dashes for asides. 'You' singular more often than 'we'. 'Sometimes' and 'often' more than 'always' or 'every'.\n5. The founder voice when relevant: first-person, references grandma when authentic to the topic, never as a sales hook.\n6. Examples of good Kindred copy (pull 3-4 from website.html and demo.html) and examples of bad copy to avoid.\n\nTrigger conditions: any task that involves writing copy, marketing material, email templates, error messages, or empty states." },
+          ]
+        },
+        {
+          label: "Safety rails (build alongside the agents above)",
+          items: [
+            { t: "Pre-flight spam-trigger check before any outbound email", tag: "agent",
+              note: "Before any email leaves your domain, run the body through a quick check: spam-trigger words, all-caps usage, suspicious links, exclamation count. Cheap heuristic, not AI — fast and deterministic. Surfaces warnings, doesn't block.",
+              prompt: "Build packages/lib/email-agent/safety-check.ts that runs every outbound email through a pre-flight check before sending. Checks:\n\n1. Spam-trigger word list (over 200 known phrases — 'act now', 'limited time', '100% free', etc).\n2. Caps ratio > 30%.\n3. Exclamation count > 2.\n4. Link count > 3.\n5. Image-to-text ratio (if HTML).\n6. Missing unsubscribe link (for any email to a lead, not for transactional).\n7. Subject line length (over 60 chars = warning).\n\nReturns { passed: boolean, warnings: string[], blockers: string[] }. Blockers prevent send entirely; warnings show a confirm dialog. Never use AI for this — pure deterministic check. Fast." },
+            { t: "Hallucination guard on the session-recap drafter", tag: "agent",
+              note: "When Claude drafts a recap from sparse director notes, it's tempting for the model to invent details ('Eleanor's eyes lit up when…'). Add a second-pass verification: 'Given these exact notes, is every claim in the draft supported by the notes? List unsupported claims.'",
+              prompt: "Add a hallucination guard to the session-recap flow. After generating a draft, make a second Claude API call:\n\n'Compare this draft recap to the original director notes. List any claims, details, or quotes in the draft that are NOT directly supported by the notes. Be strict — phrases like \"her face lit up\" are unsupported if the notes only say \"talked about granddaughter.\" Return JSON: { supported: boolean, unsupported_claims: string[] }.'\n\nIf unsupported_claims is non-empty, highlight those phrases in the draft UI with a yellow underline and a tooltip explaining what's invented. AD can keep or remove. Never auto-delete." },
+            { t: "Rate limits + cost budget on every agent endpoint", tag: "must",
+              note: "Vercel + Anthropic make it scarily easy to ship an agent that bankrupts you overnight. Per-endpoint daily caps, per-user weekly caps, alert at 80% of budget.",
+              prompt: "Add cost budgeting to every Anthropic API call site:\n\n1. Create packages/lib/ai/budget.ts that wraps every Anthropic call. Logs each call's tokens + estimated cost to a usage table.\n2. Per-endpoint daily cap (configurable via env, e.g. ENRICH_DAILY_CAP=$5, TRIVIA_DAILY_CAP=$2).\n3. Per-user weekly cap (default $20).\n4. When 80% of any cap is hit, send Slack alert to founder.\n5. When 100% hit, return a graceful error to the calling code: 'AI features paused for the day — back tomorrow.'\n\nThis is non-negotiable — solo founders have been bankrupted by runaway agents." },
+          ]
+        },
+        {
+          label: "v2 agent surfaces (build later, plan now)",
+          items: [
+            { t: "Matching-engine rationale generator", tag: "agent",
+              note: "v2. When the engine surfaces top-3 pen-pal candidates, Claude writes a one-paragraph explanation per pair. Becomes the accountability layer — if a match flops, you can read the rationale and debug what signal was wrong." },
+            { t: "Family-survey reminder cadencer", tag: "agent",
+              note: "v2. Family received survey link 4 days ago, hasn't started. Agent drafts a gentle nudge. AD approves or edits. Sent through notifications subdomain." },
+            { t: "Voice-note transcription + light moderation", tag: "agent",
+              note: "v2. Every pen-pal voice note auto-transcribes (Daily already gives you this via Deepgram). Transcript is for captions + a very light safety pass (flagging if a message contains distress signals, contact info exchange, or unusual patterns)." },
+          ]
+        },
+      ]
+    },
+  ];
+
+const COMPANY = 'kindred';
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+function renderPhases() {
+  const container = document.getElementById('phases');
+  const saved = JSON.parse(localStorage.getItem(`build-checks-${COMPANY}`) || '{}');
+
+  let totalTasks = 0, doneTasks = 0, phasesDone = 0;
+
+  container.innerHTML = kindredPlan.map(phase => {
+    const taskCount = phase.groups.reduce((n, g) => n + g.items.length, 0);
+    const phaseDone = phase.groups.reduce((n, g) => n + g.items.filter((it, i) => saved[`${phase.id}-${g.label}-${i}`]).length, 0);
+    totalTasks += taskCount;
+    doneTasks += phaseDone;
+    const allPhaseDone = (phaseDone === taskCount && taskCount > 0);
+    if (allPhaseDone) phasesDone++;
+
+    const groupsHtml = phase.groups.map(group => `
+      <div class="phase-group">
+        <div class="phase-group-label">${escapeHtml(group.label)}</div>
+        ${group.items.map((item, i) => {
+          const key = `${phase.id}-${group.label}-${i}`;
+          const isDone = !!saved[key];
+          let extras = '';
+          if (item.note) extras += `<div class="task-note">${escapeHtml(item.note)}</div>`;
+          if (item.link) extras += `<a class="task-link" href="${item.link}" target="_blank" rel="noopener">${escapeHtml(item.link.replace(/^https?:\/\//, '').replace(/\/$/, ''))} ↗</a><br/>`;
+          if (item.prompt)     extras += `<div class="task-prompt">${escapeHtml(item.prompt)}</div>`;
+          if (item.promptBash) extras += `<div class="task-prompt bash">${escapeHtml(item.promptBash)}</div>`;
+          if (item.promptSql)  extras += `<div class="task-prompt sql">${escapeHtml(item.promptSql)}</div>`;
+          if (item.promptEnv)  extras += `<div class="task-prompt env">${escapeHtml(item.promptEnv)}</div>`;
+          return `
+            <div class="task ${isDone ? 'done' : ''}" data-key="${escapeHtml(key)}">
+              <div class="task-check"></div>
+              <div class="task-body">
+                <div class="task-text">${escapeHtml(item.t)}</div>
+                ${extras}
+                ${item.tag ? `<div class="task-meta"><span class="task-tag ${item.tag}">${item.tag.replace('-', ' ')}</span></div>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `).join('');
+
+    return `
+      <div class="phase ${allPhaseDone ? 'done' : ''}" data-phase="${phase.id}">
+        <div class="phase-head" onclick="phaseToggle('${phase.id}')">
+          <div class="phase-num">${escapeHtml(phase.icon)}</div>
+          <div class="phase-info">
+            <div class="phase-title">${escapeHtml(phase.title)}</div>
+            <div class="phase-when">${escapeHtml(phase.desc.slice(0, 110))}${phase.desc.length > 110 ? '…' : ''}</div>
+          </div>
+          <div class="phase-count">${phaseDone}/${taskCount}</div>
+          <div class="phase-chevron">›</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-desc">${escapeHtml(phase.desc)}</div>
+          ${groupsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('phases-done').innerHTML = `${phasesDone}<span class="dim">/8</span>`;
+  document.getElementById('tasks-done').innerHTML = `${doneTasks}<span class="dim">/${totalTasks}</span>`;
+  document.getElementById('top-bar').style.width = totalTasks ? `${(doneTasks/totalTasks)*100}%` : '0%';
+  document.getElementById('portal-phase-count').textContent = `${phasesDone}/8`;
+
+  // Save totals so the Studio shell can read them
+  localStorage.setItem(`build-totals-${COMPANY}`, JSON.stringify({ total: totalTasks, phases: phasesDone }));
+
+  container.querySelectorAll('.task').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('a, .task-prompt')) return;
+      const key = el.dataset.key;
+      const saved = JSON.parse(localStorage.getItem(`build-checks-${COMPANY}`) || '{}');
+      saved[key] = !saved[key];
+      localStorage.setItem(`build-checks-${COMPANY}`, JSON.stringify(saved));
+      renderPhases();
+    });
+  });
+}
+
+function phaseToggle(id) {
+  const el = document.querySelector(`.phase[data-phase="${id}"]`);
+  if (el) el.classList.toggle('open');
+}
+
+function auditShow(slice, btn) {
+  btn.parentElement.querySelectorAll('.strip-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#pane-audit .strip-pane').forEach(p => p.classList.toggle('on', p.id === `audit-${slice}`));
+}
+
+function agentsShow(slice, btn) {
+  btn.parentElement.querySelectorAll('.strip-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#pane-agents .strip-pane').forEach(p => p.classList.toggle('on', p.id === `agents-${slice}`));
+}
+
+// Sidebar nav with lazy iframe load + load-state handling
+document.querySelectorAll('.nav-item[data-pane]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.pane;
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === `pane-${target}`));
+    // Lazy-load iframes on click
+    const iframe = document.querySelector(`#pane-${target} iframe[data-src]`);
+    if (iframe && iframe.src.endsWith('about:blank')) {
+      const loader = iframe.closest('.iframe-wrap')?.querySelector('.iframe-loading');
+      iframe.addEventListener('load', () => {
+        iframe.classList.add('loaded');
+        if (loader) loader.classList.add('gone');
+      }, { once: true });
+      iframe.src = iframe.dataset.src;
+    }
+    document.querySelector('.main').scrollTop = 0;
+  });
+});
+
+renderPhases();
+</script>
+
+</body>
+</html>

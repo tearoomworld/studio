@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<title>source — atlanta</title>
+<style>
+  :root {
+    --ink: #0a0a0a; --ink-2: #2a2a2a; --muted: #7a7a7a; --faint: #b8b8b8;
+    --hair: #e8e8e8; --bg: #ffffff; --soft: #f4f4f2;
+    --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font); color: var(--ink); background: var(--bg);
+    text-transform: lowercase; line-height: 1.4;
+    -webkit-font-smoothing: antialiased; letter-spacing: -0.005em;
+  }
+
+  /* ── sticky tab nav ── */
+  nav {
+    position: sticky; top: 0; z-index: 50; background: var(--bg);
+    border-bottom: 1px solid var(--ink);
+    padding: env(safe-area-inset-top) 0 0;
+  }
+  .nav-inner { display: flex; max-width: 860px; margin: 0 auto; overflow-x: auto; }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 0 0 auto; background: none; border: 0; cursor: pointer;
+    font: inherit; font-size: 12px; letter-spacing: 0.03em; color: var(--muted);
+    padding: 16px 18px; position: relative; white-space: nowrap;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); }
+  .tab[aria-selected="true"]::after {
+    content: ""; position: absolute; left: 18px; right: 18px; bottom: -1px;
+    height: 1px; background: var(--ink);
+  }
+
+  .page { display: none; }
+  .page.on { display: block; }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px 100px; }
+
+  /* ── page header ── */
+  .ph { padding: 48px 0 0; }
+  .ph .kicker { font-size: 11px; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; }
+  .ph h1 { font-size: 40px; line-height: 1.0; font-weight: 500; letter-spacing: -0.02em; margin: 16px 0 0; }
+  .ph .lede { font-size: 15px; color: var(--muted); margin: 16px 0 0; max-width: 480px; }
+
+  h2 { font-size: 22px; font-weight: 500; letter-spacing: -0.01em;
+    margin: 48px 0 0; padding-bottom: 9px; border-bottom: 1px solid var(--ink); }
+  h3 { font-size: 16px; font-weight: 500; margin: 26px 0 0; }
+  p { font-size: 14px; color: var(--ink-2); margin: 10px 0 0; }
+  p.muted { color: var(--muted); }
+
+  .row { padding: 18px 0; border-bottom: 1px solid var(--hair); }
+  .row:last-child { border-bottom: 0; }
+  .row-head { display: flex; align-items: baseline; gap: 12px; }
+  .row-no { font-size: 11px; letter-spacing: 0.06em; color: var(--faint);
+    font-weight: 500; min-width: 50px; font-feature-settings: "tnum"; }
+  .row-title { font-size: 16px; font-weight: 500; }
+  .row-tag { margin-left: auto; font-size: 10px; letter-spacing: 0.05em;
+    font-weight: 500; padding: 2px 7px; border: 1px solid var(--hair); color: var(--muted); }
+  .row-body { font-size: 13px; color: var(--muted); margin: 8px 0 0 62px; }
+  @media (max-width: 540px) { .row-body { margin-left: 0; } }
+
+  /* ── metric cards ── */
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--hair); border: 1px solid var(--hair); margin-top: 22px; }
+  .metric { background: var(--bg); padding: 18px 16px; }
+  .metric .k { font-size: 10px; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; }
+  .metric .v { font-size: 28px; font-weight: 500; letter-spacing: -0.015em;
+    margin-top: 8px; font-feature-settings: "tnum"; }
+  .metric .n { font-size: 11px; color: var(--faint); margin-top: 4px; }
+  @media (max-width: 540px) { .metrics { grid-template-columns: 1fr; } }
+
+  /* ── data table ── */
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { text-align: left; padding: 11px 8px; font-size: 13px;
+    border-bottom: 1px solid var(--hair); }
+  th { font-size: 10px; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; }
+  td { font-feature-settings: "tnum"; }
+  td:first-child, th:first-child { padding-left: 0; }
+  td:last-child, th:last-child { padding-right: 0; text-align: right; }
+  th:not(:first-child), td:not(:first-child) { text-align: right; }
+  tr.total td { border-top: 1px solid var(--ink); border-bottom: 0;
+    font-weight: 500; padding-top: 13px; }
+
+  .callout { margin: 22px 0 0; padding: 16px 20px; background: var(--soft); }
+  .callout p { font-size: 13px; color: var(--muted); margin: 0; }
+  .callout p + p { margin-top: 8px; }
+  .callout strong { color: var(--ink); font-weight: 500; }
+
+  .assume { margin-top: 20px; }
+  .assume-item { padding: 13px 0; border-bottom: 1px solid var(--hair); }
+  .assume-item:last-child { border-bottom: 0; }
+  .assume-k { font-size: 11px; letter-spacing: 0.05em; color: var(--muted); font-weight: 500; }
+  .assume-v { font-size: 13px; margin-top: 4px; }
+
+  .estimate-flag {
+    display: inline-block; font-size: 10px; letter-spacing: 0.05em; font-weight: 500;
+    padding: 3px 9px; border: 1px solid var(--ink); margin-top: 18px;
+  }
+
+  /* ── flywheel steps ── */
+  .flow { margin-top: 22px; }
+  .flow-step { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--hair); }
+  .flow-step:last-child { border-bottom: 0; }
+  .flow-n { font-size: 11px; letter-spacing: 0.06em; color: var(--faint);
+    font-weight: 500; min-width: 24px; font-feature-settings: "tnum"; }
+  .flow-t { font-size: 14px; }
+  .flow-t strong { font-weight: 500; }
+  .flow-t span { color: var(--muted); }
+
+  footer { border-top: 1px solid var(--hair); margin-top: 56px; padding: 26px 0; }
+  footer p { font-size: 12px; color: var(--faint); margin: 4px 0 0; }
+
+  .week-aim { font-size: 13px; color: var(--muted); margin: 12px 0 4px; font-style: normal; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-page="build">build plan</button>
+    <button class="tab" role="tab" aria-selected="false" data-page="v2">v2 features</button>
+    <button class="tab" role="tab" aria-selected="false" data-page="revenue">revenue &amp; growth</button>
+    <button class="tab" role="tab" aria-selected="false" data-page="marketing">marketing</button>
+    <button class="tab" role="tab" aria-selected="false" data-page="vision">5-year vision</button>
+  </div>
+</nav>
+
+<!-- ════════════════ BUILD PLAN ════════════════ -->
+<section class="page on" id="page-build">
+  <div class="wrap">
+    <div class="ph">
+      <div class="kicker">source — atlanta · internal</div>
+      <h1>the build plan</h1>
+      <p class="lede">eight weeks from prototype to a native app live in the app store and google play. the work splits into four build weeks, one to go native, and a submission window paced by apple's review queue.</p>
+    </div>
+
+    <h2>the shape</h2>
+    <div class="metrics">
+      <div class="metric"><div class="k">build</div><div class="v">4 wks</div><div class="n">app, database, tickets, hosts</div></div>
+      <div class="metric"><div class="k">go native</div><div class="v">1 wk</div><div class="n">wrap, icons, store prep</div></div>
+      <div class="metric"><div class="k">submit</div><div class="v">2–3 wks</div><div class="n">apple review loop</div></div>
+    </div>
+    <div class="callout">
+      <p><strong>why eight, not four.</strong> the hands-on build is ~4 weeks. the rest is apple's bureaucracy — llc, d-u-n-s number, developer enrollment, app review — which runs in the background while the build continues. the one thing outside our control is apple's queue.</p>
+    </div>
+
+    <h2>week one — foundation</h2>
+    <p class="week-aim">tools installed, the app running locally, and the slow paperwork started so it processes for weeks while we build.</p>
+    <div class="row"><div class="row-head"><span class="row-no">days 1–5</span><span class="row-title">dev environment, accounts, the app on-screen</span></div>
+      <div class="row-body">node, xcode, vs code, github. supabase + vercel + google play accounts. the prototype foundation runs locally on real database data. llc filing and the d-u-n-s number start now as background tasks.</div></div>
+
+    <h2>week two — real content</h2>
+    <p class="week-aim">the app stops being a demo: real atlanta events, real photos, real copy.</p>
+    <div class="row"><div class="row-head"><span class="row-no">days 6–10</span><span class="row-title">15 real events, photo uploads, apple enrollment</span></div>
+      <div class="row-body">the seed becomes 15 real may–july atlanta events. photo upload works end to end. apple developer enrollment begins once the llc + d-u-n-s clear.</div></div>
+
+    <h2>week three — accounts &amp; tickets</h2>
+    <p class="week-aim">people can sign in and buy a ticket. money is involved, so everything is tested twice.</p>
+    <div class="row"><div class="row-head"><span class="row-no">days 11–15</span><span class="row-title">sign-in, stripe, ticketing, confirmation emails</span></div>
+      <div class="row-body">the lightweight "buy door" — a one-screen sign-in at checkout. stripe wired, fee math confirmed (10% + $0.99 per ticket), test purchases, then real payments live.</div></div>
+
+    <h2>week four — hosts, the pool &amp; the admin dashboard</h2>
+    <p class="week-aim">hosts can sign up, get paid, and post. the pool runs. and we get a private place to operate the business.</p>
+    <div class="row"><div class="row-head"><span class="row-no">days 16–19</span><span class="row-title">host onboarding, stripe connect, posting, the pool</span></div>
+      <div class="row-body">the guided "host door": profile, payout setup, posting events. stripe connect pays hosts automatically. the pool tally and host leaderboard go live.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">day 20</span><span class="row-title">backend admin dashboard</span><span class="row-tag">new</span></div>
+      <div class="row-body">a private, founders-only dashboard: every event and host at a glance, ticket sales and revenue, the live pool tally, and a "mark winner" action to pay out the quarterly prize. lightweight by design — supabase already gives a raw table view, so this is just the summaries and actions that need to be one click.</div></div>
+
+    <h2>week five — becoming a real app</h2>
+    <p class="week-aim">the finished web app gets wrapped into real iphone + android apps.</p>
+    <div class="row"><div class="row-head"><span class="row-no">days 21–25</span><span class="row-title">capacitor wrap, app icon, store listings, testflight</span></div>
+      <div class="row-body">capacitor turns one codebase into native apps — no rewrite. app icon, store screenshots, privacy disclosures, and a testflight beta to real phones, including the launch hosts'.</div></div>
+
+    <h2>weeks six–eight — submit &amp; launch</h2>
+    <p class="week-aim">submit to both stores, work the review loop, launch together.</p>
+    <div class="row"><div class="row-head"><span class="row-no">days 26+</span><span class="row-title">submission, review rounds, public launch</span></div>
+      <div class="row-body">submit to apple + google. expect 2–3 review rounds — normal for a first app. when both approve, source launches in both stores with the three confirmed hosts posting the first real events.</div></div>
+
+    <footer>
+      <p>source — atlanta build plan. timeline flexes; apple's review queue is the variable.</p>
+      <p>a personal version with checkable progress is maintained separately.</p>
+    </footer>
+  </div>
+</section>
+
+<!-- ════════════════ V2 FEATURES ════════════════ -->
+<section class="page" id="page-v2">
+  <div class="wrap">
+    <div class="ph">
+      <div class="kicker">source — atlanta · internal</div>
+      <h1>v2 features</h1>
+      <p class="lede">what comes after the beta. the launch proves the core loop — find, buy, host, pool. these are the next layers, captured and sequenced, not yet designed.</p>
+    </div>
+
+    <h2>next up</h2>
+    <div class="row"><div class="row-head"><span class="row-no">v2 · 01</span><span class="row-title">event series</span><span class="row-tag">first</span></div>
+      <div class="row-body">a recurring night as its own thing — "jes grew, every tuesday at echo room." a host posts the series once; each date belongs to it. the series gets its own page. fixes the re-post-from-scratch problem and gives regular nights a home.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">v2 · 02</span><span class="row-title">following</span><span class="row-tag">second</span></div>
+      <div class="row-body">follow a series, a host, or a venue — followed things surface in a personal feed with notifications when new dates post. needs series first; pulls in a notification layer.</div></div>
+
+    <h2>the wider ecosystem</h2>
+    <div class="row"><div class="row-head"><span class="row-no">v2 · 03</span><span class="row-title">open calls</span></div>
+      <div class="row-body">hosts post calls for performers, vendors, collaborators; creatives apply in-app.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">v2 · 04</span><span class="row-title">artist directory</span></div>
+      <div class="row-body">a directory of atlanta artists open for work — named on the about page. creatives get a profile; hosts find them.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">v2 · 05</span><span class="row-title">in-app chat</span></div>
+      <div class="row-body">messaging between hosts and attendees, or hosts and creatives. revisited once the directory and open calls give people a reason to message.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">v2 · 06</span><span class="row-title">ticket transfers &amp; resale</span></div>
+      <div class="row-body">letting holders transfer or resell tickets. real payment + fraud complexity, handled deliberately.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">v2 · 07</span><span class="row-title">grants &amp; residencies</span></div>
+      <div class="row-body">the ecosystem the about page describes — grants for small spaces, residencies for first-time hosts. grows from the pool once it's funded and proven.</div></div>
+
+    <h2>cities — v3</h2>
+    <div class="row"><div class="row-head"><span class="row-no">v2 · 08</span><span class="row-title">other cities</span><span class="row-tag">v3</span></div>
+      <div class="row-body">la, new york, london, then nashville / new orleans / durham. groundwork is already done — the beta database is hub-aware, every event tagged to a city, the city picker already live. launching a city is "switch a hub on," not a rebuild.</div></div>
+
+    <div class="callout">
+      <p><strong>a note on sequencing.</strong> series, following, open calls, and the directory all rest on the same idea — persistent pages and profiles you can subscribe to. building series first lays groundwork the next three reuse. each slice makes the ones after cheaper.</p>
+    </div>
+
+    <footer>
+      <p>source — atlanta v2 backlog. nothing here is designed yet.</p>
+      <p>each feature gets its own design pass when its time comes.</p>
+    </footer>
+  </div>
+</section>
+
+<!-- ════════════════ REVENUE & GROWTH ════════════════ -->
+<section class="page" id="page-revenue">
+  <div class="wrap">
+    <div class="ph">
+      <div class="kicker">source — atlanta · internal</div>
+      <h1>revenue &amp; growth</h1>
+      <p class="lede">a twelve-month projection in two cases — conservative and strong. the headline numbers are the year-one outcomes; every figure traces to an assumption further down.</p>
+    </div>
+
+    <span class="estimate-flag">projection — illustrative estimates, not a forecast</span>
+
+    <h2>year one — the headline</h2>
+    <p class="muted">two cases. conservative assumes a steady ramp to ~20 hosts. strong reflects the founder's actual host reach — ~55 active hosts by month twelve. both keep tickets-per-event grounded; hosts are not the constraint, real demand is.</p>
+
+    <h3>conservative case</h3>
+    <div class="metrics">
+      <div class="metric"><div class="k">12-mo ticket gmv</div><div class="v">$135k</div><div class="n">gross ticket value</div></div>
+      <div class="metric"><div class="k">12-mo source net</div><div class="v">$14.5k</div><div class="n">fee revenue, after pool</div></div>
+      <div class="metric"><div class="k">pool, year-end</div><div class="v">$4.8k</div><div class="n">across four quarters</div></div>
+    </div>
+
+    <h3>strong case</h3>
+    <div class="metrics">
+      <div class="metric"><div class="k">12-mo ticket gmv</div><div class="v">$546k</div><div class="n">gross ticket value</div></div>
+      <div class="metric"><div class="k">12-mo source net</div><div class="v">$58.5k</div><div class="n">fee revenue, after pool</div></div>
+      <div class="metric"><div class="k">pool, year-end</div><div class="v">$19.5k</div><div class="n">across four quarters</div></div>
+    </div>
+    <div class="callout">
+      <p><strong>the strong case is the working plan.</strong> the founder has direct reach into 15–20 hosts in the first months alone — host acquisition, the usual cold-start problem for a marketplace, is largely solved. the conservative case is the floor: what happens even if onboarding is slow and sell-through stays modest.</p>
+    </div>
+
+    <h2>how the money works</h2>
+    <p>source takes a fee on every paid ticket: <strong>10% of the ticket price, plus $0.99 per ticket</strong>. a quarter of that fee funds the pool — the quarterly prize for a top-rated host. the rest is source's revenue. free events carry no ticket fee.</p>
+    <table>
+      <thead><tr><th>on a $20 ticket</th><th>amount</th></tr></thead>
+      <tbody>
+        <tr><td>total source fee</td><td>$2.99</td></tr>
+        <tr><td>— to the pool (¼)</td><td>$0.75</td></tr>
+        <tr><td>— source keeps (¾)</td><td>$2.24</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">the fee is deliberately small — hosts keep the overwhelming majority of ticket revenue. the pitch to a host: keep your audience, keep your money, and a stake in a quarterly prize.</p>
+
+    <h2>twelve-month build — strong case</h2>
+    <p>month-by-month, the working plan. "paid events" excludes free events, which generate no ticket fee.</p>
+    <table>
+      <thead><tr><th>month</th><th>hosts</th><th>paid ev.</th><th>gmv</th><th>net</th></tr></thead>
+      <tbody>
+        <tr><td>m1</td><td>10</td><td>11</td><td>$9,600</td><td>$1,030</td></tr>
+        <tr><td>m3</td><td>18</td><td>20</td><td>$19,300</td><td>$2,070</td></tr>
+        <tr><td>m6</td><td>30</td><td>34</td><td>$39,100</td><td>$4,200</td></tr>
+        <tr><td>m9</td><td>42</td><td>47</td><td>$61,600</td><td>$6,610</td></tr>
+        <tr><td>m12</td><td>55</td><td>62</td><td>$92,700</td><td>$9,940</td></tr>
+        <tr class="total"><td>year 1</td><td>—</td><td>~470</td><td>$546k</td><td>$58.5k</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">"gmv" is gross ticket value moving through source. "net" is monthly fee revenue after the pool's quarter is set aside. by month twelve the run-rate alone annualizes near $119k.</p>
+
+    <h2>twelve-month build — conservative case</h2>
+    <p>the floor — slow host onboarding, modest sell-through. still a real, growing business.</p>
+    <table>
+      <thead><tr><th>month</th><th>hosts</th><th>paid ev.</th><th>gmv</th><th>net</th></tr></thead>
+      <tbody>
+        <tr><td>m1</td><td>5</td><td>5</td><td>$3,450</td><td>$370</td></tr>
+        <tr><td>m3</td><td>9</td><td>8</td><td>$5,900</td><td>$630</td></tr>
+        <tr><td>m6</td><td>15</td><td>14</td><td>$11,900</td><td>$1,280</td></tr>
+        <tr><td>m9</td><td>18</td><td>16</td><td>$14,700</td><td>$1,580</td></tr>
+        <tr><td>m12</td><td>20</td><td>18</td><td>$18,600</td><td>$2,000</td></tr>
+        <tr class="total"><td>year 1</td><td>—</td><td>~150</td><td>$135k</td><td>$14.5k</td></tr>
+      </tbody>
+    </table>
+
+    <h2>the pool, quarter by quarter</h2>
+    <p>the pool is a quarter of all ticket fees, awarded to one top-rated host each quarter. it grows as the platform grows — a visible, compounding prize.</p>
+    <table>
+      <thead><tr><th>quarter</th><th>conservative</th><th>strong</th></tr></thead>
+      <tbody>
+        <tr><td>q1 award</td><td>$480</td><td>$1,560</td></tr>
+        <tr><td>q2 award</td><td>$1,050</td><td>$3,450</td></tr>
+        <tr><td>q3 award</td><td>$1,490</td><td>$5,770</td></tr>
+        <tr><td>q4 award</td><td>$1,820</td><td>$8,740</td></tr>
+        <tr class="total"><td>year 1 total</td><td>$4,840</td><td>$19,520</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">in the strong case, a host wins close to $9k by the fourth quarter — a number large enough to be a real reason to host on source, and a real story to tell.</p>
+
+    <h2>the flywheel</h2>
+    <div class="flow">
+      <div class="flow-step"><span class="flow-n">01</span><span class="flow-t"><strong>tickets fund the pool.</strong> <span>a slice of every paid ticket builds a quarterly prize.</span></span></div>
+      <div class="flow-step"><span class="flow-n">02</span><span class="flow-t"><strong>the prize attracts hosts.</strong> <span>top-rated hosts compete for it — a reason to host on source, not instagram.</span></span></div>
+      <div class="flow-step"><span class="flow-n">03</span><span class="flow-t"><strong>more hosts, more events.</strong> <span>each host brings their own audience to the feed.</span></span></div>
+      <div class="flow-step"><span class="flow-n">04</span><span class="flow-t"><strong>more events, a bigger pool.</strong> <span>which makes the prize more compelling — and the loop tightens.</span></span></div>
+    </div>
+
+    <h2>beyond year one</h2>
+    <p>year-one revenue from a single city is modest by design — the low fee is the cost of winning hosts and proving the loop. the thesis is the <strong>per-city multiplier</strong>: the model is built to repeat in la, new york, and london, each with its own pool and its own scene. the database is already hub-aware — a second city is a switch, not a rebuild. five cities at the strong-case run-rate is a materially different business.</p>
+
+    <h2>assumptions</h2>
+    <div class="assume">
+      <div class="assume-item"><div class="assume-k">average paid ticket price</div><div class="assume-v">~$23 — the average across the 15-event seed set, excluding free events.</div></div>
+      <div class="assume-item"><div class="assume-k">tickets per paid event</div><div class="assume-v">30–45 (conservative) / 38–65 (strong) over the year. grounded — the seed events' real capacities run 60–600, so these are modest sell-through rates, not optimistic ones.</div></div>
+      <div class="assume-item"><div class="assume-k">host growth</div><div class="assume-v">conservative: 5 → 20 over twelve months. strong: 10 → 55, reflecting the founder's stated reach of 15–20 hosts available in the first months.</div></div>
+      <div class="assume-item"><div class="assume-k">events per host</div><div class="assume-v">~1.3–1.6 events per host per month, of which ~70% are paid (the rest free).</div></div>
+      <div class="assume-item"><div class="assume-k">what's excluded</div><div class="assume-v">free events (no ticket fee), payment processing costs, and any future revenue lines. this is ticket-fee revenue only.</div></div>
+    </div>
+    <p class="muted">estimates for planning, to be revised against real launch data. the strong case is the working plan; the conservative case is the floor.</p>
+
+    <footer>
+      <p>source — atlanta revenue model. all figures illustrative, pre-launch.</p>
+      <p>to be replaced with actuals once the beta is live.</p>
+    </footer>
+  </div>
+</section>
+
+<!-- ════════════════ MARKETING ════════════════ -->
+<section class="page" id="page-marketing">
+  <div class="wrap">
+    <div class="ph">
+      <div class="kicker">source — atlanta · internal</div>
+      <h1>marketing strategy</h1>
+      <p class="lede">source doesn't win by out-spending anyone. it wins by being the place atlanta's scene already trusts — built host-first, told in public, in a voice that never sounds like marketing.</p>
+    </div>
+
+    <h2>the core idea</h2>
+    <p>events already happen — they're just scattered across instagram, tiktok, and group chats, found by accident or not at all. source isn't creating demand; it's <strong>consolidating attention that already exists</strong>. the marketing job isn't persuasion. it's being where the scene already is, and being obviously useful.</p>
+
+    <h2>hosts are the wedge</h2>
+    <p>the whole strategy in one line: <strong>win the host, and their audience comes with them.</strong> a venue or collective that posts on source brings their existing followers to the feed. one good host is worth more than any ad — it's audience acquisition disguised as supply acquisition.</p>
+    <p>and this is source's structural advantage: <strong>host acquisition is largely solved before launch.</strong> the founder has direct reach into 15–20 hosts in the first months — the cold-start problem that kills most marketplaces is, here, a network the founder already has.</p>
+    <div class="flow">
+      <div class="flow-step"><span class="flow-n">01</span><span class="flow-t"><strong>start with the founder's network.</strong> <span>the first wave of hosts comes from existing relationships in the atlanta scene — recruited directly, by hand.</span></span></div>
+      <div class="flow-step"><span class="flow-n">02</span><span class="flow-t"><strong>let hosts recruit hosts.</strong> <span>scenes are small and connected. a host who keeps their money and likes the tool tells the next one.</span></span></div>
+      <div class="flow-step"><span class="flow-n">03</span><span class="flow-t"><strong>the pool is the closer.</strong> <span>"a quarterly prize, funded by tickets, for top-rated hosts" — a reason to choose source no other platform offers.</span></span></div>
+    </div>
+
+    <h2>building in public — the signature play</h2>
+    <p>source's launch story isn't an ad campaign — it's the build itself. <strong>document making the app, step by step, and release it as content</strong>: the prototype, the design choices, the pool idea, the first hosts, the first ticket sold. take people through the process as it happens.</p>
+    <p>this does three things at once. it <strong>builds an audience before launch</strong> — people follow a story, not a product. it <strong>earns trust with hosts</strong>, who see a real founder doing real, careful work, not a faceless platform. and it's <strong>authentically on-brand</strong> — source is editorial, transparent, anti-hype; a build-in-public series is that voice, extended. it costs nothing but honesty.</p>
+    <div class="flow">
+      <div class="flow-step"><span class="flow-n">01</span><span class="flow-t"><strong>the making-of series.</strong> <span>short, regular posts — designing the feed, the lowercase rule, wiring the pool, the first host conversations.</span></span></div>
+      <div class="flow-step"><span class="flow-n">02</span><span class="flow-t"><strong>show the why.</strong> <span>not just "we built a screen" — "here's why a slice of every ticket goes back to a host." the mission, in public.</span></span></div>
+      <div class="flow-step"><span class="flow-n">03</span><span class="flow-t"><strong>launch to a warm audience.</strong> <span>by the time the app is live, the people who watched it get built are the first to download — and the first to tell others.</span></span></div>
+    </div>
+
+    <h2>instagram &amp; tiktok — the home channels</h2>
+    <p>this is where atlanta's scene already lives, so this is where source lives too. not as an advertiser — as a presence worth following in its own right.</p>
+    <div class="row"><div class="row-head"><span class="row-no">01</span><span class="row-title">the build-in-public series</span></div>
+      <div class="row-body">the making-of content, posted as it happens. tiktok for reach and discovery, instagram for the editorial cut. the founder's story is the hook.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">02</span><span class="row-title">the feed, restyled for social</span></div>
+      <div class="row-body">what's on this week, in source's editorial style — lowercase, photo-led, calm. a reason to follow even before downloading. the app's aesthetic, extended.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">03</span><span class="row-title">host spotlights</span></div>
+      <div class="row-body">short features on the hosts and the nights they run. promotes hosts, deepens the partnership, and gives them content to reshare to their own audiences.</div></div>
+    <div class="row"><div class="row-head"><span class="row-no">04</span><span class="row-title">the pool announcements</span></div>
+      <div class="row-body">each quarterly award is a built-in content moment — a named winner, a real amount, a story about money moving back to culture. four a year, by design.</div></div>
+
+    <h2>the brand does the work</h2>
+    <p>source looks like a gallery catalog, not a tech app — lowercase, editorial, calm, photo-led. in a feed of loud, templated event promos, that restraint <em>is</em> the differentiator. the brand signals taste, and taste is what the atlanta arts scene responds to. the rule for every post, everywhere: <strong>never sound like marketing.</strong> plain, lowercase, in voice — the same register as the app itself.</p>
+
+    <h2>launch — atlanta only, on purpose</h2>
+    <p>source launches in one city and says so plainly. that focus is a strength: a credible, dense presence in one scene beats a thin presence across five. the beta's goal isn't scale — it's <strong>proof</strong>: that hosts stay, that the pool funds, that the loop turns. proof is what makes the second city, and any raise, real.</p>
+
+    <div class="callout">
+      <p><strong>the one-line strategy.</strong> win atlanta's hosts through the founder's network, build the app in public so launch meets a warm audience, let the pool give everyone a story worth repeating — and never sound like an ad. spend on nothing until the loop is proven, then repeat it city by city.</p>
+    </div>
+
+    <footer>
+      <p>source — atlanta marketing strategy. a working framework.</p>
+      <p>to be shaped further with founder knowledge of the atlanta scene.</p>
+    </footer>
+  </div>
+</section>
+
+<!-- ════════════════ 5-YEAR VISION ════════════════ -->
+<section class="page" id="page-vision">
+  <div class="wrap">
+    <div class="ph">
+      <div class="kicker">source — atlanta · internal</div>
+      <h1>the five-year vision</h1>
+      <p class="lede">where source goes if the loop holds — from one feed in atlanta to cultural infrastructure across a network of cities, each with its own scene, its own pool, its own people getting paid.</p>
+    </div>
+
+    <span class="estimate-flag">vision — a picture of the ambition, not a forecast</span>
+
+    <h2>the picture</h2>
+    <p>five years out, source isn't an events app. it's the layer a city's culture runs on. in every city it's in, the question "what's on this week" has one answer — and the people who throw those nights keep their audiences, keep their money, and have a real stake in a prize that pays out every quarter.</p>
+    <p>the model proven in atlanta — host-first, pool-funded, editorial — repeats city by city. not franchised, not templated: each city onboarded the way that city actually works, the way the brief always said. the pool becomes a quiet, recurring act of redistribution at city scale — culture funding culture, on a loop.</p>
+
+    <h2>the pool cap — how it scales</h2>
+    <p>a quarterly pool that grew without limit would eventually distort everything — a runaway prize warps incentives. so the pool is <strong>capped at $10,000 per city, per quarter</strong>. it stays a serious, life-changing prize for a host — but a sane one.</p>
+    <p>once a city's quarterly pool hits the cap, the <strong>overflow flows to source</strong>. this is the mechanic that makes mission and business agree: young cities pay everything to hosts (no city hits the cap early — exactly when hosts matter most), and mature cities generate overflow that funds the company. the system self-adjusts.</p>
+    <table>
+      <thead><tr><th>one mature city, per quarter</th><th>amount</th></tr></thead>
+      <tbody>
+        <tr><td>raw pool share (25% of fees)</td><td>~$19,500</td></tr>
+        <tr><td>— pool, capped</td><td>$10,000</td></tr>
+        <tr><td>— overflow to source</td><td>~$9,500</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">the host prize stays meaningful and stable; source captures the upside of a city's maturity. the cap is a feature, not a limit.</p>
+
+    <h2>year by year</h2>
+    <p>a city rollout — atlanta first, then a widening cadence. figures are illustrative, built on the strong-case city model extended over time.</p>
+
+    <h3>year one — prove it</h3>
+    <div class="metrics">
+      <div class="metric"><div class="k">cities</div><div class="v">1</div><div class="n">atlanta</div></div>
+      <div class="metric"><div class="k">ticket gmv</div><div class="v">$0.4m</div><div class="n">the beta year</div></div>
+      <div class="metric"><div class="k">source revenue</div><div class="v">$47k</div><div class="n">single city</div></div>
+    </div>
+    <p class="muted">atlanta only. the year the loop is proven — hosts stay, the pool funds, the flywheel turns. no city near the cap; every pool dollar goes to hosts.</p>
+
+    <h3>year two — repeat it</h3>
+    <div class="metrics">
+      <div class="metric"><div class="k">cities</div><div class="v">3</div><div class="n">+ la, new york</div></div>
+      <div class="metric"><div class="k">ticket gmv</div><div class="v">$2.1m</div><div class="n">across three scenes</div></div>
+      <div class="metric"><div class="k">source revenue</div><div class="v">$225k</div><div class="n">the model travels</div></div>
+    </div>
+    <p class="muted">the first proof that source isn't an atlanta thing — it's a model. atlanta, now maturing, is the first city to brush the pool cap.</p>
+
+    <h3>year three — momentum</h3>
+    <div class="metrics">
+      <div class="metric"><div class="k">cities</div><div class="v">6</div><div class="n">+ london &amp; more</div></div>
+      <div class="metric"><div class="k">ticket gmv</div><div class="v">$5.9m</div><div class="n">six scenes live</div></div>
+      <div class="metric"><div class="k">source revenue</div><div class="v">$676k</div><div class="n">incl. $44k overflow</div></div>
+    </div>
+    <p class="muted">three cities now hit the cap each quarter — the overflow mechanic starts contributing real revenue. the ecosystem features from v2 — open calls, the artist directory — begin layering in.</p>
+
+    <h3>year four — infrastructure</h3>
+    <div class="metrics">
+      <div class="metric"><div class="k">cities</div><div class="v">10</div><div class="n">a real network</div></div>
+      <div class="metric"><div class="k">ticket gmv</div><div class="v">$12.5m</div><div class="n">ten scenes</div></div>
+      <div class="metric"><div class="k">source revenue</div><div class="v">$1.49m</div><div class="n">incl. $145k overflow</div></div>
+    </div>
+    <p class="muted">source crosses into seven figures. half the network is mature enough to hit the cap — the company is funded increasingly by the overflow of its own success.</p>
+
+    <h3>year five — the layer</h3>
+    <div class="metrics">
+      <div class="metric"><div class="k">cities</div><div class="v">15</div><div class="n">a cultural network</div></div>
+      <div class="metric"><div class="k">ticket gmv</div><div class="v">$22.3m</div><div class="n">fifteen scenes</div></div>
+      <div class="metric"><div class="k">source revenue</div><div class="v">$2.71m</div><div class="n">incl. $319k overflow</div></div>
+    </div>
+    <p class="muted">fifteen cities, ~$478k paid out to hosts through the pools in a single year, and source a sustainable company funded by the model working as designed.</p>
+
+    <h2>the five-year arc</h2>
+    <table>
+      <thead><tr><th>year</th><th>cities</th><th>gmv</th><th>source rev.</th><th>to pools</th></tr></thead>
+      <tbody>
+        <tr><td>year 1</td><td>1</td><td>$0.4m</td><td>$47k</td><td>$16k</td></tr>
+        <tr><td>year 2</td><td>3</td><td>$2.1m</td><td>$225k</td><td>$71k</td></tr>
+        <tr><td>year 3</td><td>6</td><td>$5.9m</td><td>$676k</td><td>$167k</td></tr>
+        <tr><td>year 4</td><td>10</td><td>$12.5m</td><td>$1.49m</td><td>$303k</td></tr>
+        <tr class="total"><td>year 5</td><td>15</td><td>$22.3m</td><td>$2.71m</td><td>$478k</td></tr>
+      </tbody>
+    </table>
+    <p class="muted">"to pools" is money paid directly to hosts as quarterly prizes — a number that, by year five, is approaching half a million dollars a year flowing back to the people who make culture.</p>
+
+    <h2>what it adds up to</h2>
+    <div class="callout">
+      <p><strong>the thesis in one line.</strong> source proves a model in atlanta where finding culture is easy and making it pays — then repeats that model city by city, with a capped pool that keeps the prize meaningful and the company funded. five years out: a fifteen-city cultural network, millions in revenue, and hundreds of thousands of dollars a year moving back to hosts. infrastructure for scenes, built one city at a time.</p>
+    </div>
+
+    <footer>
+      <p>source — atlanta. the five-year vision is a picture of the ambition.</p>
+      <p>all figures illustrative — the further out, the more they are story, not forecast.</p>
+    </footer>
+  </div>
+</section>
+
+
+<script>
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+  var pages = {
+    build: document.getElementById("page-build"),
+    v2: document.getElementById("page-v2"),
+    revenue: document.getElementById("page-revenue"),
+    marketing: document.getElementById("page-marketing"),
+    vision: document.getElementById("page-vision")
+  };
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      var target = tab.dataset.page;
+      tabs.forEach(function (t) {
+        t.setAttribute("aria-selected", t === tab ? "true" : "false");
+      });
+      Object.keys(pages).forEach(function (k) {
+        pages[k].classList.toggle("on", k === target);
+      });
+      window.scrollTo(0, 0);
+    });
+  });
+</script>
+</body>
+</html>

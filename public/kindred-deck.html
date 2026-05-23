@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#fdf8f0" />
+<title>kindred — the deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #2a221c; --ink-2: #4a3f36; --muted: #8a7d70; --faint: #c4b8a8;
+    --hair: #ebe1d2; --bg: #fdf8f0; --soft: #f5ede0;
+    --peach: #f4b860; --peach-deep: #c87740; --peach-soft: #fde3c4;
+    --sage: #a8c98a; --sage-deep: #5a7a3f; --sage-soft: #d4e7d4;
+    --lav: #c4b5e0; --lav-soft: #e8dff5;
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Inter", -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--sans); color: var(--ink); background: var(--bg);
+    line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 50; background: var(--bg);
+    border-bottom: 1px solid var(--hair);
+    padding: env(safe-area-inset-top) 0 0;
+    backdrop-filter: blur(8px);
+    background: rgba(253, 248, 240, 0.92);
+  }
+  .nav-inner { display: flex; max-width: 920px; margin: 0 auto; overflow-x: auto; padding: 0 8px; align-items: center; }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .brand {
+    flex: 0 0 auto; padding: 18px 16px 18px 24px;
+    font-family: var(--serif); font-size: 18px; font-weight: 500;
+    color: var(--ink); letter-spacing: -0.02em;
+    border-right: 1px solid var(--hair); margin-right: 4px;
+  }
+  .brand::before {
+    content: ""; display: inline-block; width: 10px; height: 10px;
+    background: var(--peach); border-radius: 50%; margin-right: 8px;
+    vertical-align: 1px;
+  }
+  .tab {
+    flex: 0 0 auto; background: none; border: 0; cursor: pointer;
+    font: inherit; font-size: 13px; color: var(--muted); font-weight: 500;
+    padding: 18px 16px; position: relative; white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .tab:hover { color: var(--ink-2); }
+  .tab[aria-selected="true"] { color: var(--ink); }
+  .tab[aria-selected="true"]::after {
+    content: ""; position: absolute; left: 16px; right: 16px; bottom: -1px;
+    height: 2px; background: var(--peach); border-radius: 2px;
+  }
+
+  .page { display: none; }
+  .page.on { display: block; animation: fade 0.3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .wrap { max-width: 820px; margin: 0 auto; padding: 0 28px 120px; }
+
+  .ph { padding: 56px 0 0; position: relative; }
+  .ph .kicker {
+    font-size: 11px; letter-spacing: 0.12em; color: var(--peach-deep);
+    font-weight: 500; text-transform: uppercase; font-family: var(--sans);
+  }
+  .ph h1 {
+    font-family: var(--serif); font-size: 56px; line-height: 1.05;
+    font-weight: 400; letter-spacing: -0.025em; margin: 18px 0 0;
+    color: var(--ink);
+  }
+  .ph h1 em { font-style: italic; color: var(--peach-deep); }
+  .ph .lede {
+    font-size: 17px; color: var(--ink-2); margin: 20px 0 0; max-width: 540px;
+    line-height: 1.6;
+  }
+
+  h2 {
+    font-family: var(--serif); font-size: 28px; font-weight: 400;
+    letter-spacing: -0.018em; margin: 56px 0 0; padding-bottom: 14px;
+    border-bottom: 1px solid var(--ink); color: var(--ink);
+  }
+  h2 em { font-style: italic; color: var(--peach-deep); }
+  h3 { font-family: var(--sans); font-size: 14px; font-weight: 500; margin: 28px 0 0; color: var(--ink); letter-spacing: 0.02em; text-transform: uppercase; }
+  p { font-size: 15px; color: var(--ink-2); margin: 14px 0 0; }
+  p.muted { color: var(--muted); }
+  p em { font-family: var(--serif); font-style: italic; font-size: 1.05em; color: var(--ink); }
+
+  .row { padding: 22px 0; border-bottom: 1px solid var(--hair); }
+  .row:last-child { border-bottom: 0; }
+  .row-head { display: flex; align-items: baseline; gap: 14px; }
+  .row-no {
+    font-size: 11px; letter-spacing: 0.08em; color: var(--peach-deep);
+    font-weight: 500; min-width: 52px; font-feature-settings: "tnum";
+    font-family: var(--sans);
+  }
+  .row-title { font-family: var(--serif); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; }
+  .row-tag {
+    margin-left: auto; font-size: 10px; letter-spacing: 0.08em;
+    font-weight: 500; padding: 4px 10px; border-radius: 999px;
+    background: var(--peach-soft); color: var(--peach-deep);
+    text-transform: uppercase;
+  }
+  .row-tag.sage { background: var(--sage-soft); color: var(--sage-deep); }
+  .row-tag.lav { background: var(--lav-soft); color: #5a4080; }
+  .row-body { font-size: 14px; color: var(--muted); margin: 10px 0 0 66px; line-height: 1.65; }
+  @media (max-width: 540px) { .row-body { margin-left: 0; } }
+
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
+  .metric {
+    background: var(--soft); padding: 22px 20px; border-radius: 18px;
+    position: relative; overflow: hidden;
+  }
+  .metric.peach { background: var(--peach-soft); }
+  .metric.sage { background: var(--sage-soft); }
+  .metric.lav { background: var(--lav-soft); }
+  .metric .k {
+    font-size: 11px; letter-spacing: 0.08em; color: var(--muted);
+    font-weight: 500; text-transform: uppercase;
+  }
+  .metric.peach .k { color: var(--peach-deep); }
+  .metric.sage .k { color: var(--sage-deep); }
+  .metric.lav .k { color: #5a4080; }
+  .metric .v {
+    font-family: var(--serif); font-size: 38px; font-weight: 500;
+    letter-spacing: -0.025em; margin-top: 10px; color: var(--ink);
+    font-feature-settings: "tnum"; line-height: 1;
+  }
+  .metric .n { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  @media (max-width: 640px) { .metrics { grid-template-columns: 1fr; } }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  th, td {
+    text-align: left; padding: 14px 10px; font-size: 14px;
+    border-bottom: 1px solid var(--hair);
+  }
+  th {
+    font-size: 11px; letter-spacing: 0.08em; color: var(--muted);
+    font-weight: 500; text-transform: uppercase;
+  }
+  td { font-feature-settings: "tnum"; color: var(--ink-2); }
+  td:first-child, th:first-child { padding-left: 0; }
+  td:last-child, th:last-child { padding-right: 0; text-align: right; }
+  th:not(:first-child), td:not(:first-child) { text-align: right; }
+  tr.total td {
+    border-top: 1px solid var(--ink); border-bottom: 0;
+    font-weight: 500; padding-top: 16px; color: var(--ink);
+    font-family: var(--serif); font-size: 16px;
+  }
+
+  .callout {
+    margin: 28px 0 0; padding: 24px 26px; background: var(--peach-soft);
+    border-radius: 20px; position: relative;
+  }
+  .callout.sage { background: var(--sage-soft); }
+  .callout.lav { background: var(--lav-soft); }
+  .callout p { font-size: 15px; color: var(--ink-2); margin: 0; line-height: 1.65; }
+  .callout p + p { margin-top: 12px; }
+  .callout strong { color: var(--ink); font-weight: 500; font-family: var(--serif); font-size: 1.05em; }
+  .callout em { font-family: var(--serif); font-style: italic; color: var(--peach-deep); font-size: 1.05em; }
+
+  .assume { margin-top: 24px; }
+  .assume-item { padding: 16px 0; border-bottom: 1px solid var(--hair); display: grid; grid-template-columns: 180px 1fr; gap: 20px; align-items: baseline; }
+  .assume-item:last-child { border-bottom: 0; }
+  .assume-k {
+    font-size: 12px; letter-spacing: 0.06em; color: var(--peach-deep);
+    font-weight: 500; text-transform: uppercase;
+  }
+  .assume-v { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+  @media (max-width: 540px) { .assume-item { grid-template-columns: 1fr; gap: 4px; } }
+
+  .quote {
+    font-family: var(--serif); font-size: 22px; line-height: 1.4;
+    font-style: italic; color: var(--ink); margin: 32px 0;
+    padding: 0 0 0 24px; border-left: 3px solid var(--peach);
+    max-width: 600px;
+  }
+  .quote-attr {
+    display: block; margin-top: 12px; font-family: var(--sans);
+    font-size: 12px; font-style: normal; color: var(--muted);
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(60px);
+    opacity: 0.4; pointer-events: none; z-index: -1;
+  }
+
+  .footer-note {
+    margin-top: 64px; padding-top: 28px; border-top: 1px solid var(--hair);
+    font-size: 12px; color: var(--faint); text-align: center;
+    font-family: var(--serif); font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand">kindred</div>
+    <button class="tab" role="tab" aria-selected="true" data-page="build">Build plan</button>
+    <button class="tab" role="tab" aria-selected="false" data-page="features">Features</button>
+    <button class="tab" role="tab" aria-selected="false" data-page="revenue">Revenue &amp; growth</button>
+    <button class="tab" role="tab" aria-selected="false" data-page="marketing">Marketing</button>
+    <button class="tab" role="tab" aria-selected="false" data-page="vision">5-year vision</button>
+  </div>
+</nav>
+
+<section class="page on" id="page-build">
+  <div class="wrap">
+    <div class="ph">
+      <div class="blob" style="background: var(--peach); top: 40px; right: -60px; width: 280px; height: 280px;"></div>
+      <div class="kicker">The plan · weeks one through eight</div>
+      <h1>A weekly <em>visit</em><br/>between communities.</h1>
+      <p class="lede">Kindred is the only software that lets nursing home residents spend an hour each week with residents at another community — playing Bingo, sharing stories, hearing music together. Not a screen replacement. A visiting day.</p>
+    </div>
+
+    <h2>The shape</h2>
+    <p>One product, three rhythms. Group visits weekly. Resident spotlights monthly. Pen pals ongoing. Activities directors run it. Residents experience it. Families notice it on tours.</p>
+
+    <div class="metrics">
+      <div class="metric peach">
+        <div class="k">Sessions per week</div>
+        <div class="v">1</div>
+        <div class="n">curated, facilitated, never overwhelming</div>
+      </div>
+      <div class="metric sage">
+        <div class="k">Setup time per session</div>
+        <div class="v">5 min</div>
+        <div class="n">vs. 2 hours of planning today</div>
+      </div>
+      <div class="metric lav">
+        <div class="k">Tech required</div>
+        <div class="v">1 TV</div>
+        <div class="n">the one already in the common room</div>
+      </div>
+    </div>
+
+    <h2>Week one — <em>foundation</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">01</div>
+        <div class="row-title">Polish the dashboard &amp; lobby</div>
+        <div class="row-tag">Design</div>
+      </div>
+      <div class="row-body">Fix text overlaps. Settle the type scale. Ship the screens grandma can navigate.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">02</div>
+        <div class="row-title">Supabase + auth</div>
+        <div class="row-tag sage">Build</div>
+      </div>
+      <div class="row-body">Facilities sign up. Activities directors log in. Sessions tied to accounts. Two days of work.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">03</div>
+        <div class="row-title">Daily.co video integration</div>
+        <div class="row-tag sage">Build</div>
+      </div>
+      <div class="row-body">Real video between two facilities. Roughly 50 lines of code. Don't roll your own WebRTC.</div>
+    </div>
+
+    <h2>Week two — <em>real content</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">04</div>
+        <div class="row-title">Bingo, multiplayer-synced</div>
+        <div class="row-tag sage">Build</div>
+      </div>
+      <div class="row-body">Both rooms see the same number called. The cheer when someone yells "Bingo" is the magic moment.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">05</div>
+        <div class="row-title">Decade Trivia with auto-generated questions</div>
+        <div class="row-tag sage">Build</div>
+      </div>
+      <div class="row-body">1940s through 1970s. Weekly cron job generates fresh sets via Claude API. Director reviews before publish.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">06</div>
+        <div class="row-title">Storytelling prompts</div>
+        <div class="row-tag sage">Build</div>
+      </div>
+      <div class="row-body">"Tell us about your first job." Reminiscence therapy hiding in a game. Lowest-tech, highest-emotion feature.</div>
+    </div>
+
+    <h2>Week three — <em>onboarding</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">07</div>
+        <div class="row-title">Grandma test</div>
+        <div class="row-tag lav">Validate</div>
+      </div>
+      <div class="row-body">She plays all three games. We watch where she gets stuck. We fix what trips her up. Every UX decision is grounded here.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">08</div>
+        <div class="row-title">First pilot facility</div>
+        <div class="row-tag lav">Validate</div>
+      </div>
+      <div class="row-body">A.G. Rhodes, Albert's House, or King's Bridge. Hand-deliver the iPad. Sit in the common room. Watch the first session happen.</div>
+    </div>
+
+    <h2>Week four — <em>three pilots running</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">09</div>
+        <div class="row-title">Three free pilots, all in Atlanta</div>
+        <div class="row-tag lav">Validate</div>
+      </div>
+      <div class="row-body">Two facilities matched per session, third in rotation. 30 days of free use in exchange for testimonials and weekly feedback calls.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">10</div>
+        <div class="row-title">Session recap emails</div>
+        <div class="row-tag sage">Build</div>
+      </div>
+      <div class="row-body">Auto-summary sent to the director after every session — who attended, what was played, a quote or two. They forward it to families. Marketing in disguise.</div>
+    </div>
+
+    <h2>Weeks five through eight — <em>becoming real</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">11</div>
+        <div class="row-title">First paying customer</div>
+        <div class="row-tag">Revenue</div>
+      </div>
+      <div class="row-body">One of the pilots converts to $449/month. Champagne moment.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">12</div>
+        <div class="row-title">Cold outreach begins</div>
+        <div class="row-tag">Revenue</div>
+      </div>
+      <div class="row-body">50 facilities per week across GA, AL, TN, FL. Activities directors named by hand. Personalized openers referencing their actual programming.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">13</div>
+        <div class="row-title">LLC + insurance + Stripe</div>
+        <div class="row-tag">Admin</div>
+      </div>
+      <div class="row-body">Form the LLC the week the first contract is signed. Not before. General liability insurance to satisfy procurement.</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-features">
+  <div class="wrap">
+    <div class="ph">
+      <div class="blob" style="background: var(--sage); top: 40px; right: -60px; width: 280px; height: 280px;"></div>
+      <div class="kicker">What we ship · v1 to v2</div>
+      <h1>Three rhythms<br/>of <em>connection</em>.</h1>
+      <p class="lede">Group visits, resident spotlights, and pen pals. Every resident gets the kind of connection that works at their pace.</p>
+    </div>
+
+    <h2>v1 — <em>the weekly visit</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">01</div>
+        <div class="row-title">Bingo, the right way</div>
+        <div class="row-tag">Game</div>
+      </div>
+      <div class="row-body">One caller, two rooms, one shared called number on screen. Both rooms cheer when someone wins. Universal, near-zero learning curve.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">02</div>
+        <div class="row-title">Decade Trivia</div>
+        <div class="row-tag">Game</div>
+      </div>
+      <div class="row-body">1940s through 1970s. Questions about things 80-year-olds actually lived through. Auto-generated weekly, human-reviewed.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">03</div>
+        <div class="row-title">Name That Tune</div>
+        <div class="row-tag">Game</div>
+      </div>
+      <div class="row-body">Music memory survives dementia longer than almost anything else. Era-appropriate clips. Both rooms sing the chorus together.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">04</div>
+        <div class="row-title">Memory Lane</div>
+        <div class="row-tag">Game</div>
+      </div>
+      <div class="row-body">Storytelling prompts. "What was your first job?" "Describe Sunday dinners growing up." Least game-like, most connecting.</div>
+    </div>
+
+    <h2>v1.5 — <em>spotlights</em></h2>
+    <div class="callout sage">
+      <p><strong>Once a month, one resident is the expert.</strong></p>
+      <p>Mr. Henderson on his 40 years working the railroad. Mrs. Patel's recipes from childhood in Mumbai. Eleanor on raising a family during Vietnam. A 20-minute talk, 10 minutes of questions, recorded with permission, sent to families as a keepsake.</p>
+      <p><em>The resident gets to be the expert again. That feeling is hard to manufacture and impossible to put a price on.</em></p>
+    </div>
+
+    <h2>v2 — <em>pen pals</em></h2>
+    <div class="callout lav">
+      <p><strong>The quiet residents need this most.</strong></p>
+      <p>Group sessions are eight people once a week. Pen pals are one-to-one, ongoing, gentle. Letters, audio notes, short videos exchanged with a friend at another community. Directors read incoming letters aloud to residents who can't read easily anymore.</p>
+      <p><em>Slow, asynchronous, no bad days missed. It's the feature that turns Kindred from "video games for seniors" into a senior connection platform.</em></p>
+    </div>
+
+    <h2>The wider <em>ecosystem</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">05</div>
+        <div class="row-title">Family portal</div>
+        <div class="row-tag lav">v2</div>
+      </div>
+      <div class="row-body">Families log in to see session recaps, spotlight recordings, pen pal letters. Becomes one of the top tour-closers.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">06</div>
+        <div class="row-title">Auto-matching</div>
+        <div class="row-tag lav">v2</div>
+      </div>
+      <div class="row-body">Match facilities by shared era, region, language, resident interests. Director clicks "find a partner." Software does the rest.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">07</div>
+        <div class="row-title">Marketing kit for facilities</div>
+        <div class="row-tag lav">v2</div>
+      </div>
+      <div class="row-body">Pre-made social posts, family newsletter inserts, tour talking points. The thing that makes Activities Directors look like heroes internally.</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-revenue">
+  <div class="wrap">
+    <div class="ph">
+      <div class="blob" style="background: var(--lav); top: 40px; right: -60px; width: 280px; height: 280px;"></div>
+      <div class="kicker">Year one · realistic numbers</div>
+      <h1>$67K total.<br/>$188K <em>run-rate</em>.</h1>
+      <p class="lede">Year one looks small. The way to read it is the December exit rate — that's where year two begins.</p>
+    </div>
+
+    <h2>Year one — <em>the headline</em></h2>
+
+    <div class="metrics">
+      <div class="metric peach">
+        <div class="k">Customers paying $449/mo</div>
+        <div class="v">35</div>
+        <div class="n">by December of year one</div>
+      </div>
+      <div class="metric sage">
+        <div class="k">Year one total revenue</div>
+        <div class="v">$67K</div>
+        <div class="n">building from zero in Q1</div>
+      </div>
+      <div class="metric lav">
+        <div class="k">December run-rate</div>
+        <div class="v">$188K</div>
+        <div class="n">year two starts here</div>
+      </div>
+    </div>
+
+    <h2>Quarter by <em>quarter</em></h2>
+    <table>
+      <thead>
+        <tr><th>Quarter</th><th>What happens</th><th>Paying</th><th>Revenue</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Q1</td><td style="text-align: left;">Build · three free pilots in Atlanta</td><td>0</td><td>$0</td></tr>
+        <tr><td>Q2</td><td style="text-align: left;">First paid customers · testimonials</td><td>5</td><td>$4,500</td></tr>
+        <tr><td>Q3</td><td style="text-align: left;">Conferences · referrals · regional pilot</td><td>15</td><td>$16,200</td></tr>
+        <tr><td>Q4</td><td style="text-align: left;">Regional pilot converts · momentum</td><td>35</td><td>$46,800</td></tr>
+        <tr class="total"><td>Year one</td><td></td><td></td><td>$67,500</td></tr>
+      </tbody>
+    </table>
+
+    <h2>How the money <em>works</em></h2>
+    <div class="callout">
+      <p><strong>Per facility, per month: $449.</strong></p>
+      <p>Below the procurement-approval threshold at most facilities. Cheaper than the part-time activities assistant they'd consider hiring. About 0.05% of facility revenue — a rounding error to them, a real business for us.</p>
+      <p><em>Three tiers exist for chains: Starter at $249, Standard at $449, Network at $899 with volume discounts above five facilities.</em></p>
+    </div>
+
+    <h2>The <em>flywheel</em></h2>
+    <p class="muted">Activities directors talk to each other constantly. State chapters, the NAAP conference, private Facebook groups. One director who loves Kindred is worth fifty cold emails.</p>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">01</div>
+        <div class="row-title">Director loves Kindred</div>
+      </div>
+      <div class="row-body">Because it gives her ten hours back per week and makes her look great to her boss and the families.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">02</div>
+        <div class="row-title">She tells two friends at other facilities</div>
+      </div>
+      <div class="row-body">In her state NAAP chapter, in her Facebook group, at the regional conference.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">03</div>
+        <div class="row-title">They sign up · they tell two friends each</div>
+      </div>
+      <div class="row-body">By year two, cold outreach is a smaller fraction of growth than referrals. CAC drops, retention stays high.</div>
+    </div>
+
+    <h2><em>Assumptions</em></h2>
+    <div class="assume">
+      <div class="assume-item">
+        <div class="assume-k">Pricing</div>
+        <div class="assume-v">$449/month flat per facility for Standard tier</div>
+      </div>
+      <div class="assume-item">
+        <div class="assume-k">Free pilot length</div>
+        <div class="assume-v">30 days, converts to paid in month four</div>
+      </div>
+      <div class="assume-item">
+        <div class="assume-k">Sales cycle</div>
+        <div class="assume-v">3 to 6 weeks from first contact to signature</div>
+      </div>
+      <div class="assume-item">
+        <div class="assume-k">Churn (year one)</div>
+        <div class="assume-v">5% monthly · improves to 2% by year two</div>
+      </div>
+      <div class="assume-item">
+        <div class="assume-k">Customer acquisition cost</div>
+        <div class="assume-v">~$150 per facility in year one, falling fast with referrals</div>
+      </div>
+      <div class="assume-item">
+        <div class="assume-k">Personal capital needed</div>
+        <div class="assume-v">$3,000 to $8,000 (insurance, hosting, conferences, travel)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-marketing">
+  <div class="wrap">
+    <div class="ph">
+      <div class="blob" style="background: var(--peach); top: 40px; right: -60px; width: 280px; height: 280px;"></div>
+      <div class="kicker">Strategy · who, where, how</div>
+      <h1>Activities directors<br/>are the <em>wedge</em>.</h1>
+      <p class="lede">Selling to nursing homes is selling to one person: the Activities Director. Win her, the facility follows. Win three in a region, the whole state's NAAP chapter knows your name within a month.</p>
+    </div>
+
+    <h2>The core <em>idea</em></h2>
+    <div class="callout sage">
+      <p><strong>Don't sell from the activities budget. Sell from the marketing budget.</strong></p>
+      <p>Kindred isn't pitched as a tool that replaces in-person programming. It's pitched as a marketing differentiator. <em>"Your residents have weekly visits with three sister communities. Tell that to the next family touring."</em></p>
+      <p>One additional resident attracted = $108,000/year in facility revenue. Eighteen days of one new resident covers Kindred for the entire year.</p>
+    </div>
+
+    <h2>Channels — <em>in priority order</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">01</div>
+        <div class="row-title">In-person Atlanta tours</div>
+        <div class="row-tag">M1–3</div>
+      </div>
+      <div class="row-body">Visit five facilities. Ask for the Activities Director by name. Bring a printed pitch, a tablet demo, and a free pilot offer. Nothing beats showing up.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">02</div>
+        <div class="row-title">NAAP Annual Conference · Chicago · April 27–29</div>
+        <div class="row-tag">M4</div>
+      </div>
+      <div class="row-body">The one conference that matters. Walk the floor, not a booth. Ten quality pilot conversations is the goal.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">03</div>
+        <div class="row-title">State NAAP chapters &amp; Facebook groups</div>
+        <div class="row-tag">Ongoing</div>
+      </div>
+      <div class="row-body">Activities directors live in these spaces. One champion's recommendation outweighs a hundred cold emails.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">04</div>
+        <div class="row-title">Personalized cold email</div>
+        <div class="row-tag">Ongoing</div>
+      </div>
+      <div class="row-body">References their actual programming calendar. Mentions a specific upcoming event. Asks for fifteen minutes, not a contract. Drafted by AI, sent by hand.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">05</div>
+        <div class="row-title">Industry podcasts &amp; trade publications</div>
+        <div class="row-tag">M6+</div>
+      </div>
+      <div class="row-body">Senior Living Foresight, McKnight's, Argentum. Pitch a story about a resident who made a friend across state lines. The story sells the software.</div>
+    </div>
+
+    <h2>The <em>brand</em> does the work</h2>
+    <p>Warm peach. Soft sage. Cream backgrounds. Fraunces italics. Generous whitespace. Kindred looks like a wellness brand, not a nursing home tech vendor. That difference matters. The Activities Director who clicks our link expects another sterile portal and finds something that looks like it was made with care. The pitch is half-done before the first word is read.</p>
+
+    <h2>Launch — <em>Atlanta first</em></h2>
+    <p class="muted">Stay tight. Five facilities, all within thirty miles. Visit them weekly. Fix bugs in person. Build the playbook here, then repeat it in Birmingham, Charlotte, Nashville. The first city is a craft, not a campaign.</p>
+  </div>
+</section>
+
+<section class="page" id="page-vision">
+  <div class="wrap">
+    <div class="ph">
+      <div class="blob" style="background: var(--sage); top: 40px; right: -60px; width: 280px; height: 280px;"></div>
+      <div class="kicker">Where this could go</div>
+      <h1>Five years.<br/>One network of <em>communities</em>.</h1>
+      <p class="lede">If Kindred works, year five looks less like a software company and more like a hidden infrastructure — the connective tissue between thousands of senior communities.</p>
+    </div>
+
+    <h2>Year by <em>year</em></h2>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">Y1</div>
+        <div class="row-title">Atlanta proves it</div>
+        <div class="row-tag">35 homes · $188K ARR</div>
+      </div>
+      <div class="row-body">First paying customers. First regional chain pilot. NAAP credibility built. December run-rate funds year two without outside capital.</div>
+    </div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">Y2</div>
+        <div class="row-title">Southeast expansion</div>
+        <div class="row-tag sage">250 homes · $1.3M ARR</div>
+      </div>
+      <div class="row-body">Birmingham, Charlotte, Nashville, Jacksonville. First regional chain signs. Pen Pals ships. Family portal launches. Hire first employee — a sales lead from the senior living industry, not tech.</div>
+    </div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">Y3</div>
+        <div class="row-title">National rollout</div>
+        <div class="row-tag sage">900 homes · $4.8M ARR</div>
+      </div>
+      <div class="row-body">First national chain pilot — likely Atria or Five Star, the engagement-focused operators. Spotlight recordings become a content engine. Team grows to eight.</div>
+    </div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">Y4</div>
+        <div class="row-title">The flywheel turns</div>
+        <div class="row-tag lav">2,400 homes · $12.8M ARR</div>
+      </div>
+      <div class="row-body">One national chain contract = 200+ facilities at once. Sales becomes inbound-dominant. Activities directors actively recruit Kindred for new jobs they take. The brand precedes us.</div>
+    </div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">Y5</div>
+        <div class="row-title">The connective tissue</div>
+        <div class="row-tag lav">5,000+ homes · $25M+ ARR</div>
+      </div>
+      <div class="row-body">10% of US senior facilities on the network. International pilots — UK and Canada follow similar facility structures. Kindred is the default verb for "meeting another community."</div>
+    </div>
+
+    <h2>What stays the <em>same</em></h2>
+    <div class="callout">
+      <p><strong>The product never gets more complicated than residents can handle.</strong></p>
+      <p>Big buttons. Familiar games. Warm colors. One TV in the common room. Activities directors run it. That's true at five homes and it's true at five thousand.</p>
+      <p><em>Every new feature has to pass the grandma test. If she can't use it, it doesn't ship.</em></p>
+    </div>
+
+    <h2>What it's <em>not</em></h2>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">×</div>
+        <div class="row-title">Not a screen-replacement for in-person care</div>
+      </div>
+      <div class="row-body">One session a week. A visit, not a habit.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">×</div>
+        <div class="row-title">Not a clinical or medical product</div>
+      </div>
+      <div class="row-body">No HIPAA-protected data. No diagnoses. Just connection.</div>
+    </div>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-no">×</div>
+        <div class="row-title">Not a marketplace</div>
+      </div>
+      <div class="row-body">Facilities pay flat subscription. No transaction fees. No upcharges. Predictable, simple.</div>
+    </div>
+
+    <div class="footer-note">
+      Kindred · Bringing communities together, one visit at a time.
+    </div>
+  </div>
+</section>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const pages = document.querySelectorAll('.page');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.page;
+      tabs.forEach(t => t.setAttribute('aria-selected', t === tab ? 'true' : 'false'));
+      pages.forEach(p => p.classList.toggle('on', p.id === 'page-' + target));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

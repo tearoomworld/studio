@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand palette — neutral white shell with accent moments */
+    --ink: #0D1821;
+    --ink-2: #1f2d3a;
+    --muted: #5a6573;
+    --faint: #8c95a0;
+    --fainter: #b8bec6;
+    --hair: #e6e8eb;
+    --hair-2: #eff1f3;
+    --bg: #ffffff;
+    --paper: #ffffff;
+    --soft: #f7f8f8;
+    --softer: #fafbfb;
+    --sidebar: #fafbfb;
+    --sage: #BFCC94;
+    --sage-deep: #97a570;
+    --sage-soft: #e9eed8;
+    --blush: #E6AACE;
+    --blush-deep: #c280a3;
+    --blush-soft: #f6e2ee;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
+
+    --font: "Calibre", "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+    line-height: 1.47;
+    height: 100vh;
+    overflow: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; }
+
+  /* ─── Layout shell ─── */
+  .shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    height: 100vh;
+  }
+  @media (max-width: 800px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+  }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    background: var(--sidebar);
+    border-right: 1px solid var(--hair-2);
+    padding: 20px 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 8px 24px 8px;
+    border-bottom: 1px solid var(--hair-2);
+    margin-bottom: 16px;
+  }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--ink); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .brand-name {
+    font-size: 15px; font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .brand-sub {
+    font-size: 11px; color: var(--muted);
+    margin-top: 1px;
+    letter-spacing: -0.005em;
+  }
+  .nav-group { margin-bottom: 18px; }
+  .nav-group-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0 8px 6px 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 9px; border-radius: 7px;
+    color: var(--ink-2); font-size: 13.5px;
+    font-weight: 500; cursor: pointer; width: 100%;
+    text-align: left; border: none; background: transparent;
+    letter-spacing: -0.005em;
+    transition: background 0.12s;
+  }
+  .nav-item:hover { background: rgba(0,0,0,0.04); }
+  .nav-item.active {
+    background: rgba(0,0,0,0.06); color: var(--ink);
+  }
+  .nav-item-icon {
+    width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-item-icon { color: var(--ink); }
+  .nav-item-count {
+    margin-left: auto;
+    font-size: 11px; color: var(--muted);
+    background: rgba(0,0,0,0.05); padding: 1px 6px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .sidebar-foot {
+    margin-top: auto; padding: 16px 8px 4px;
+    border-top: 1px solid var(--hair-2);
+    font-size: 11px; color: var(--muted);
+    line-height: 1.5;
+  }
+  .sidebar-foot strong { color: var(--ink-2); }
+
+  /* ─── Main ─── */
+  .main {
+    overflow-y: auto;
+    height: 100vh;
+  }
+  .main-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 48px 48px 80px;
+  }
+  @media (max-width: 700px) { .main-inner { padding: 32px 24px 64px; } }
+
+  .surface { display: none; }
+  .surface.on { display: block; animation: fade 0.18s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .surface-head {
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .surface-eyebrow {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 8px;
+  }
+  .surface-title {
+    font-size: 36px; font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 12px;
+  }
+  .surface-sub {
+    font-size: 16px; color: var(--ink-2);
+    line-height: 1.5; max-width: 620px;
+    letter-spacing: -0.005em;
+  }
+
+  /* ─── Cards ─── */
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-xl);
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    font-size: 20px; font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .card p {
+    font-size: 14px; color: var(--ink-2);
+    line-height: 1.55;
+  }
+
+  /* ─── Recommendation card (the one ink moment) ─── */
+  .recommendation {
+    background: var(--ink); color: #fff;
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .recommendation::before {
+    content: ""; position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: var(--blush);
+    opacity: 0.18;
+    filter: blur(50px);
+  }
+  .recommendation-label {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--sage); margin-bottom: 12px;
+    position: relative;
+  }
+  .recommendation h2 {
+    font-size: 28px; font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-bottom: 14px;
+    line-height: 1.2;
+    position: relative;
+  }
+  .recommendation p {
+    font-size: 14.5px; color: rgba(255,255,255,0.75);
+    line-height: 1.6;
+    margin-bottom: 22px;
+    max-width: 580px;
+    position: relative;
+  }
+  .reasoning-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+    position: relative;
+  }
+  @media (max-width: 700px) { .reasoning-grid { grid-template-columns: 1fr; } }
+  .reason {
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .reason-criterion {
+    font-size: 10px; font-weight: 700;
+    color: var(--sage);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .reason-claim {
+    font-size: 13px; color: #fff;
+    line-height: 1.5; margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .reason-evidence {
+    font-size: 11.5px; color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+  }
+
+  /* ─── Companies grid — portal entries ─── */
+  .companies-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 800px) { .companies-grid { grid-template-columns: 1fr; } }
+
+  .company-card {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-xl);
+    padding: 0;
+    display: flex; flex-direction: column;
+    min-height: 360px;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.25s, border-color 0.25s;
+    position: relative;
+    text-decoration: none; color: inherit;
+  }
+  .company-card.portal-link {
+    cursor: pointer;
+  }
+  .company-card.portal-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px -22px rgba(13, 24, 33, 0.18);
+    border-color: var(--ink);
+  }
+
+  /* Logo zone — top of each card */
+  .company-logo {
+    height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Kindred — warm peach + Fraunces wordmark */
+  .company-logo.kindred {
+    background: #fef0d9;
+    font-family: "Fraunces", Georgia, serif;
+    color: #b85e25;
+  }
+  .company-logo.kindred .logo-mark {
+    font-size: 56px; font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .company-logo.kindred .logo-mark::before {
+    content: "";
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #E29449;
+  }
+  .company-logo.kindred .logo-mark em {
+    font-style: italic;
+    color: #E29449;
+  }
+  /* Source — ink bg, lowercase Helvetica */
+  .company-logo.source {
+    background: var(--ink);
+    color: #fff;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  .company-logo.source .logo-mark {
+    font-size: 64px; font-weight: 400;
+    letter-spacing: -0.035em;
+    text-transform: lowercase;
+    line-height: 1;
+  }
+  .company-logo.source .logo-mark::after {
+    content: ".";
+    color: var(--sage);
+  }
+  /* Future slots */
+  .company-logo.placeholder {
+    background: var(--soft);
+    color: var(--faint);
+    font-family: var(--font);
+    font-size: 16px; font-weight: 500;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .company-logo.talent {
+    background: linear-gradient(135deg, var(--blush-soft), var(--sage-soft));
+    color: var(--ink);
+    font-size: 17px; font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+
+  .company-card-body {
+    padding: 24px 28px 28px;
+    display: flex; flex-direction: column;
+    flex: 1;
+  }
+  .company-card-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .company-card-name {
+    font-size: 22px; font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .company-card-tag {
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted);
+    padding: 3px 9px; border-radius: 4px;
+    background: var(--soft);
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .company-card-tag.active {
+    background: var(--sage-soft);
+    color: var(--sage-deep);
+  }
+  .company-card-tag.future {
+    background: transparent;
+    border: 1px solid var(--hair);
+  }
+  .company-card-line {
+    font-size: 13.5px; color: var(--ink-2);
+    line-height: 1.55; margin-bottom: 18px;
+  }
+  .company-card-progress {
+    padding: 14px 0; border-top: 1px solid var(--hair-2);
+    border-bottom: 1px solid var(--hair-2);
+    margin-bottom: 16px;
+  }
+  .progress-row {
+    display: flex; justify-content: space-between;
+    margin-bottom: 8px; font-size: 13px;
+  }
+  .progress-row strong { font-weight: 600; }
+  .progress-row span { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .progress-bar {
+    height: 4px; background: var(--hair-2);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: var(--sage-deep);
+    transition: width 0.4s ease;
+  }
+  .company-card-cta {
+    margin-top: auto;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .company-card-cta-text {
+    font-size: 12.5px; color: var(--ink);
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .company-card-cta-arrow {
+    color: var(--muted);
+    font-size: 18px;
+    transition: transform 0.2s, color 0.2s;
+  }
+  .company-card.portal-link:hover .company-card-cta-arrow {
+    transform: translateX(4px);
+    color: var(--ink);
+  }
+  .company-card-honest {
+    font-size: 12.5px; color: var(--muted);
+    line-height: 1.5; margin-bottom: 14px;
+  }
+  .company-card-honest::before {
+    content: "Signal · "; font-weight: 600;
+    color: var(--ink-2); text-transform: uppercase;
+    font-size: 10px; letter-spacing: 0.06em;
+  }
+
+  /* ─── Calendar ─── */
+  .cal-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; flex-wrap: wrap; gap: 12px;
+  }
+  .cal-nav { display: flex; gap: 4px; }
+  .cal-nav-btn {
+    background: var(--paper); border: 1px solid var(--hair);
+    border-radius: 8px; padding: 7px 12px;
+    font-size: 13px; color: var(--ink-2); cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .cal-nav-btn:hover { background: var(--soft); }
+  .cal-nav-btn.today { font-weight: 500; }
+  .cal-current {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .cal-legend {
+    display: flex; gap: 14px; font-size: 12px; color: var(--muted);
+  }
+  .cal-legend-item { display: flex; align-items: center; gap: 6px; }
+  .cal-dot {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+  }
+  .cal-dot.demo { background: var(--sage-deep); }
+  .cal-dot.content { background: var(--blush-deep); }
+  .cal-dot.field { background: var(--ink); }
+
+  .cal-week {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 8px; margin-bottom: 20px;
+  }
+  @media (max-width: 700px) { .cal-week { grid-template-columns: repeat(3, 1fr); } }
+  .cal-day {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-md);
+    padding: 12px 10px;
+    min-height: 180px;
+    display: flex; flex-direction: column;
+  }
+  .cal-day.weekend { background: var(--softer); }
+  .cal-day.today-cell {
+    border-color: var(--ink); border-width: 1.5px;
+  }
+  .cal-day-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .cal-day.today-cell .cal-day-label { color: var(--ink); }
+  .cal-day-num {
+    font-size: 20px; font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-top: 2px; color: var(--ink);
+  }
+  .cal-day-events {
+    margin-top: 10px; flex: 1;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .cal-event {
+    padding: 7px 9px;
+    border-radius: 6px;
+    line-height: 1.3;
+    cursor: pointer;
+    border-left: 2px solid;
+    background: var(--softer);
+    transition: transform 0.12s;
+  }
+  .cal-event:hover { transform: translateX(2px); }
+  .cal-event.demo { border-left-color: var(--sage-deep); background: var(--sage-soft); }
+  .cal-event.content { border-left-color: var(--blush-deep); background: var(--blush-soft); }
+  .cal-event.field { border-left-color: var(--ink); background: var(--soft); }
+  .cal-event-time {
+    font-size: 10px; color: var(--muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .cal-event-title {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: -0.005em; color: var(--ink);
+    margin-top: 2px;
+  }
+  .cal-event-meta {
+    font-size: 10.5px; color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .cal-week-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 20px;
+    background: var(--softer);
+    border-radius: var(--radius-lg);
+  }
+  @media (max-width: 700px) { .cal-week-stats { grid-template-columns: repeat(2, 1fr); } }
+  .cal-stat-num {
+    font-size: 26px; font-weight: 700;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+  }
+  .cal-stat-label {
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .ledger-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  /* ─── Ledger surface ─── */
+  @media (max-width: 700px) { .ledger-grid { grid-template-columns: 1fr; } }
+  .ledger-item {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+  }
+  .ledger-mark {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    margin-right: 10px;
+    font-size: 10px; font-weight: 700;
+    text-align: center; line-height: 18px;
+    vertical-align: 1px;
+  }
+  .ledger-mark.yes { background: var(--sage); color: var(--ink); }
+  .ledger-mark.maybe { background: var(--soft); color: var(--ink); }
+  .ledger-mark.no {
+    background: #fff; color: var(--ink);
+    border: 1.5px solid var(--ink); width: 15px; height: 15px;
+    line-height: 13px;
+  }
+  .ledger-item strong {
+    font-size: 13.5px; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .ledger-item p {
+    font-size: 12.5px; color: var(--muted);
+    line-height: 1.5; margin-top: 6px;
+  }
+
+  /* ─── Generate New ─── */
+  .gen-card {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    margin-bottom: 16px;
+  }
+  .gen-step {
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .gen-step:last-child { border: none; padding: 0; margin: 0; }
+  .gen-q {
+    font-size: 16px; font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-bottom: 4px;
+  }
+  .gen-q-sub {
+    font-size: 13px; color: var(--muted);
+    line-height: 1.5; margin-bottom: 14px;
+  }
+  .gen-input, .gen-textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    font-family: inherit; font-size: 14px;
+    color: var(--ink); background: #fff;
+    letter-spacing: -0.005em;
+    transition: border-color 0.15s;
+  }
+  .gen-textarea { min-height: 96px; resize: vertical; line-height: 1.55; }
+  .gen-input:focus, .gen-textarea:focus { outline: none; border-color: var(--ink); }
+  .gen-options { display: flex; flex-direction: column; gap: 8px; }
+
+  .gen-images { margin-top: 12px; }
+  .gen-image-upload {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px;
+    border: 1.5px dashed var(--hair);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--softer);
+  }
+  .gen-image-upload:hover {
+    border-color: var(--ink);
+    background: var(--soft);
+  }
+  .gen-image-upload-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--ink); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .gen-image-upload-text {
+    font-size: 13px; color: var(--ink-2);
+    font-weight: 500;
+  }
+  .gen-image-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px; margin-top: 12px;
+  }
+  .gen-image-thumb {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--hair);
+    position: relative;
+  }
+  .gen-image-thumb .remove {
+    position: absolute; top: 6px; right: 6px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(13, 24, 33, 0.85);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+  }
+  .gen-image-thumb .remove:hover {
+    background: var(--ink);
+  }
+  .gen-opt {
+    padding: 12px 16px; background: var(--soft);
+    border: 1.5px solid transparent;
+    border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; font-size: 13.5px;
+  }
+  .gen-opt:hover { background: rgba(0,0,0,0.04); }
+  .gen-opt.active {
+    border-color: var(--ink);
+    background: var(--paper);
+  }
+  .gen-opt strong { display: block; font-weight: 600; margin-bottom: 2px; }
+  .gen-opt span { font-size: 12px; color: var(--muted); }
+
+  .gen-generating {
+    background: var(--ink); color: #fff;
+    border-radius: var(--radius-xl);
+    padding: 36px;
+  }
+  .gen-pulse {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--sage);
+    margin-right: 10px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  .gen-generating h2 { font-size: 22px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .gen-generating p { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.55; margin-bottom: 20px; max-width: 540px; }
+  .gen-task-list { background: rgba(255,255,255,0.06); border-radius: 10px; padding: 16px 20px; margin-top: 16px; }
+  .gen-task { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 13px; color: rgba(255,255,255,0.85); }
+  .gen-task-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.15); flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.3); }
+  .gen-task.done .gen-task-dot { background: var(--sage); border-color: var(--sage); }
+  .gen-task.active .gen-task-dot { background: rgba(255,255,255,0.5); border-color: #fff; animation: pulse 1.5s ease-in-out infinite; }
+  .gen-task.done .gen-task-dot::after { content: "✓"; color: var(--ink); font-size: 9px; font-weight: 700; display: block; text-align: center; line-height: 12px; }
+  .truth-banner {
+    background: var(--sage-soft); border: 1px solid var(--sage);
+    border-radius: 12px; padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 13px; color: var(--ink-2);
+    line-height: 1.55;
+  }
+  .truth-banner strong { font-weight: 700; color: var(--ink); }
+  .task-prompt {
+    background: var(--ink); color: #f5f5f7;
+    border-radius: 8px; padding: 14px 14px 12px;
+    font-family: var(--mono);
+    font-size: 11.5px; line-height: 1.6;
+    white-space: pre-wrap; overflow-x: auto;
+    position: relative;
+  }
+  .task-prompt::before {
+    content: "claude code prompt";
+    position: absolute; top: -8px; left: 12px;
+    background: var(--ink); color: var(--sage);
+    padding: 2px 7px; border-radius: 3px;
+    font-family: var(--font); font-size: 9px;
+    font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ─── Teams + team dashboards ─── */
+  .teams-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .team-card {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-xl);
+    padding: 24px 28px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.2s, border-color 0.2s;
+  }
+  .team-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px -22px rgba(13, 24, 33, 0.18);
+    border-color: var(--ink);
+  }
+  .team-head {
+    display: flex; align-items: center; gap: 14px;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .team-kind-mark {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .team-kind-mark.sales { background: var(--sage-soft); color: var(--sage-deep); }
+  .team-kind-mark.marketing { background: var(--blush-soft); color: var(--blush-deep); }
+  .team-info { flex: 1; }
+  .team-name {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .team-kind {
+    font-size: 12px; color: var(--muted);
+    margin-top: 3px;
+  }
+  .team-cta {
+    font-size: 12.5px; color: var(--ink);
+    font-weight: 600;
+    transition: transform 0.2s;
+  }
+  .team-card:hover .team-cta { transform: translateX(4px); }
+
+  .team-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 700px) { .team-stats { grid-template-columns: repeat(2, 1fr); } }
+  .team-stat-label {
+    font-size: 10.5px; font-weight: 500;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .team-stat-value {
+    font-size: 24px; font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--fainter);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .team-add {
+    background: transparent;
+    border: 1.5px dashed var(--hair);
+    border-radius: var(--radius-xl);
+    padding: 22px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    color: var(--muted); font-size: 13px; font-weight: 500;
+    cursor: pointer; width: 100%;
+    transition: all 0.15s;
+  }
+  .team-add:hover {
+    border-color: var(--ink); color: var(--ink); background: var(--softer);
+  }
+  .team-add-icon {
+    width: 22px; height: 22px;
+    border-radius: 50%; background: var(--soft);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* Team dashboard view */
+  .team-dashboard { animation: fade 0.2s ease; }
+  .team-back {
+    background: transparent; border: none;
+    color: var(--muted); font-size: 12.5px;
+    cursor: pointer; padding: 4px 0;
+    margin-bottom: 18px;
+    transition: color 0.15s;
+  }
+  .team-back:hover { color: var(--ink); }
+
+  .team-dash-head {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .team-dash-kind {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .team-dash-title {
+    font-size: 30px; font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .team-dash-sub {
+    font-size: 14.5px; color: var(--ink-2);
+    line-height: 1.55;
+    max-width: 620px;
+  }
+
+  .team-dash-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 800px) { .team-dash-stats { grid-template-columns: repeat(2, 1fr); } }
+  .dash-stat {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+  }
+  .dash-stat-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .dash-stat-value {
+    font-size: 32px; font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--fainter);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .dash-stat-sub {
+    font-size: 11px; color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .team-dash-actions { margin-bottom: 28px; }
+  .team-dash-actions h3 {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    letter-spacing: 0.06em;
+  }
+  .dash-action-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 700px) { .dash-action-grid { grid-template-columns: 1fr; } }
+  .dash-action {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex; align-items: flex-start; gap: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .dash-action:hover {
+    border-color: var(--ink);
+    transform: translateY(-1px);
+  }
+  .dash-action-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--ink);
+    flex-shrink: 0;
+  }
+  .dash-action-body strong {
+    display: block; font-size: 13.5px;
+    font-weight: 600; letter-spacing: -0.01em;
+    margin-bottom: 3px;
+  }
+  .dash-action-body span {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.45;
+  }
+
+  .team-dash-motion {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+  }
+  .team-dash-motion h3 {
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .team-dash-motion p {
+    font-size: 13.5px; color: var(--ink-2);
+    line-height: 1.6;
+  }
+  .team-dash-motion code {
+    font-family: var(--mono); font-size: 12px;
+    background: var(--soft); padding: 1px 6px;
+    border-radius: 4px; color: var(--ink);
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 999px;
+    background: var(--ink); color: #fff;
+    border: 1px solid var(--ink);
+    font-size: 13px; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: #000; }
+  .btn.ghost {
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--hair);
+  }
+  .btn.ghost:hover { background: var(--soft); }
+  .btn.lg { padding: 12px 22px; font-size: 15px; }
+  .btn.sm { padding: 5px 12px; font-size: 12px; }
+
+  /* ─── Live (populated) stat values get ink color ─── */
+  .team-stat-value.live,
+  .dash-stat-value.live { color: var(--ink); }
+
+  /* ─── Tool tabs inside team dashboard ─── */
+  .team-tools { margin-bottom: 28px; }
+  .tool-pane { animation: fade 0.18s ease; }
+  .tool-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+  }
+  .tool-bar-title {
+    font-size: 12px; color: var(--muted); font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .tool-search {
+    flex: 1; max-width: 320px;
+    padding: 8px 12px; border: 1px solid var(--hair);
+    border-radius: 8px; font-size: 13px; font-family: inherit;
+    background: var(--paper);
+  }
+  .tool-search:focus { outline: none; border-color: var(--ink); }
+  .tool-actions { display: flex; gap: 6px; }
+
+  /* ─── Data tables ─── */
+  .data-table {
+    background: var(--paper);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .data-row {
+    display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr;
+    gap: 16px; padding: 14px 18px;
+    border-top: 1px solid var(--hair-2);
+    align-items: center; font-size: 13px;
+  }
+  .data-row:first-child { border-top: none; }
+  .data-row.data-head {
+    background: var(--softer);
+    font-size: 10.5px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 11px 18px;
+  }
+  .data-row strong {
+    display: block; font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .data-row .sub {
+    display: block; font-size: 11.5px; color: var(--muted);
+    margin-top: 2px;
+  }
+  .data-row .dim { color: var(--fainter); }
+  .pill {
+    display: inline-block;
+    font-size: 10.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 3px 8px; border-radius: 4px;
+  }
+  .pill.researching { background: var(--soft); color: var(--ink-2); }
+  .pill.contacted { background: var(--blush-soft); color: var(--ink-2); }
+  .pill.replied { background: var(--sage-soft); color: var(--sage-deep); }
+  .pill.demo { background: var(--ink); color: var(--sage); }
+
+  /* ─── Compose ─── */
+  .compose-grid {
+    display: grid; grid-template-columns: 1.7fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 800px) { .compose-grid { grid-template-columns: 1fr; } }
+  .compose-form {
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg); padding: 22px;
+  }
+  .compose-row { margin-bottom: 14px; }
+  .compose-row label {
+    display: block; font-size: 10.5px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 6px;
+  }
+  .compose-input {
+    width: 100%; padding: 9px 12px;
+    border: 1px solid var(--hair); border-radius: 8px;
+    font-size: 13px; font-family: inherit;
+    background: var(--paper); color: var(--ink);
+  }
+  .compose-input:focus { outline: none; border-color: var(--ink); }
+  .compose-body {
+    min-height: 220px; resize: vertical; line-height: 1.55;
+  }
+  .compose-actions {
+    display: flex; gap: 8px; justify-content: flex-end;
+    margin-top: 6px;
+  }
+  .compose-side {
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg); padding: 22px;
+  }
+  .compose-side h4 {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 14px;
+  }
+  .tactic-score {
+    display: flex; align-items: baseline; gap: 8px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--hair-2);
+    margin-bottom: 16px;
+  }
+  .tactic-score-num {
+    font-size: 36px; font-weight: 700;
+    letter-spacing: -0.025em; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .tactic-score-label { font-size: 12px; color: var(--muted); }
+  .tactic-used { margin-bottom: 14px; }
+  .tactic-section-label {
+    font-size: 10px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .tactic-tag {
+    display: inline-block; font-size: 11.5px;
+    padding: 3px 9px; border-radius: 4px;
+    margin: 0 4px 4px 0;
+  }
+  .tactic-tag.good { background: var(--sage-soft); color: var(--sage-deep); }
+  .tactic-tag.suggest { background: var(--soft); color: var(--ink-2); border: 1px dashed var(--hair); }
+  .tactic-note { font-size: 11px; color: var(--muted); margin-top: 10px; }
+  .tactic-note code {
+    font-family: var(--mono); background: var(--soft);
+    padding: 1px 5px; border-radius: 3px;
+  }
+
+  /* ─── Demos ─── */
+  .demos-list { display: flex; flex-direction: column; gap: 10px; }
+  .demo-card {
+    display: grid; grid-template-columns: 140px 1fr;
+    gap: 18px; padding: 18px 22px;
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+  }
+  .demo-card.upcoming { border-left: 3px solid var(--sage-deep); }
+  .demo-when-day {
+    font-size: 11px; font-weight: 600; color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .demo-when-time {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.02em; margin-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-body strong {
+    display: block; font-size: 14.5px; font-weight: 600;
+    letter-spacing: -0.01em; margin-bottom: 6px;
+  }
+  .demo-body p {
+    font-size: 13px; color: var(--ink-2);
+    line-height: 1.5; margin-bottom: 10px;
+  }
+  .demo-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+  .demo-tag {
+    font-size: 10.5px; font-weight: 500;
+    padding: 3px 8px; border-radius: 4px;
+    background: var(--soft); color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .demo-tag.done { background: var(--sage-soft); color: var(--sage-deep); }
+
+  /* ─── Templates ─── */
+  .templates-list { display: flex; flex-direction: column; gap: 10px; }
+  .template-card {
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg); padding: 18px 22px;
+    cursor: pointer; transition: border-color 0.15s;
+  }
+  .template-card:hover { border-color: var(--ink); }
+  .template-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .template-head strong { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+  .template-usage {
+    font-size: 11px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .template-subj {
+    font-size: 12px; color: var(--ink-2); font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .template-preview {
+    font-size: 12.5px; color: var(--muted); line-height: 1.5;
+    font-family: var(--mono); padding: 8px 10px;
+    background: var(--softer); border-radius: 6px;
+  }
+
+  /* ─── Content calendar ─── */
+  .content-list { display: flex; flex-direction: column; gap: 10px; }
+  .content-card {
+    display: grid; grid-template-columns: 120px 1fr 100px;
+    gap: 18px; padding: 18px 22px;
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+    align-items: center;
+  }
+  @media (max-width: 700px) {
+    .content-card { grid-template-columns: 1fr; }
+  }
+  .cw-day { font-size: 11px; font-weight: 600; }
+  .cw-time {
+    font-size: 16px; font-weight: 700;
+    letter-spacing: -0.015em; margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .content-meta { display: flex; gap: 6px; margin-bottom: 6px; }
+  .content-channel {
+    font-size: 10.5px; font-weight: 600;
+    padding: 2px 7px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .content-channel.ig { background: var(--blush-soft); color: var(--blush-deep); }
+  .content-channel.tiktok { background: var(--ink); color: #fff; }
+  .content-channel.newsletter { background: var(--sage-soft); color: var(--sage-deep); }
+  .content-format {
+    font-size: 10.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 2px 0;
+  }
+  .content-body strong {
+    display: block; font-size: 14px; font-weight: 600;
+    letter-spacing: -0.01em; margin-bottom: 4px;
+  }
+  .content-preview {
+    font-size: 12.5px; color: var(--muted); line-height: 1.5;
+  }
+  .content-status {
+    font-size: 11px; font-weight: 600;
+    text-align: center; padding: 5px 10px;
+    border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .content-status.scheduled { background: var(--sage-soft); color: var(--sage-deep); }
+  .content-status.drafted { background: var(--soft); color: var(--ink-2); }
+
+  /* ─── Idea pool ─── */
+  .ideas-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 700px) { .ideas-grid { grid-template-columns: 1fr; } }
+  .idea-card {
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg); padding: 16px 18px;
+  }
+  .idea-card.ai { border-left: 3px solid var(--blush); }
+  .idea-meta {
+    display: flex; gap: 6px; align-items: center;
+    margin-bottom: 8px;
+  }
+  .idea-channel {
+    font-size: 10.5px; font-weight: 600;
+    background: var(--soft); padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .idea-ai {
+    font-size: 10px; color: var(--blush-deep);
+    font-weight: 600; letter-spacing: 0.04em;
+  }
+  .idea-card strong {
+    display: block; font-size: 13.5px; font-weight: 600;
+    letter-spacing: -0.01em; margin-bottom: 6px;
+  }
+  .idea-card p {
+    font-size: 12.5px; color: var(--muted); line-height: 1.5;
+  }
+
+  /* ─── Generator ─── */
+  .generator-wrap {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 800px) { .generator-wrap { grid-template-columns: 1fr; } }
+  .generator-form, .generator-results {
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg); padding: 22px;
+  }
+  .generator-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 10px;
+    display: block;
+  }
+  .generator-input {
+    width: 100%; min-height: 130px; resize: vertical;
+    padding: 12px 14px; border: 1px solid var(--hair);
+    border-radius: 8px; font-family: inherit; font-size: 13.5px;
+    line-height: 1.55; background: var(--paper);
+  }
+  .generator-input:focus { outline: none; border-color: var(--ink); }
+  .generator-meta {
+    margin-top: 14px; display: flex; gap: 8px; align-items: center;
+    flex-wrap: wrap;
+  }
+  .generator-pill {
+    font-size: 11px; color: var(--muted);
+    padding: 4px 10px; background: var(--soft);
+    border-radius: 4px;
+  }
+  .generator-pill code {
+    font-family: var(--mono); font-size: 10.5px;
+    background: transparent; color: var(--ink);
+  }
+  .generator-result-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 12px;
+  }
+  .generator-result-card {
+    padding: 14px 16px; border: 1px solid var(--hair-2);
+    border-radius: 10px; margin-bottom: 10px;
+    background: var(--softer);
+  }
+  .generator-result-card:last-child { margin-bottom: 0; }
+  .generator-result-card strong {
+    display: block; font-size: 13.5px; font-weight: 600;
+    margin-bottom: 6px; letter-spacing: -0.01em;
+  }
+  .generator-result-card p {
+    font-size: 12.5px; color: var(--ink-2);
+    line-height: 1.55; margin-bottom: 10px;
+  }
+  .result-actions {
+    display: flex; gap: 6px; justify-content: flex-end;
+  }
+
+  /* ─── Field log ─── */
+  .field-list { display: flex; flex-direction: column; gap: 10px; }
+  .field-card {
+    display: grid; grid-template-columns: 110px 1fr;
+    gap: 16px; padding: 16px 20px;
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg);
+  }
+  .field-when {
+    font-size: 12.5px; font-weight: 600;
+    color: var(--sage-deep); letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .field-body strong {
+    display: block; font-size: 14.5px; font-weight: 600;
+    margin-bottom: 6px; letter-spacing: -0.01em;
+  }
+  .field-body p {
+    font-size: 12.5px; color: var(--ink-2); line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .field-body em {
+    color: var(--blush-deep); font-style: normal; font-weight: 500;
+  }
+  .field-tags { display: flex; gap: 6px; }
+  .field-tags span {
+    font-size: 10.5px; padding: 3px 8px;
+    background: var(--soft); color: var(--muted);
+    border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  /* ─── Settings ─── */
+  .settings-row {
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: 24px; padding: 16px 0;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .settings-row:last-child { border: none; }
+  .settings-label {
+    font-size: 13px; font-weight: 600;
+    color: var(--ink);
+  }
+  .settings-val {
+    font-size: 13px; color: var(--ink-2);
+    line-height: 1.55;
+  }
+  .settings-val code {
+    font-family: var(--mono); font-size: 12px;
+    background: var(--soft); padding: 2px 6px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="brand-name">Studio</div>
+        <div class="brand-sub" id="today">—</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <button class="nav-item active" data-surface="companies">
+        <span class="nav-item-icon">◇</span>
+        Companies
+        <span class="nav-item-count">2</span>
+      </button>
+      <button class="nav-item" data-surface="calendar">
+        <span class="nav-item-icon">▦</span>
+        Calendar
+      </button>
+      <button class="nav-item" data-surface="sales">
+        <span class="nav-item-icon">▣</span>
+        Operations
+      </button>
+      <button class="nav-item" data-surface="ledger">
+        <span class="nav-item-icon">≡</span>
+        Ledger
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Plan</div>
+      <button class="nav-item" data-surface="generate">
+        <span class="nav-item-icon">+</span>
+        Generate new
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">System</div>
+      <button class="nav-item" data-surface="settings">
+        <span class="nav-item-icon">⚙</span>
+        Settings
+      </button>
+    </div>
+
+    <div class="sidebar-foot">
+      <strong>Solo founder · Atlanta</strong><br/>
+      Pre-build. Mocks ready. No backend wired.
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+    <div class="main-inner">
+
+      <!-- COMPANIES -->
+      <section class="surface on" data-surface="companies">
+        <div class="surface-head">
+          <div class="surface-eyebrow">Studio</div>
+          <h1 class="surface-title">Companies in flight.</h1>
+          <p class="surface-sub">Click a company to enter its working portal — build plan, audit, agents, and every asset in one place. The Studio shell is for the strategic layer; the portals are where the work happens.</p>
+        </div>
+
+        <div class="companies-grid">
+
+          <a href="kindred-portal.html" class="company-card portal-link">
+            <div class="company-logo kindred">
+              <div class="logo-mark">Kin<em>dred</em></div>
+            </div>
+            <div class="company-card-body">
+              <div class="company-card-head">
+                <div class="company-card-name">Kindred</div>
+                <div class="company-card-tag active">Prototype</div>
+              </div>
+              <div class="company-card-line">A weekly visit between senior communities. Group video sessions, Spotlights, AD-run. v2: family-survey pen-pal matching.</div>
+              <div class="company-card-progress">
+                <div class="progress-row"><strong>Build progress</strong><span id="kindred-progress-label">0% · 0/8 phases</span></div>
+                <div class="progress-bar"><div class="progress-bar-fill" id="kindred-progress-bar" style="width: 0%"></div></div>
+              </div>
+              <div class="company-card-cta">
+                <span class="company-card-cta-text">Enter portal</span>
+                <span class="company-card-cta-arrow">→</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="source-portal.html" class="company-card portal-link">
+            <div class="company-logo source">
+              <div class="logo-mark">source</div>
+            </div>
+            <div class="company-card-body">
+              <div class="company-card-head">
+                <div class="company-card-name">Source</div>
+                <div class="company-card-tag active">Prototype</div>
+              </div>
+              <div class="company-card-line">An editorial events app for Atlanta. Find, buy, host. Ticket fees fund a quarterly host prize pool. Native iOS + Android at launch.</div>
+              <div class="company-card-progress">
+                <div class="progress-row"><strong>Build progress</strong><span id="source-progress-label">0% · 0/8 phases</span></div>
+                <div class="progress-bar"><div class="progress-bar-fill" id="source-progress-bar" style="width: 0%"></div></div>
+              </div>
+              <div class="company-card-cta">
+                <span class="company-card-cta-text">Enter portal</span>
+                <span class="company-card-cta-arrow">→</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- CALENDAR -->
+      <section class="surface" data-surface="calendar">
+        <div class="surface-head">
+          <div class="surface-eyebrow">Overview</div>
+          <h1 class="surface-title">Calendar.</h1>
+          <p class="surface-sub">Everything date-bound across all companies. Demos from Kindred Sales auto-flow here. Phase 1: content scheduled posts, focus blocks, atlanta events.</p>
+        </div>
+
+        <div class="cal-toolbar">
+          <div class="cal-nav">
+            <button class="cal-nav-btn">←</button>
+            <button class="cal-nav-btn today">Today</button>
+            <button class="cal-nav-btn">→</button>
+          </div>
+          <div class="cal-current">Week of May 19 — May 25, 2026</div>
+          <div class="cal-legend">
+            <span class="cal-legend-item"><span class="cal-dot demo"></span> Demos</span>
+            <span class="cal-legend-item"><span class="cal-dot content"></span> Content</span>
+            <span class="cal-legend-item"><span class="cal-dot field"></span> Field</span>
+          </div>
+        </div>
+
+        <div class="cal-week">
+          <div class="cal-day">
+            <div class="cal-day-label">Mon</div>
+            <div class="cal-day-num">19</div>
+            <div class="cal-day-events">
+              <div class="cal-event demo">
+                <div class="cal-event-time">2:00 PM</div>
+                <div class="cal-event-title">Sunrise Manor</div>
+                <div class="cal-event-meta">Kindred · 30 min</div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-day">
+            <div class="cal-day-label">Tue</div>
+            <div class="cal-day-num">20</div>
+            <div class="cal-day-events">
+              <div class="cal-event content">
+                <div class="cal-event-time">9:00 AM</div>
+                <div class="cal-event-title">IG carousel · supper clubs</div>
+                <div class="cal-event-meta">Source · scheduled</div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-day today-cell">
+            <div class="cal-day-label">Wed · today</div>
+            <div class="cal-day-num">21</div>
+            <div class="cal-day-events">
+              <div class="cal-event demo">
+                <div class="cal-event-time">10:30 AM</div>
+                <div class="cal-event-title">Brookdale Atlanta</div>
+                <div class="cal-event-meta">Kindred · demo</div>
+              </div>
+              <div class="cal-event demo">
+                <div class="cal-event-time">3:00 PM</div>
+                <div class="cal-event-title">A.G. Rhodes</div>
+                <div class="cal-event-meta">Kindred · demo</div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-day">
+            <div class="cal-day-label">Thu</div>
+            <div class="cal-day-num">22</div>
+            <div class="cal-day-events"></div>
+          </div>
+          <div class="cal-day">
+            <div class="cal-day-label">Fri</div>
+            <div class="cal-day-num">23</div>
+            <div class="cal-day-events">
+              <div class="cal-event demo">
+                <div class="cal-event-time">11:00 AM</div>
+                <div class="cal-event-title">Atria Buckhead</div>
+                <div class="cal-event-meta">Kindred · follow-up</div>
+              </div>
+              <div class="cal-event content">
+                <div class="cal-event-time">5:00 PM</div>
+                <div class="cal-event-title">Newsletter · weekend picks</div>
+                <div class="cal-event-meta">Source · drafted</div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-day weekend">
+            <div class="cal-day-label">Sat</div>
+            <div class="cal-day-num">24</div>
+            <div class="cal-day-events">
+              <div class="cal-event field">
+                <div class="cal-event-time">8:00 PM</div>
+                <div class="cal-event-title">Listening night · Cabbagetown</div>
+                <div class="cal-event-meta">Source · attending</div>
+              </div>
+            </div>
+          </div>
+          <div class="cal-day weekend">
+            <div class="cal-day-label">Sun</div>
+            <div class="cal-day-num">25</div>
+            <div class="cal-day-events"></div>
+          </div>
+        </div>
+
+        <div class="cal-week-stats">
+          <div class="cal-stat"><div class="cal-stat-num">4</div><div class="cal-stat-label">demos this week</div></div>
+          <div class="cal-stat"><div class="cal-stat-num">2</div><div class="cal-stat-label">content drops</div></div>
+          <div class="cal-stat"><div class="cal-stat-num">1</div><div class="cal-stat-label">atlanta event</div></div>
+          <div class="cal-stat"><div class="cal-stat-num">7</div><div class="cal-stat-label">total bookings</div></div>
+        </div>
+      </section>
+
+      <!-- OPERATIONS -->
+      <section class="surface" data-surface="sales">
+        <div class="surface-head">
+          <div class="surface-eyebrow">Overview</div>
+          <h1 class="surface-title">Operations.</h1>
+          <p class="surface-sub">Each company has teams. Each team has a dashboard scoped to its work. Click into a team to see what they're doing right now — leads, emails sent, templates, content scheduled. As you grow, you add teams (or hire someone into one).</p>
+        </div>
+
+        <div class="strip-tabs" style="display: flex; gap: 4px; margin-bottom: 22px; background: var(--soft); padding: 4px; border-radius: 10px; width: fit-content;">
+          <button class="ops-tab active" onclick="opsShow('kindred', this)" style="padding: 7px 14px; border-radius: 7px; background: var(--paper); color: var(--ink); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">Kindred</button>
+          <button class="ops-tab" onclick="opsShow('source', this)" style="padding: 7px 14px; border-radius: 7px; background: transparent; color: var(--muted); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer;">Source</button>
+        </div>
+
+        <!-- KINDRED OPERATIONS -->
+        <div class="ops-pane on" id="ops-kindred">
+          <div class="teams-list">
+            <div class="team-card" onclick="teamShow('kindred-sales')">
+              <div class="team-head">
+                <div class="team-kind-mark sales">◷</div>
+                <div class="team-info">
+                  <div class="team-name">Sales</div>
+                  <div class="team-kind">Outbound · cold sales</div>
+                </div>
+                <div class="team-cta">View →</div>
+              </div>
+              <div class="team-stats">
+                <div class="team-stat">
+                  <div class="team-stat-label">Leads</div>
+                  <div class="team-stat-value live">23</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-label">Emails sent</div>
+                  <div class="team-stat-value live">51</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-label">Demos booked</div>
+                  <div class="team-stat-value live">4</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-label">Reply rate</div>
+                  <div class="team-stat-value live">12%</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="team-add" onclick="alert('Adding a team is a Phase 1 feature. For now teams are seeded from your motion choice.')">
+              <span class="team-add-icon">+</span>
+              <span>Add a team to Kindred</span>
+            </button>
+          </div>
+
+          <!-- TEAM DASHBOARD: KINDRED SALES -->
+          <div class="team-dashboard" id="dash-kindred-sales" style="display: none;">
+            <button class="team-back" onclick="teamHide('kindred-sales')">← Kindred · all teams</button>
+
+            <div class="team-dash-head">
+              <div class="team-dash-kind">Sales team · outbound</div>
+              <h2 class="team-dash-title">Kindred Sales.</h2>
+              <p class="team-dash-sub">Selling to atlanta-area Activities Directors. Cold outreach, warm replies, demos booked from the pipeline.</p>
+            </div>
+
+            <div class="team-dash-stats">
+              <div class="dash-stat">
+                <div class="dash-stat-label">Leads in pipeline</div>
+                <div class="dash-stat-value live">23</div>
+                <div class="dash-stat-sub">Researching · Contacted · Replied</div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-label">Emails sent · 7d</div>
+                <div class="dash-stat-value live">18</div>
+                <div class="dash-stat-sub">Tracked via Resend</div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-label">Demos this month</div>
+                <div class="dash-stat-value live">4</div>
+                <div class="dash-stat-sub">Auto-flow to Calendar</div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-label">Templates ready</div>
+                <div class="dash-stat-value live">3</div>
+                <div class="dash-stat-sub">Reusable cold opens</div>
+              </div>
+            </div>
+
+            <div class="team-tools">
+              <div class="strip-tabs" style="display: flex; gap: 4px; margin-bottom: 18px; background: var(--soft); padding: 4px; border-radius: 10px; width: fit-content;">
+                <button class="tool-tab active" onclick="toolShow('ks', 'pipeline', this)" style="padding: 7px 14px; border-radius: 7px; background: var(--paper); color: var(--ink); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">Pipeline</button>
+                <button class="tool-tab" onclick="toolShow('ks', 'compose', this)" style="padding: 7px 14px; border-radius: 7px; background: transparent; color: var(--muted); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer;">Compose</button>
+                <button class="tool-tab" onclick="toolShow('ks', 'demos', this)" style="padding: 7px 14px; border-radius: 7px; background: transparent; color: var(--muted); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer;">Demos</button>
+                <button class="tool-tab" onclick="toolShow('ks', 'templates', this)" style="padding: 7px 14px; border-radius: 7px; background: transparent; color: var(--muted); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer;">Templates</button>
+              </div>
+
+              <!-- PIPELINE -->
+              <div class="tool-pane on" id="ks-pipeline">
+                <div class="tool-bar">
+                  <input type="text" placeholder="Search prospects..." class="tool-search" />
+                  <div class="tool-actions">
+                    <button class="btn ghost sm">Bulk paste</button>
+                    <button class="btn sm">+ Add prospect</button>
+                  </div>
+                </div>
+                <div class="data-table">
+                  <div class="data-row data-head">
+                    <div>Name</div><div>Contact</div><div>Status</div><div>Last touch</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>Sunrise Manor</strong><span class="sub">Decatur, GA</span></div>
+                    <div>—</div>
+                    <div><span class="pill researching">Researching</span></div>
+                    <div class="dim">—</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>Brookdale Atlanta</strong><span class="sub">Buckhead</span></div>
+                    <div>Mary Chen · AD</div>
+                    <div><span class="pill demo">Demo booked</span></div>
+                    <div>2 days ago</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>A.G. Rhodes</strong><span class="sub">Atlanta · Cobb · Wesley Woods</span></div>
+                    <div>—</div>
+                    <div><span class="pill demo">Demo booked</span></div>
+                    <div>4 days ago</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>Atria Buckhead</strong><span class="sub">Buckhead</span></div>
+                    <div>Jennifer R. · Director</div>
+                    <div><span class="pill replied">Replied</span></div>
+                    <div>yesterday</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>Bridge Senior Living</strong><span class="sub">Marietta, GA</span></div>
+                    <div>—</div>
+                    <div><span class="pill contacted">Contacted</span></div>
+                    <div>5 days ago</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- COMPOSE -->
+              <div class="tool-pane" id="ks-compose" style="display: none;">
+                <div class="compose-grid">
+                  <div class="compose-form">
+                    <div class="compose-row">
+                      <label>To</label>
+                      <select class="compose-input">
+                        <option>Sunrise Manor · Decatur, GA</option>
+                        <option>Brookdale Atlanta · Buckhead</option>
+                        <option>A.G. Rhodes · Atlanta</option>
+                      </select>
+                    </div>
+                    <div class="compose-row">
+                      <label>Template</label>
+                      <select class="compose-input">
+                        <option>Cold open · AD intro</option>
+                        <option>Follow-up · soft bump</option>
+                        <option>Demo request · meeting invite</option>
+                      </select>
+                    </div>
+                    <div class="compose-row">
+                      <label>Subject</label>
+                      <input type="text" class="compose-input" value="A quick idea for your residents · weekly visits with another community" />
+                    </div>
+                    <div class="compose-row">
+                      <label>Body</label>
+                      <textarea class="compose-input compose-body">Hi {{contact_name}},
+
+I'm Diana, an engineer who became a caretaker for my grandma — that's how Kindred started.
+
+Kindred is a 30-minute weekly video visit between residents at {{community}} and another senior community. You'd run it (it takes about an hour of prep). I bring the structure, the games, the format that works.
+
+We're piloting with five Atlanta-area communities. Two slots left.
+
+Worth a 15-min call this week?
+
+Diana</textarea>
+                    </div>
+                    <div class="compose-actions">
+                      <button class="btn ghost">Save as template</button>
+                      <button class="btn ghost">Analyze tactics</button>
+                      <button class="btn">Send via Resend →</button>
+                    </div>
+                  </div>
+                  <div class="compose-side">
+                    <h4>Tactic analysis</h4>
+                    <div class="tactic-score">
+                      <div class="tactic-score-num">7.8</div>
+                      <div class="tactic-score-label">/ 10 overall</div>
+                    </div>
+                    <div class="tactic-used">
+                      <div class="tactic-section-label">Used</div>
+                      <span class="tactic-tag good">✓ Founder story</span>
+                      <span class="tactic-tag good">✓ Specificity</span>
+                      <span class="tactic-tag good">✓ Scarcity (two slots)</span>
+                      <span class="tactic-tag good">✓ Soft CTA</span>
+                    </div>
+                    <div class="tactic-used">
+                      <div class="tactic-section-label">Could add</div>
+                      <span class="tactic-tag suggest">+ Social proof</span>
+                      <span class="tactic-tag suggest">+ Time-specific ask</span>
+                    </div>
+                    <p class="tactic-note">Voice: <code>kindred-warm</code> · Claude-checked</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- DEMOS -->
+              <div class="tool-pane" id="ks-demos" style="display: none;">
+                <div class="tool-bar">
+                  <div class="tool-bar-title">Booked demos · auto-syncs to Calendar</div>
+                  <button class="btn ghost sm">+ Add manual demo</button>
+                </div>
+                <div class="demos-list">
+                  <div class="demo-card upcoming">
+                    <div class="demo-when">
+                      <div class="demo-when-day">Wed · May 21</div>
+                      <div class="demo-when-time">10:30 AM</div>
+                    </div>
+                    <div class="demo-body">
+                      <strong>Brookdale Atlanta · Mary Chen</strong>
+                      <p>AD at Brookdale Buckhead. Asked about the family-survey component (v2). Interested in piloting at one home first.</p>
+                      <div class="demo-meta">
+                        <span class="demo-tag">15 min</span>
+                        <span class="demo-tag">Zoom</span>
+                        <span class="demo-tag">Notes pending</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="demo-card upcoming">
+                    <div class="demo-when">
+                      <div class="demo-when-day">Wed · May 21</div>
+                      <div class="demo-when-time">3:00 PM</div>
+                    </div>
+                    <div class="demo-body">
+                      <strong>A.G. Rhodes · three locations</strong>
+                      <p>Group call with the regional director. Could be the largest opportunity — three sites at once.</p>
+                      <div class="demo-meta">
+                        <span class="demo-tag">30 min</span>
+                        <span class="demo-tag">Zoom</span>
+                        <span class="demo-tag">Multi-site</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="demo-card">
+                    <div class="demo-when">
+                      <div class="demo-when-day">Mon · May 19</div>
+                      <div class="demo-when-time">2:00 PM</div>
+                    </div>
+                    <div class="demo-body">
+                      <strong>Sunrise Manor · Decatur</strong>
+                      <p>First demo. Liked the Spotlight feature. Wants to think it over with their director. Follow up Friday.</p>
+                      <div class="demo-meta">
+                        <span class="demo-tag done">Completed</span>
+                        <span class="demo-tag">Follow-up Fri</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TEMPLATES -->
+              <div class="tool-pane" id="ks-templates" style="display: none;">
+                <div class="tool-bar">
+                  <div class="tool-bar-title">Reusable email templates · kindred-warm voice</div>
+                  <button class="btn sm">+ New template</button>
+                </div>
+                <div class="templates-list">
+                  <div class="template-card">
+                    <div class="template-head">
+                      <strong>Cold open · AD intro</strong>
+                      <span class="template-usage">Used 28×</span>
+                    </div>
+                    <div class="template-subj">Subject: A quick idea for your residents · weekly visits with another community</div>
+                    <p class="template-preview">Hi {{contact_name}}, I'm Diana, an engineer who became a caretaker for my grandma — that's how Kindred started...</p>
+                  </div>
+                  <div class="template-card">
+                    <div class="template-head">
+                      <strong>Follow-up · soft bump</strong>
+                      <span class="template-usage">Used 14×</span>
+                    </div>
+                    <div class="template-subj">Subject: Re: A quick idea for your residents</div>
+                    <p class="template-preview">Hi {{contact_name}}, no pressure at all — just wanted to gently bump this in case it got buried. If now's not the right time...</p>
+                  </div>
+                  <div class="template-card">
+                    <div class="template-head">
+                      <strong>Demo invite · 15 min hold</strong>
+                      <span class="template-usage">Used 9×</span>
+                    </div>
+                    <div class="template-subj">Subject: Let me show you what this looks like</div>
+                    <p class="template-preview">Hi {{contact_name}}, would love 15 min to show you how a typical Kindred session runs. I'll bring it live...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="team-dash-motion">
+              <h3>Motion · how this team works</h3>
+              <p>Kindred Sales runs sprint motion. Defined buyer (Activities Directors at atlanta-area senior communities), high-velocity outreach, founder-led emails. Average rep: 5 cold emails / afternoon. Expected reply rate: 8-15% on the first touch, higher on follow-ups.</p>
+              <p style="margin-top: 8px;">The voice skill <code>kindred-warm</code> shapes every Claude API call — emails sound like a warm founder with real care experience, never like a SaaS pitch.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOURCE OPERATIONS -->
+        <div class="ops-pane" id="ops-source" style="display: none;">
+          <div class="teams-list">
+            <div class="team-card" onclick="teamShow('source-marketing')">
+              <div class="team-head">
+                <div class="team-kind-mark marketing">●</div>
+                <div class="team-info">
+                  <div class="team-name">Marketing</div>
+                  <div class="team-kind">Content + presence · marathon</div>
+                </div>
+                <div class="team-cta">View →</div>
+              </div>
+              <div class="team-stats">
+                <div class="team-stat">
+                  <div class="team-stat-label">Ideas in pool</div>
+                  <div class="team-stat-value live">14</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-label">Posts scheduled</div>
+                  <div class="team-stat-value live">6</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-label">Posted · 7d</div>
+                  <div class="team-stat-value live">3</div>
+                </div>
+                <div class="team-stat">
+                  <div class="team-stat-label">Field events · 7d</div>
+                  <div class="team-stat-value live">2</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="team-add" onclick="alert('Adding a team is a Phase 1 feature. For now teams are seeded from your motion choice.')">
+              <span class="team-add-icon">+</span>
+              <span>Add a team to Source</span>
+            </button>
+          </div>
+
+          <!-- TEAM DASHBOARD: SOURCE MARKETING -->
+          <div class="team-dashboard" id="dash-source-marketing" style="display: none;">
+            <button class="team-back" onclick="teamHide('source-marketing')">← Source · all teams</button>
+
+            <div class="team-dash-head">
+              <div class="team-dash-kind">Marketing team · marathon</div>
+              <h2 class="team-dash-title">Source Marketing.</h2>
+              <p class="team-dash-sub">Building source's presence in atlanta. Content drops on IG and TikTok. Field log of events you attend. Host scouting for the platform.</p>
+            </div>
+
+            <div class="team-dash-stats">
+              <div class="dash-stat">
+                <div class="dash-stat-label">Idea pool</div>
+                <div class="dash-stat-value live">14</div>
+                <div class="dash-stat-sub">Generated · saved · scheduled</div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-label">Scheduled this week</div>
+                <div class="dash-stat-value live">6</div>
+                <div class="dash-stat-sub">IG · TikTok · newsletter</div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-label">Posted · 30d</div>
+                <div class="dash-stat-value live">21</div>
+                <div class="dash-stat-sub">Across all channels</div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-label">Hosts scouted</div>
+                <div class="dash-stat-value live">15</div>
+                <div class="dash-stat-sub">Identified · reached out</div>
+              </div>
+            </div>
+
+            <div class="team-tools">
+              <div class="strip-tabs" style="display: flex; gap: 4px; margin-bottom: 18px; background: var(--soft); padding: 4px; border-radius: 10px; width: fit-content; flex-wrap: wrap;">
+                <button class="tool-tab active" onclick="toolShow('sm', 'calendar', this)" style="padding: 7px 14px; border-radius: 7px; background: var(--paper); color: var(--ink); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">Content calendar</button>
+                <button class="tool-tab" onclick="toolShow('sm', 'pool', this)" style="padding: 7px 14px; border-radius: 7px; background: transparent; color: var(--muted); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer;">Idea pool</button>
+                <button class="tool-tab" onclick="toolShow('sm', 'generator', this)" style="padding: 7px 14px; border-radius: 7px; background: transparent; color: var(--muted); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer;">Generator</button>
+                <button class="tool-tab" onclick="toolShow('sm', 'field', this)" style="padding: 7px 14px; border-radius: 7px; background: transparent; color: var(--muted); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer;">Field log</button>
+                <button class="tool-tab" onclick="toolShow('sm', 'hosts', this)" style="padding: 7px 14px; border-radius: 7px; background: transparent; color: var(--muted); border: none; font-size: 12.5px; font-weight: 500; cursor: pointer;">Hosts</button>
+              </div>
+
+              <!-- CONTENT CALENDAR -->
+              <div class="tool-pane on" id="sm-calendar">
+                <div class="tool-bar">
+                  <div class="tool-bar-title">Scheduled drops · this week</div>
+                  <button class="btn sm">+ Add post</button>
+                </div>
+                <div class="content-list">
+                  <div class="content-card">
+                    <div class="content-when">
+                      <div class="cw-day">Tue · May 20</div>
+                      <div class="cw-time">9:00 AM</div>
+                    </div>
+                    <div class="content-body">
+                      <div class="content-meta">
+                        <span class="content-channel ig">Instagram</span>
+                        <span class="content-format">carousel</span>
+                      </div>
+                      <strong>5 atlanta supper clubs to know</strong>
+                      <p class="content-preview">"if you've been to one, you know. if you haven't — here's where to start." curated list, each with a photo and one-line vibe check.</p>
+                    </div>
+                    <div class="content-status scheduled">Scheduled</div>
+                  </div>
+                  <div class="content-card">
+                    <div class="content-when">
+                      <div class="cw-day">Fri · May 23</div>
+                      <div class="cw-time">5:00 PM</div>
+                    </div>
+                    <div class="content-body">
+                      <div class="content-meta">
+                        <span class="content-channel newsletter">Newsletter</span>
+                        <span class="content-format">weekly digest</span>
+                      </div>
+                      <strong>weekend picks · may 23-25</strong>
+                      <p class="content-preview">listening night in cabbagetown · pottery saturday · sunday brunch at little mama's. three things, that's it.</p>
+                    </div>
+                    <div class="content-status drafted">Drafted</div>
+                  </div>
+                  <div class="content-card">
+                    <div class="content-when">
+                      <div class="cw-day">Mon · May 26</div>
+                      <div class="cw-time">7:00 AM</div>
+                    </div>
+                    <div class="content-body">
+                      <div class="content-meta">
+                        <span class="content-channel tiktok">TikTok</span>
+                        <span class="content-format">reel</span>
+                      </div>
+                      <strong>"i went to a listening night last week"</strong>
+                      <p class="content-preview">first-person walkthrough. handheld. honest. ends with "this is what source is for."</p>
+                    </div>
+                    <div class="content-status scheduled">Scheduled</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- IDEA POOL -->
+              <div class="tool-pane" id="sm-pool" style="display: none;">
+                <div class="tool-bar">
+                  <div class="tool-bar-title">14 ideas saved · 3 ai-generated this week</div>
+                  <button class="btn ghost sm">Filter</button>
+                </div>
+                <div class="ideas-grid">
+                  <div class="idea-card ai">
+                    <div class="idea-meta"><span class="idea-channel">IG</span><span class="idea-ai">✦ ai</span></div>
+                    <strong>where atlanta's twenty-somethings actually go</strong>
+                    <p>a map carousel. five neighborhoods, one favorite hidden spot in each. less "best of" energy, more "trusted friend."</p>
+                  </div>
+                  <div class="idea-card ai">
+                    <div class="idea-meta"><span class="idea-channel">TikTok</span><span class="idea-ai">✦ ai</span></div>
+                    <strong>"how to throw your first supper club"</strong>
+                    <p>a host POV. real one, real apartment. honest about what's hard. ends with "tools we wish existed."</p>
+                  </div>
+                  <div class="idea-card">
+                    <div class="idea-meta"><span class="idea-channel">IG</span></div>
+                    <strong>this week in atlanta · friday digest</strong>
+                    <p>weekly carousel. tonight / saturday / sunday. consistent format, builds saved-post anticipation.</p>
+                  </div>
+                  <div class="idea-card">
+                    <div class="idea-meta"><span class="idea-channel">Newsletter</span></div>
+                    <strong>"the friend who knows where to go"</strong>
+                    <p>about page rewrite. who we are. what we stand against (the algorithm, fake fees, "discover"). edit on saturday.</p>
+                  </div>
+                  <div class="idea-card ai">
+                    <div class="idea-meta"><span class="idea-channel">IG</span><span class="idea-ai">✦ ai</span></div>
+                    <strong>5 atlanta hosts you should know</strong>
+                    <p>portrait-style mini-features. one paragraph each. cross-promote with the hosts' own accounts.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- GENERATOR -->
+              <div class="tool-pane" id="sm-generator" style="display: none;">
+                <div class="generator-wrap">
+                  <div class="generator-form">
+                    <label class="generator-label">Tell Claude what you want</label>
+                    <textarea class="generator-input" placeholder="3 IG carousel ideas about atlanta listening sessions, lowercase voice, one-line captions">3 IG carousel ideas about atlanta listening sessions, lowercase voice, one-line captions, no exclamation marks, source-editorial</textarea>
+                    <div class="generator-meta">
+                      <span class="generator-pill">Voice: <code>source-editorial</code></span>
+                      <span class="generator-pill">Channel: Instagram</span>
+                      <button class="btn">✦ Generate ideas</button>
+                    </div>
+                  </div>
+                  <div class="generator-results">
+                    <div class="generator-result-label">Last generation · 3 ideas</div>
+                    <div class="generator-result-card">
+                      <strong>01 · listening rooms of atlanta</strong>
+                      <p>five photos, five rooms. blank space + a single quote from someone who's been. no captions on the photos. let the rooms speak.</p>
+                      <div class="result-actions">
+                        <button class="btn ghost sm">Skip</button>
+                        <button class="btn sm">+ Save to pool</button>
+                      </div>
+                    </div>
+                    <div class="generator-result-card">
+                      <strong>02 · "what's playing tonight"</strong>
+                      <p>weekly listening-only post. one event, one photo, one sentence. friday at 4pm, same format every week. ritual.</p>
+                      <div class="result-actions">
+                        <button class="btn ghost sm">Skip</button>
+                        <button class="btn sm">+ Save to pool</button>
+                      </div>
+                    </div>
+                    <div class="generator-result-card">
+                      <strong>03 · the playlist behind the night</strong>
+                      <p>spotify embed from each listening session. you saw it, here's what played, save it for later. archive of atlanta's sonic memory.</p>
+                      <div class="result-actions">
+                        <button class="btn ghost sm">Skip</button>
+                        <button class="btn sm">+ Save to pool</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FIELD LOG -->
+              <div class="tool-pane" id="sm-field" style="display: none;">
+                <div class="tool-bar">
+                  <div class="tool-bar-title">Atlanta events attended · 7d</div>
+                  <button class="btn sm">+ Log event</button>
+                </div>
+                <div class="field-list">
+                  <div class="field-card">
+                    <div class="field-when">Sat · May 17</div>
+                    <div class="field-body">
+                      <strong>Listening night · cabbagetown</strong>
+                      <p>~40 people. host: maya k. format worked. she mentioned wanting analytics on regulars-vs-new attendees. <em>add to host scout.</em></p>
+                      <div class="field-tags"><span>Listening</span><span>40 attendees</span></div>
+                    </div>
+                  </div>
+                  <div class="field-card">
+                    <div class="field-when">Thu · May 15</div>
+                    <div class="field-body">
+                      <strong>Supper club · west end</strong>
+                      <p>10 seats, 12 people. by-donation. host: jordan p. they want a way to do waitlists. real demand for source's host tools.</p>
+                      <div class="field-tags"><span>Supper</span><span>Demand signal</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HOSTS -->
+              <div class="tool-pane" id="sm-hosts" style="display: none;">
+                <div class="tool-bar">
+                  <input type="text" placeholder="Search hosts..." class="tool-search" />
+                  <button class="btn sm">+ Add host</button>
+                </div>
+                <div class="data-table">
+                  <div class="data-row data-head">
+                    <div>Host</div><div>Their thing</div><div>Status</div><div>Last touch</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>Maya K.</strong><span class="sub">@mk.atl · cabbagetown</span></div>
+                    <div>Monthly listening nights</div>
+                    <div><span class="pill replied">Meeting set</span></div>
+                    <div>yesterday</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>Jordan P.</strong><span class="sub">@jordan.cooks</span></div>
+                    <div>Donation supper club</div>
+                    <div><span class="pill contacted">Reached out</span></div>
+                    <div>3 days ago</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>Aaron G.</strong><span class="sub">small concerts · BeltLine venues</span></div>
+                    <div>Pop-up shows, 50-100 cap</div>
+                    <div><span class="pill researching">Identified</span></div>
+                    <div class="dim">—</div>
+                  </div>
+                  <div class="data-row">
+                    <div><strong>Sasha R.</strong><span class="sub">art-show coordinator</span></div>
+                    <div>Quarterly open studios</div>
+                    <div><span class="pill researching">Identified</span></div>
+                    <div class="dim">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="team-dash-motion">
+              <h3>Motion · how this team works</h3>
+              <p>Source Marketing runs marathon motion. No outbound; growth comes from consistent content, in-person presence, and word of mouth. The work is daily and compounding — one post Tuesday, one Friday, one event a week, one host conversation a week.</p>
+              <p style="margin-top: 8px;">The voice skill <code>source-editorial</code> shapes every Claude API call — content reads as editorial, lowercase, Apartamento-meets-text-from-a-friend. Never SaaS-speak.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="surface" data-surface="ledger">
+        <div class="surface-head">
+          <div class="surface-eyebrow">Overview</div>
+          <h1 class="surface-title">The ledger.</h1>
+          <p class="surface-sub">What's working. What isn't. Updated whenever you learn something real from a customer call, a build day, or a moment in the field. Pattern-match across companies.</p>
+        </div>
+        <div class="ledger-grid">
+          <div class="ledger-item">
+            <strong><span class="ledger-mark yes">✓</span>Founder story = trust unlock</strong>
+            <p>"GT + tech + grandma caretaker" lands in every Kindred cold email reply. Use the same shape (credentials + lived experience) for every future company.</p>
+          </div>
+          <div class="ledger-item">
+            <strong><span class="ledger-mark yes">✓</span>Single-HTML mocks beat polished pixels</strong>
+            <p>Click-through HTML mocks have closed more conversations than Figma files would. Always lead with something interactive.</p>
+          </div>
+          <div class="ledger-item">
+            <strong><span class="ledger-mark yes">✓</span>Audit-before-code saves weeks</strong>
+            <p>The v1→v2 audit pattern catches dormant-data and polymorphism lock-ins before they become migrations.</p>
+          </div>
+          <div class="ledger-item">
+            <strong><span class="ledger-mark yes">✓</span>Portal model beats nested tabs</strong>
+            <p>Each company gets its own working portal with its own sidebar. The Studio shell stays for strategy; the portals own the work. Stops the OS becoming a soup of every company's stuff.</p>
+          </div>
+          <div class="ledger-item">
+            <strong><span class="ledger-mark yes">✓</span>Different motions can run in parallel</strong>
+            <p>Kindred = sprint (build then sell). Source = marathon (build then sustained content + presence). The work types don't compete for the same hours.</p>
+          </div>
+          <div class="ledger-item">
+            <strong><span class="ledger-mark maybe">?</span>Lowercase brand voice (Source)</strong>
+            <p>Aesthetic is striking but untested with actual buyers. Validate at first 10 atlanta events before doubling down.</p>
+          </div>
+          <div class="ledger-item">
+            <strong><span class="ledger-mark no">×</span>Vision-without-pilot is procrastination</strong>
+            <p>Writing the "humans-first bible" or designing the talent marketplace before Kindred has a paid customer is a form of avoidance. Note the ideas. Don't build them.</p>
+          </div>
+          <div class="ledger-item">
+            <strong><span class="ledger-mark no">×</span>Copy-pasting structure across companies</strong>
+            <p>Source's sales tool was first built as Kindred's with words swapped. It didn't work. Each company's tabs must come from its actual go-to-market, not from a template.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- GENERATE NEW -->
+      <section class="surface" data-surface="generate">
+        <div class="surface-head">
+          <div class="surface-eyebrow">Plan</div>
+          <h1 class="surface-title">Generate a new company.</h1>
+          <p class="surface-sub">The intake flow that produces a full asset suite (deck, product mock, marketing site, sales tool if needed) sized to a specific company. Same shape as Kindred and Source, but every detail derived from your answers.</p>
+        </div>
+
+        <div class="truth-banner">
+          <strong>What's real:</strong> The questions are real — these are the ones any new company needs answered before assets get generated. <strong>What's not yet real:</strong> The "generate" button doesn't run a real Claude API yet. Fill out the form, see the meta-prompt, then paste it into Claude Code to actually generate the assets.
+        </div>
+
+        <div class="gen-card" id="gen-form">
+          <div class="gen-step">
+            <div class="gen-q">1 · What's the company, in one paragraph?</div>
+            <div class="gen-q-sub">What it does, who it's for, why it matters. Specific over ambitious. ~6 sentences.</div>
+            <textarea class="gen-textarea" id="gen-idea" placeholder="Example: An events app for atlanta that helps people find the great things happening in their city. Hosts post events, attendees buy tickets, source takes 10% + $0.99 per ticket. 25% of fees fund a quarterly prize awarded to the top-rated host..."></textarea>
+          </div>
+          <div class="gen-step">
+            <div class="gen-q">2 · What's the go-to-market motion?</div>
+            <div class="gen-q-sub">The motion determines which Operations sub-tabs auto-generate for this company in your Studio.</div>
+            <div class="gen-options">
+              <div class="gen-opt" onclick="genPick(this)">
+                <strong>Outbound · sprint</strong>
+                <span>Defined buyer, you reach out one-by-one. Like Kindred. Operations auto-spawns: Pipeline, Compose, Demos.</span>
+              </div>
+              <div class="gen-opt" onclick="genPick(this)">
+                <strong>Content + presence · marathon</strong>
+                <span>You build through IG/TikTok, in-person, word of mouth. Like Source. Operations auto-spawns: Content calendar, Idea generator, Field log, Host scouting.</span>
+              </div>
+              <div class="gen-opt" onclick="genPick(this)">
+                <strong>Paid acquisition · ads</strong>
+                <span>Scaled paid channels. Operations auto-spawns: Ad accounts, Creative library, Funnel analytics.</span>
+              </div>
+              <div class="gen-opt" onclick="genPick(this)">
+                <strong>Partnerships · B2B2C</strong>
+                <span>One signed partner gets you 100 customers. Operations auto-spawns: Partner pipeline, Joint launches, Co-marketing.</span>
+              </div>
+            </div>
+          </div>
+          <div class="gen-step">
+            <div class="gen-q">3 · What's the aesthetic?</div>
+            <div class="gen-q-sub">Color palette, typography, the feel of the brand. Drop in 2-4 moodboard images for visual reference, plus a sentence or two of context.</div>
+            <textarea class="gen-textarea" id="gen-aesthetic" placeholder="Example: warm peach + cream, Fraunces serif for headlines + Inter for body, generous whitespace, soft rounded corners..."></textarea>
+            <div class="gen-images" id="gen-images">
+              <label class="gen-image-upload" for="gen-image-input">
+                <span class="gen-image-upload-icon">+</span>
+                <span class="gen-image-upload-text">Add moodboard images</span>
+                <input type="file" id="gen-image-input" accept="image/*" multiple style="display: none;" onchange="genImages(this)" />
+              </label>
+              <div class="gen-image-grid" id="gen-image-grid"></div>
+            </div>
+          </div>
+          <div class="gen-step">
+            <div class="gen-q">4 · What's the v2 vision?</div>
+            <div class="gen-q-sub">What gets added once v1 has traction? Determines dormant tables, reserved user types, feature flags.</div>
+            <textarea class="gen-textarea" id="gen-v2" placeholder="Example: v2 adds attendee accounts. v2 also expands to a second city..."></textarea>
+          </div>
+          <div class="gen-step">
+            <div class="gen-q">5 · What's the wedge — why this, why now?</div>
+            <div class="gen-q-sub">One sentence on why an incumbent (or absence) leaves room for you specifically. Your founder story stays consistent across all companies (set in Settings).</div>
+            <input class="gen-input" id="gen-wedge" placeholder="Example: Eventbrite treats events like products; we treat them like culture..." />
+          </div>
+          <button class="btn lg" onclick="genStart()">Generate the asset suite →</button>
+        </div>
+
+        <div class="gen-generating" id="gen-running" style="display: none;">
+          <h2><span class="gen-pulse"></span>Generating · <span id="gen-company-name">Untitled Company</span></h2>
+          <p>This is the design of what the generator would do. Right now it doesn't run a real Claude API — it's the architectural mockup so you can see the flow. To actually produce these assets today, copy the prompt at the bottom into Claude Code.</p>
+          <div class="gen-task-list">
+            <div class="gen-task" id="gen-t1"><div class="gen-task-dot"></div>Pitch deck — full slide deck</div>
+            <div class="gen-task" id="gen-t2"><div class="gen-task-dot"></div>Pitch — short 5-6 slide version</div>
+            <div class="gen-task" id="gen-t3"><div class="gen-task-dot"></div>Product mock — click-through, matches aesthetic + moodboard</div>
+            <div class="gen-task" id="gen-t4"><div class="gen-task-dot"></div>Marketing site — hero, features, pricing, FAQ</div>
+            <div class="gen-task" id="gen-t5"><div class="gen-task-dot"></div>Build plan — 8 phases scoped to this company's stack</div>
+            <div class="gen-task" id="gen-t6"><div class="gen-task-dot"></div>v1→v2 audit — lock-in risks specific to this product</div>
+            <div class="gen-task" id="gen-t7"><div class="gen-task-dot"></div>Agents + Claude Skills for this brand voice</div>
+            <div class="gen-task" id="gen-t8"><div class="gen-task-dot"></div>New company portal + Operations sub-tabs (auto-generated from motion)</div>
+          </div>
+          <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p style="margin-bottom: 12px; font-size: 13px; color: rgba(255,255,255,0.6);">To run this for real, paste this prompt into Claude Code with your answers filled in:</p>
+            <div class="task-prompt" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);" id="gen-prompt-out"></div>
+          </div>
+          <button class="btn ghost" style="margin-top: 20px; background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2);" onclick="genReset()">← Back to form</button>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="surface" data-surface="settings">
+        <div class="surface-head">
+          <div class="surface-eyebrow">System</div>
+          <h1 class="surface-title">Settings.</h1>
+          <p class="surface-sub">Studio-wide defaults. The locked stack, the founder profile, the patterns every new company starts from.</p>
+        </div>
+
+        <div class="card">
+          <h3>Studio defaults · locked</h3>
+          <p style="margin-bottom: 16px;">Every new company inherits these. Override only when the company specifically needs something different.</p>
+          <div class="settings-row"><div class="settings-label">Stack</div><div class="settings-val"><code>Next.js 15</code> · <code>Supabase</code> · <code>Vercel</code> · <code>Resend</code> · <code>Anthropic API</code> · Stripe (Connect for marketplaces) · Daily.co or Capacitor as needed</div></div>
+          <div class="settings-row"><div class="settings-label">Monorepo</div><div class="settings-val">pnpm workspaces. Three apps per company: <code>web</code>, <code>app</code> (or <code>hosts</code>), <code>admin</code> (or <code>dashboard</code>). Shared packages: <code>ui</code>, <code>db</code>, <code>lib</code>.</div></div>
+          <div class="settings-row"><div class="settings-label">Database</div><div class="settings-val">Postgres on Supabase. RLS on every table. Money in cents (integers, never floats). UUIDs for primary keys.</div></div>
+          <div class="settings-row"><div class="settings-label">Auth</div><div class="settings-val">Magic-link via Supabase. <code>users.user_type</code> enum from day one — even if v1 has one role, v2 adds more.</div></div>
+          <div class="settings-row"><div class="settings-label">Email subdomains</div><div class="settings-val"><code>hello@[company].care</code> for sales. <code>notifications.[company].care</code> for transactional. Separate from day one.</div></div>
+          <div class="settings-row"><div class="settings-label">Feature flags</div><div class="settings-val">Every v2 surface gates behind a flag on the relevant scope (community, city, venue). Default false. Flip per-customer.</div></div>
+        </div>
+
+        <div class="card">
+          <h3>Founder profile</h3>
+          <p style="margin-bottom: 16px;">Background that gets referenced across every company's founder story.</p>
+          <div class="settings-row"><div class="settings-label">Education</div><div class="settings-val">Georgia Tech · engineering + design</div></div>
+          <div class="settings-row"><div class="settings-label">Background</div><div class="settings-val">A few years in tech before founding</div></div>
+          <div class="settings-row"><div class="settings-label">Personal wedge (Kindred)</div><div class="settings-val">Caretaker for grandma — origin of Kindred</div></div>
+          <div class="settings-row"><div class="settings-label">Personal wedge (Source)</div><div class="settings-val">Helping atlanta event organizers as friends-of-friends for years</div></div>
+          <div class="settings-row"><div class="settings-label">Location</div><div class="settings-val">Atlanta, GA · solo founder</div></div>
+        </div>
+
+        <div class="card">
+          <h3>Compatibility rules · studio-wide</h3>
+          <p style="margin-bottom: 14px;">Applied to every company. Override only with explicit reason.</p>
+          <div class="settings-row"><div class="settings-label">v2 tables in v1</div><div class="settings-val">All defined, empty. Never <code>ALTER TABLE ADD</code> on a live system you can avoid.</div></div>
+          <div class="settings-row"><div class="settings-label">Polymorphic columns</div><div class="settings-val">Polymorphic from day one. Type columns even when v1 has one value.</div></div>
+          <div class="settings-row"><div class="settings-label">Schema additions</div><div class="settings-val">Nullable + defaulted. v1 code never writes them.</div></div>
+          <div class="settings-row"><div class="settings-label">No premature user surfaces</div><div class="settings-val">If a feature requires a user type that doesn't exist yet, it's a v2 feature. Don't sneak in.</div></div>
+          <div class="settings-row"><div class="settings-label">Agent budgets</div><div class="settings-val">Every Anthropic API call wrapped. Per-endpoint daily cap. Slack alert at 80%.</div></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<script>
+  // Update build progress bars by reading localStorage from portals
+  const today = new Date();
+  document.getElementById('today').textContent = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+  function readProgress(company) {
+    try {
+      const saved = JSON.parse(localStorage.getItem(`build-checks-${company}`) || '{}');
+      const totals = JSON.parse(localStorage.getItem(`build-totals-${company}`) || '{"total":0,"phases":0}');
+      const doneCount = Object.values(saved).filter(Boolean).length;
+      const total = totals.total || 0;
+      const phasesDone = totals.phases || 0;
+      return { doneCount, total, phasesDone };
+    } catch { return { doneCount: 0, total: 0, phasesDone: 0 }; }
+  }
+  function updateCardProgress() {
+    ['kindred', 'source'].forEach(c => {
+      const { doneCount, total, phasesDone } = readProgress(c);
+      const bar = document.getElementById(`${c}-progress-bar`);
+      const label = document.getElementById(`${c}-progress-label`);
+      const pct = total > 0 ? Math.round((doneCount/total)*100) : 0;
+      if (bar && total > 0) bar.style.width = `${pct}%`;
+      if (label) label.textContent = `${pct}% · ${phasesDone}/8 phases`;
+    });
+  }
+  updateCardProgress();
+  window.addEventListener('storage', updateCardProgress);
+
+  // Sidebar nav
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.surface;
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.surface').forEach(s => s.classList.toggle('on', s.dataset.surface === target));
+      document.querySelector('.main').scrollTop = 0;
+    });
+  });
+
+  // Operations sub-tab toggle
+  function opsShow(which, btn) {
+    document.querySelectorAll('.ops-tab').forEach(b => {
+      const active = b === btn;
+      b.style.background = active ? 'var(--paper)' : 'transparent';
+      b.style.color = active ? 'var(--ink)' : 'var(--muted)';
+      b.style.boxShadow = active ? '0 1px 3px rgba(0,0,0,0.06)' : 'none';
+    });
+    document.querySelectorAll('.ops-pane').forEach(p => {
+      p.style.display = p.id === `ops-${which}` ? 'block' : 'none';
+    });
+    // Reset team dashboards when switching companies
+    document.querySelectorAll('.team-dashboard').forEach(d => d.style.display = 'none');
+    document.querySelectorAll('.teams-list').forEach(l => l.style.display = 'flex');
+  }
+
+  function teamShow(teamId) {
+    // Hide teams list, show this team's dashboard
+    const pane = document.getElementById(`dash-${teamId}`).closest('.ops-pane');
+    pane.querySelector('.teams-list').style.display = 'none';
+    document.getElementById(`dash-${teamId}`).style.display = 'block';
+    document.querySelector('.main').scrollTop = 0;
+  }
+  function teamHide(teamId) {
+    const pane = document.getElementById(`dash-${teamId}`).closest('.ops-pane');
+    document.getElementById(`dash-${teamId}`).style.display = 'none';
+    pane.querySelector('.teams-list').style.display = 'flex';
+  }
+
+  function toolShow(prefix, which, btn) {
+    // Update tab styles
+    const allTabs = btn.parentElement.querySelectorAll('.tool-tab');
+    allTabs.forEach(t => {
+      const active = t === btn;
+      t.style.background = active ? 'var(--paper)' : 'transparent';
+      t.style.color = active ? 'var(--ink)' : 'var(--muted)';
+      t.style.boxShadow = active ? '0 1px 3px rgba(0,0,0,0.06)' : 'none';
+    });
+    // Show the right pane (panes have ids like ks-pipeline, sm-calendar etc)
+    const container = btn.closest('.team-tools');
+    container.querySelectorAll('.tool-pane').forEach(p => {
+      p.style.display = p.id === `${prefix}-${which}` ? 'block' : 'none';
+    });
+  }
+
+  // Generate New flow
+  let pickedGtm = '';
+  function genPick(el) {
+    el.parentElement.querySelectorAll('.gen-opt').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    pickedGtm = el.querySelector('strong').textContent;
+  }
+  // Moodboard images state
+  let moodImages = [];
+  function genImages(input) {
+    Array.from(input.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        moodImages.push({ name: file.name, dataUrl: e.target.result });
+        renderMoodGrid();
+      };
+      reader.readAsDataURL(file);
+    });
+    input.value = '';
+  }
+  function renderMoodGrid() {
+    const grid = document.getElementById('gen-image-grid');
+    grid.innerHTML = moodImages.map((img, i) => `
+      <div class="gen-image-thumb" style="background-image: url('${img.dataUrl}')">
+        <div class="remove" onclick="removeMoodImage(${i})">×</div>
+      </div>
+    `).join('');
+  }
+  function removeMoodImage(i) {
+    moodImages.splice(i, 1);
+    renderMoodGrid();
+  }
+
+  function genStart() {
+    const idea = document.getElementById('gen-idea').value.trim();
+    if (!idea) { alert('Add a one-paragraph idea first.'); return; }
+    document.getElementById('gen-form').style.display = 'none';
+    document.getElementById('gen-running').style.display = 'block';
+
+    const firstSentence = idea.split(/[.!?]/)[0];
+    const guessName = firstSentence.match(/^(?:an? )?([A-Z][\w]+|[\w]+ app|[\w]+ tool)/i);
+    const companyName = guessName ? guessName[0].replace(/^an? /i, '').trim() : 'Untitled Company';
+    document.getElementById('gen-company-name').textContent = companyName;
+
+    const aesthetic = document.getElementById('gen-aesthetic').value.trim();
+    const v2 = document.getElementById('gen-v2').value.trim();
+    const wedge = document.getElementById('gen-wedge').value.trim();
+    const imageNote = moodImages.length
+      ? `${moodImages.length} moodboard image(s) attached: ${moodImages.map(i => i.name).join(', ')}. Reference these for visual direction.`
+      : '(no moodboard images)';
+
+    const prompt = `Hey Claude — I'm starting a new company. Here's everything:
+
+IDEA:
+${idea}
+
+AESTHETIC:
+${aesthetic || '(not specified — ask before proceeding)'}
+
+MOODBOARD:
+${imageNote}
+
+GO-TO-MARKET MOTION:
+${pickedGtm || '(not selected — ask before proceeding)'}
+
+WEDGE / WHY NOW:
+${wedge || '(not specified — ask before proceeding)'}
+
+V2 VISION:
+${v2 || '(not specified — ask before proceeding)'}
+
+FOUNDER STORY: pull from Studio Settings (Diana, GT engineering+design, ex-tech, atlanta). Same across all my companies.
+
+Follow the Kindred / Source pattern from my Studio bundle. Produce:
+
+1. Pitch deck (single HTML)
+2. Pitch (shorter version, 5-6 slides)
+3. Product mock (single HTML, click-through, matches aesthetic + moodboard)
+4. Marketing site (single HTML)
+5. Build plan — 8 phases with copy-paste Claude Code prompts, specific to THIS company's product
+6. v1→v2 audit — lock-in risks specific to this product, schema with dormant tables, deployment plan
+7. Agents + Claude Skills configured for this brand voice
+8. A new company portal HTML file (modeled on kindred-portal.html) — left sidebar with build plan, audit, agents, deck, pitch, product, website
+9. Update Studio index.html Companies grid to add a card linking to the new portal
+10. The Operations sub-tabs for this company auto-generate based on the motion above (sprint → Pipeline/Compose/Demos; marathon → Content calendar/Idea generator/Field log/Host scouting; etc.). No separate sales tool HTML file.
+
+Use my locked stack: Next.js 15, Supabase, Vercel, Resend, Anthropic API, Stripe (Connect if marketplace), Daily.co or Capacitor as needed.
+
+Honest data principle: don't invent numbers. Empty states are fine; aspirational dashboards aren't.`;
+
+    document.getElementById('gen-prompt-out').textContent = prompt;
+
+    const tasks = ['gen-t1','gen-t2','gen-t3','gen-t4','gen-t5','gen-t6','gen-t7','gen-t8'];
+    let i = 0;
+    tasks.forEach((id) => {
+      const el = document.getElementById(id);
+      el.classList.remove('done', 'active');
+    });
+    function step() {
+      if (i >= tasks.length) return;
+      const el = document.getElementById(tasks[i]);
+      el.classList.add('active');
+      setTimeout(() => {
+        el.classList.remove('active');
+        el.classList.add('done');
+        i++;
+        step();
+      }, 380);
+    }
+    step();
+  }
+  function genReset() {
+    document.getElementById('gen-form').style.display = 'block';
+    document.getElementById('gen-running').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>

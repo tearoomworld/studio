@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kindred · Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #2a221c; --ink-2: #4a3f36; --muted: #8a7d70; --faint: #c4b8a8;
+    --hair: #ebe1d2; --bg: #fdf8f0; --soft: #f5ede0; --white: #ffffff;
+    --peach: #f4b860; --peach-deep: #c87740; --peach-soft: #fde3c4;
+    --sage: #a8c98a; --sage-deep: #5a7a3f; --sage-soft: #d4e7d4;
+    --lav: #c4b5e0; --lav-soft: #e8dff5;
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Inter", -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: var(--sans); color: var(--ink); background: #1a1612;
+    -webkit-font-smoothing: antialiased; line-height: 1.5;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .deck { width: 100%; height: 100vh; position: relative; }
+  .slide {
+    position: absolute; inset: 0; background: var(--bg);
+    display: none; padding: 80px 100px;
+    overflow: hidden; flex-direction: column; justify-content: center;
+  }
+  .slide.active { display: flex; }
+  @media (max-width: 768px) { .slide { padding: 40px 32px; } }
+
+  /* Slide number + nav */
+  .slide-num {
+    position: absolute; top: 32px; left: 40px;
+    font-size: 11px; color: var(--muted); letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  .slide-brand {
+    position: absolute; top: 32px; right: 40px;
+    font-family: var(--serif); font-size: 16px; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .slide-brand::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--peach);
+  }
+
+  .nav-bar {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 100; display: flex; gap: 8px; align-items: center;
+    background: rgba(42, 34, 28, 0.85); backdrop-filter: blur(12px);
+    padding: 8px 12px; border-radius: 999px;
+  }
+  .nav-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.1); color: var(--white);
+    cursor: pointer; font-size: 18px; transition: background 0.15s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.2); }
+  .nav-counter {
+    color: rgba(255,255,255,0.7); font-size: 12px; padding: 0 12px;
+    font-feature-settings: "tnum";
+  }
+  .dots { display: flex; gap: 4px; padding: 0 12px; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.25); cursor: pointer;
+    transition: background 0.15s;
+  }
+  .dot.active { background: var(--peach); }
+
+  /* Background blobs */
+  .blob {
+    position: absolute; border-radius: 50%; filter: blur(80px);
+    opacity: 0.5; pointer-events: none;
+  }
+  .blob-peach { background: var(--peach-soft); }
+  .blob-sage { background: var(--sage-soft); }
+  .blob-lav { background: var(--lav-soft); }
+
+  /* Typography */
+  h1, h2, h3 { letter-spacing: -0.02em; }
+  .display {
+    font-family: var(--serif); font-size: clamp(56px, 7vw, 100px);
+    font-weight: 400; line-height: 1.0; letter-spacing: -0.03em;
+  }
+  .display em { font-style: italic; color: var(--peach-deep); }
+  .headline {
+    font-family: var(--serif); font-size: clamp(40px, 5.5vw, 72px);
+    font-weight: 400; line-height: 1.05; letter-spacing: -0.025em;
+  }
+  .headline em { font-style: italic; color: var(--peach-deep); }
+  .subhead {
+    font-family: var(--serif); font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 400; line-height: 1.15; letter-spacing: -0.02em;
+  }
+  .subhead em { font-style: italic; color: var(--peach-deep); }
+  .lede {
+    font-size: clamp(18px, 1.8vw, 22px); color: var(--ink-2);
+    line-height: 1.55; max-width: 720px;
+  }
+  .kicker {
+    display: inline-block; padding: 6px 14px;
+    background: var(--peach-soft); color: var(--peach-deep);
+    border-radius: 999px; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+
+  /* Stat grid */
+  .stat-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 32px; margin-top: 56px;
+  }
+  .stat {
+    border-top: 2px solid var(--peach); padding-top: 20px;
+  }
+  .stat-value {
+    font-family: var(--serif); font-size: clamp(40px, 5vw, 64px);
+    font-weight: 500; letter-spacing: -0.025em; line-height: 1;
+  }
+  .stat-label {
+    font-size: 13px; color: var(--muted); margin-top: 8px;
+    font-weight: 500;
+  }
+
+  /* Two-col */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+    align-items: center; margin-top: 48px;
+  }
+
+  /* Feature cards */
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    margin-top: 48px;
+  }
+  .feature-card {
+    background: var(--white); border-radius: 24px; padding: 28px;
+    border: 1px solid var(--hair);
+  }
+  .feature-card.peach { background: var(--peach-soft); border-color: transparent; }
+  .feature-card.sage { background: var(--sage-soft); border-color: transparent; }
+  .feature-card.lav { background: var(--lav-soft); border-color: transparent; }
+  .feature-card h3 {
+    font-family: var(--serif); font-size: 24px; font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .feature-card h3 em { font-style: italic; color: var(--peach-deep); }
+  .feature-card.sage h3 em { color: var(--sage-deep); }
+  .feature-card.lav h3 em { color: #5a4080; }
+  .feature-card p { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+
+  /* Quote slide */
+  .quote-slide {
+    background: var(--ink); color: var(--white); justify-content: center;
+  }
+  .quote-slide .display { color: var(--white); text-align: center; max-width: 1100px; }
+  .quote-slide .display em { color: var(--peach); }
+  .quote-attribution {
+    text-align: center; margin-top: 40px; font-size: 14px;
+    color: rgba(255,255,255,0.5); letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Bullet list */
+  .bullets {
+    list-style: none; margin-top: 32px; display: flex;
+    flex-direction: column; gap: 16px;
+  }
+  .bullets li {
+    font-size: 18px; color: var(--ink-2); padding-left: 28px;
+    position: relative; line-height: 1.6;
+  }
+  .bullets li::before {
+    content: ""; position: absolute; left: 0; top: 12px;
+    width: 12px; height: 2px; background: var(--peach);
+  }
+  .bullets li strong {
+    color: var(--ink); font-family: var(--serif); font-weight: 500;
+    font-size: 1.05em;
+  }
+
+  /* Revenue chart */
+  .revenue-chart {
+    display: flex; align-items: flex-end; gap: 24px;
+    margin-top: 48px; height: 280px;
+  }
+  .bar-group {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 12px;
+  }
+  .bar-value {
+    font-family: var(--serif); font-size: 22px; font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .bar {
+    width: 100%; background: linear-gradient(180deg, var(--peach), var(--peach-deep));
+    border-radius: 12px 12px 0 0; min-height: 4px;
+    transition: height 0.6s ease;
+  }
+  .bar.dim { background: var(--soft); }
+  .bar-label {
+    font-size: 13px; color: var(--muted); font-weight: 500;
+  }
+
+  /* Table */
+  .table-wrap {
+    margin-top: 32px; background: var(--white); border-radius: 20px;
+    overflow: hidden; border: 1px solid var(--hair);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: var(--soft); }
+  th, td {
+    text-align: left; padding: 16px 24px; font-size: 14px;
+    border-bottom: 1px solid var(--hair);
+  }
+  th {
+    font-size: 11px; color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  td { color: var(--ink-2); }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { font-weight: 500; color: var(--ink); }
+
+  /* Ask slide */
+  .ask-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+    margin-top: 48px;
+  }
+  .ask-card {
+    background: var(--white); border-radius: 20px; padding: 28px;
+    border: 1px solid var(--hair);
+  }
+  .ask-amount {
+    font-family: var(--serif); font-size: 36px; font-weight: 500;
+    letter-spacing: -0.02em; line-height: 1; color: var(--peach-deep);
+    margin-bottom: 8px;
+  }
+  .ask-label {
+    font-size: 13px; font-weight: 500; margin-bottom: 4px;
+  }
+  .ask-sub { font-size: 12px; color: var(--muted); }
+
+  /* Final CTA */
+  .final-cta {
+    text-align: center;
+  }
+  .final-cta .display { margin-bottom: 24px; }
+  .final-cta .contact {
+    display: inline-flex; gap: 28px; margin-top: 36px;
+    padding: 16px 32px; background: var(--white); border-radius: 999px;
+    box-shadow: 0 8px 28px rgba(42, 34, 28, 0.08);
+  }
+  .contact-item {
+    font-family: var(--serif); font-size: 17px; font-style: italic;
+  }
+  .contact-item strong {
+    font-style: normal; font-family: var(--sans); font-size: 11px;
+    color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    display: block; margin-bottom: 4px; font-weight: 500;
+  }
+
+  /* Print mode */
+  @media print {
+    body, html { overflow: visible; height: auto; background: var(--white); }
+    .deck { height: auto; }
+    .slide {
+      display: flex !important; position: relative; inset: auto;
+      width: 100%; height: 100vh; page-break-after: always;
+      padding: 60px 80px;
+    }
+    .nav-bar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- SLIDE 1: Cover -->
+  <div class="slide active" data-slide="0">
+    <div class="blob blob-peach" style="top: -100px; right: -100px; width: 500px; height: 500px;"></div>
+    <div class="blob blob-sage" style="bottom: -150px; left: -80px; width: 450px; height: 450px;"></div>
+    <span class="slide-num">01 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div style="position: relative; z-index: 1;">
+      <span class="kicker">For senior living communities</span>
+      <h1 class="display" style="margin-top: 28px;">A weekly <em>visit</em><br/>between communities.</h1>
+      <p class="lede" style="margin-top: 32px;">Software that connects nursing home residents across the country for weekly games, monthly spotlights, and one-to-one friendships — without anyone leaving the building.</p>
+      <p style="margin-top: 56px; font-size: 13px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;">Pitch deck · May 2026</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: The problem -->
+  <div class="slide" data-slide="1">
+    <div class="blob blob-lav" style="top: -100px; left: -100px; width: 400px; height: 400px;"></div>
+    <span class="slide-num">02 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div style="position: relative; z-index: 1;">
+      <span class="kicker">The problem</span>
+      <h2 class="headline" style="margin-top: 24px;">Senior loneliness kills as<br/>much as <em>15 cigarettes</em> a day.</h2>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-value">1.4M</div>
+          <div class="stat-label">Americans in nursing homes today</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">41%</div>
+          <div class="stat-label">Of residents report regular loneliness</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">$6.7B</div>
+          <div class="stat-label">Activities programming market in the US</div>
+        </div>
+      </div>
+
+      <p class="lede" style="margin-top: 56px;">Activities directors plan 30+ events a month from scratch. Residents see the same eight faces. Families on tours hear the same answer about "engagement." Nothing about this is scaling.</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: The insight -->
+  <div class="slide quote-slide" data-slide="2">
+    <span class="slide-num" style="color: rgba(255,255,255,0.4);">03 / 12</span>
+    <span class="slide-brand" style="color: var(--white);">kindred</span>
+
+    <h2 class="display">"Every Wednesday, Mom plays Bingo with residents at our sister community in Asheville. She's made a friend there named <em>Eleanor</em>. They wave to each other every week."</h2>
+    <div class="quote-attribution">What families will say about your community</div>
+  </div>
+
+  <!-- SLIDE 4: The product -->
+  <div class="slide" data-slide="3">
+    <div class="blob blob-peach" style="top: -100px; right: -100px; width: 400px; height: 400px;"></div>
+    <span class="slide-num">04 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div style="position: relative; z-index: 1;">
+      <span class="kicker">The product</span>
+      <h2 class="headline" style="margin-top: 24px;">One product. Three<br/>ways to <em>connect</em>.</h2>
+
+      <div class="feature-grid">
+        <div class="feature-card peach">
+          <h3>Group <em>visits</em></h3>
+          <p>Two communities pair up for an hour. Bingo, decade trivia, Name That Tune, storytelling. Universal games on the TV in the common room.</p>
+        </div>
+        <div class="feature-card sage">
+          <h3><em>Spotlights</em></h3>
+          <p>One resident is the expert. Lorie on 80s hairstyles. Mr. Henderson on the railroad. Any community on Kindred can tune in.</p>
+        </div>
+        <div class="feature-card lav">
+          <h3>Pen <em>pals</em></h3>
+          <p>One-to-one friendships matched by family-submitted profiles. Letters, audio, short videos. The quiet residents finally get connection.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: How it works -->
+  <div class="slide" data-slide="4">
+    <span class="slide-num">05 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div>
+      <span class="kicker">How it works</span>
+      <h2 class="headline" style="margin-top: 24px;">As simple as<br/>turning on the <em>TV</em>.</h2>
+
+      <ul class="bullets">
+        <li><strong>The director schedules a session.</strong> Five minutes of prep instead of two hours.</li>
+        <li><strong>Residents gather in the common room.</strong> They watch the TV — no devices, no logins, no learning curve.</li>
+        <li><strong>The director facilitates.</strong> Kindred runs the video, the game, the prompts, the music.</li>
+        <li><strong>Families get a session recap.</strong> Photos, quotes, moments. Auto-sent. Tour-closing material.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: The market -->
+  <div class="slide" data-slide="5">
+    <div class="blob blob-sage" style="top: -100px; right: -100px; width: 400px; height: 400px;"></div>
+    <span class="slide-num">06 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div style="position: relative; z-index: 1;">
+      <span class="kicker">The market</span>
+      <h2 class="headline" style="margin-top: 24px;">A $6.7B market with no<br/>true cross-facility <em>player</em>.</h2>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-value">15K</div>
+          <div class="stat-label">Nursing homes in the US</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">30K</div>
+          <div class="stat-label">Assisted living facilities</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">10K+</div>
+          <div class="stat-label">Memory care &amp; CCRCs</div>
+        </div>
+      </div>
+
+      <p class="lede" style="margin-top: 56px;">Existing software addresses single-facility programming (Linked Senior, iN2L, GrandPad). No one has built the connective tissue <em>between</em> communities. That's the wedge.</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Business model -->
+  <div class="slide" data-slide="6">
+    <span class="slide-num">07 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div>
+      <span class="kicker">Business model</span>
+      <h2 class="headline" style="margin-top: 24px;">Simple <em>SaaS</em>.<br/>Per community, per month.</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Tier</th><th>Monthly</th><th>For</th><th>Includes</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Starter</td>
+              <td>$249</td>
+              <td>Small independents</td>
+              <td>4 sessions/mo, 2 games, 1 partner</td>
+            </tr>
+            <tr>
+              <td>Standard</td>
+              <td>$449</td>
+              <td>Most communities</td>
+              <td>Unlimited sessions, all games + Spotlights</td>
+            </tr>
+            <tr>
+              <td>Network</td>
+              <td>$899</td>
+              <td>Chains</td>
+              <td>Everything + analytics + Pen Pals + family portal</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="lede" style="margin-top: 32px;">$449 sits just below the procurement-approval threshold at most facilities. One new resident attracted via Kindred = $108K/year in facility revenue. <em>18 days to break even.</em></p>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Traction / Y1 plan -->
+  <div class="slide" data-slide="7">
+    <div class="blob blob-peach" style="bottom: -150px; right: -100px; width: 400px; height: 400px;"></div>
+    <span class="slide-num">08 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div style="position: relative; z-index: 1;">
+      <span class="kicker">Year one plan</span>
+      <h2 class="headline" style="margin-top: 24px;">$67K total revenue.<br/><em>$188K</em> December run-rate.</h2>
+
+      <div class="revenue-chart">
+        <div class="bar-group">
+          <div class="bar-value">$0</div>
+          <div class="bar dim" style="height: 4px;"></div>
+          <div class="bar-label">Q1 · Build</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-value">$4.5K</div>
+          <div class="bar" style="height: 24px;"></div>
+          <div class="bar-label">Q2 · First paid</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-value">$16.2K</div>
+          <div class="bar" style="height: 88px;"></div>
+          <div class="bar-label">Q3 · Conferences</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-value">$46.8K</div>
+          <div class="bar" style="height: 240px;"></div>
+          <div class="bar-label">Q4 · Momentum</div>
+        </div>
+      </div>
+
+      <p class="lede" style="margin-top: 32px;">Y1 looks small. The signal is the December exit rate — that's where Year 2 begins. By Y3 we're at ~$5M ARR.</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: Go-to-market -->
+  <div class="slide" data-slide="8">
+    <span class="slide-num">09 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div>
+      <span class="kicker">Go-to-market</span>
+      <h2 class="headline" style="margin-top: 24px;">Activities directors<br/>are the <em>wedge</em>.</h2>
+
+      <ul class="bullets">
+        <li><strong>Atlanta first.</strong> Five hand-delivered pilots within 30 miles. Build the playbook.</li>
+        <li><strong>NAAP conference, April 2026.</strong> The one event where every activities director gathers.</li>
+        <li><strong>State NAAP chapters and Facebook groups.</strong> Directors talk constantly. One champion = 50 cold emails.</li>
+        <li><strong>Tier 1 independents → Tier 2 regional → Tier 3 national.</strong> Brookdale doesn't sign before the testimonials exist. We earn the right.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: Why now -->
+  <div class="slide" data-slide="9">
+    <div class="blob blob-lav" style="top: -100px; left: -100px; width: 400px; height: 400px;"></div>
+    <span class="slide-num">10 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div style="position: relative; z-index: 1;">
+      <span class="kicker">Why now</span>
+      <h2 class="headline" style="margin-top: 24px;">The exact moment<br/>this becomes <em>possible</em>.</h2>
+
+      <ul class="bullets">
+        <li><strong>The Surgeon General declared loneliness a public health crisis in 2023.</strong> Regulators now measure for it.</li>
+        <li><strong>COVID normalized video calls in nursing homes.</strong> Five years ago this idea was impossible to deploy.</li>
+        <li><strong>CMS requires "person-centered" activities for full reimbursement.</strong> We help facilities check the box.</li>
+        <li><strong>Activities Director shortage is real.</strong> Our software multiplies the one they have rather than requiring a new hire.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: The team / the ask -->
+  <div class="slide" data-slide="10">
+    <span class="slide-num">11 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div>
+      <span class="kicker">The ask</span>
+      <h2 class="headline" style="margin-top: 24px;">$50K to make<br/>Year 1 <em>inevitable</em>.</h2>
+
+      <div class="ask-grid">
+        <div class="ask-card">
+          <div class="ask-amount">$15K</div>
+          <div class="ask-label">Product &amp; infrastructure</div>
+          <div class="ask-sub">Daily.co video, hosting, Supabase, Anthropic API for a year</div>
+        </div>
+        <div class="ask-card">
+          <div class="ask-amount">$20K</div>
+          <div class="ask-label">Sales &amp; marketing</div>
+          <div class="ask-sub">NAAP conference, regional travel, insurance, materials</div>
+        </div>
+        <div class="ask-card">
+          <div class="ask-amount">$15K</div>
+          <div class="ask-label">Runway</div>
+          <div class="ask-sub">Founder living costs through first paying customer</div>
+        </div>
+      </div>
+
+      <p class="lede" style="margin-top: 48px;">Revenue at the end of Y1 covers Y2 with room to grow. <em>No second raise needed</em> unless we choose to accelerate.</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: Close -->
+  <div class="slide final-cta" data-slide="11">
+    <div class="blob blob-peach" style="top: -100px; right: -100px; width: 500px; height: 500px;"></div>
+    <div class="blob blob-sage" style="bottom: -150px; left: -80px; width: 450px; height: 450px;"></div>
+    <span class="slide-num">12 / 12</span>
+    <span class="slide-brand">kindred</span>
+
+    <div style="position: relative; z-index: 1;">
+      <h1 class="display">Communities,<br/><em>connected</em>.</h1>
+      <p class="lede" style="margin: 32px auto 0;">If this works, year five looks less like a software company and more like the connective tissue between thousands of senior communities.</p>
+
+      <div class="contact">
+        <div class="contact-item"><strong>Founder</strong>[Your name]</div>
+        <div class="contact-item"><strong>Email</strong>hello@kindred.care</div>
+        <div class="contact-item"><strong>Phone</strong>(404) 000-0000</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prev">←</button>
+  <div class="dots" id="dots"></div>
+  <span class="nav-counter" id="counter">1 / 12</span>
+  <button class="nav-btn" id="next">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i);
+    dotsEl.appendChild(d);
+  }
+  const dots = document.querySelectorAll('.dot');
+
+  function go(i) {
+    if (i < 0 || i >= total) return;
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = i;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    document.getElementById('counter').textContent = `${i + 1} / ${total}`;
+  }
+  document.getElementById('prev').onclick = () => go(current - 1);
+  document.getElementById('next').onclick = () => go(current + 1);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') go(current - 1);
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(current + 1); }
+  });
+</script>
+
+</body>
+</html>

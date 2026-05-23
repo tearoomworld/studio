@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kindred — connect across care homes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Pastel palette pulled from reference */
+    --cream:#FAF5EA;
+    --cream-2:#F4EDDC;
+    --paper:#FFFCF4;
+    --buttercream:#F2D98E;
+    --sage:#B6CFB1;
+    --sky:#B7D2E3;
+    --blush:#F2BFC9;
+    --peach:#F4C5A6;
+    --lavender:#D2C3E4;
+    --terracotta:#D98B6E;
+
+    --ink:#2A211C;
+    --ink-2:#5B4E45;
+    --ink-3:#8E8278;
+    --ink-faint:#C7BDB1;
+    --line:rgba(42,33,28,0.10);
+    --line-2:rgba(42,33,28,0.06);
+
+    --r-sm:14px;
+    --r-md:22px;
+    --r-lg:32px;
+    --r-xl:44px;
+
+    --shadow-sm: 0 1px 0 rgba(255,255,255,.6) inset, 0 1px 2px rgba(42,33,28,.04);
+    --shadow-md: 0 1px 0 rgba(255,255,255,.7) inset, 0 8px 24px -10px rgba(42,33,28,.18);
+    --shadow-lg: 0 1px 0 rgba(255,255,255,.7) inset, 0 24px 60px -22px rgba(42,33,28,.28);
+
+    --serif: "Newsreader", "Cormorant Garamond", Georgia, serif;
+    --sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{min-height:100vh;min-width:1280px}
+
+  /* Type primitives */
+  .h-display{font-family:var(--serif);font-weight:450;letter-spacing:-0.015em;line-height:1.08}
+  .h-italic{font-family:var(--serif);font-style:italic;font-weight:450}
+  .h-num{font-family:var(--sans);font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-0.025em;line-height:1}
+  .h-mono{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+  .h-mono-sm{font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+  button{font-family:inherit;cursor:pointer}
+
+  /* App shell */
+  .app{min-height:100vh;display:flex;flex-direction:column}
+
+  /* Reusable surfaces */
+  .card{background:var(--paper);border-radius:var(--r-md);box-shadow:var(--shadow-md)}
+  .card-soft{background:var(--cream-2);border-radius:var(--r-md)}
+
+  .screen{flex:1;min-height:0}
+
+  /* Button styles */
+  .btn{appearance:none;border:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    padding:14px 22px;border-radius:999px;font-size:15px;font-weight:500;line-height:1;
+    transition:transform .12s ease, background .15s ease, box-shadow .15s ease;
+    min-height:48px}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--ink);color:var(--cream)}
+  .btn-primary:hover{background:#3a2e26}
+  .btn-secondary{background:var(--paper);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+  .btn-secondary:hover{background:#fff}
+  .btn-ghost{background:transparent;color:var(--ink)}
+  .btn-ghost:hover{background:rgba(42,33,28,.05)}
+  .btn-lg{padding:18px 28px;font-size:17px;min-height:60px;border-radius:999px}
+  .btn-xl{padding:22px 36px;font-size:20px;min-height:72px;border-radius:999px}
+
+  /* Pill / chip */
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;
+    font-size:12px;font-weight:500;background:rgba(42,33,28,.06);color:var(--ink-2)}
+  .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--ink-2)}
+
+  /* Avatar (initials) */
+  .avatar{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+    font-weight:600;font-size:13px;color:var(--ink);background:var(--peach);width:36px;height:36px;
+    box-shadow:0 0 0 2px var(--paper)}
+
+  /* Live indicator */
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(217,139,110,.5)}70%{box-shadow:0 0 0 8px rgba(217,139,110,0)}100%{box-shadow:0 0 0 0 rgba(217,139,110,0)}}
+  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--terracotta);animation:pulse 1.8s infinite;display:inline-block}
+
+  /* Game-screen base (used inside in-call) */
+  .stage-bg{background:linear-gradient(180deg, #F8F1DF 0%, #F4EAD2 100%)}
+
+  /* Scrollbar hide */
+  .no-scrollbar::-webkit-scrollbar{display:none}
+  .no-scrollbar{scrollbar-width:none}
+
+  /* Utility */
+  .hover-lift{transition:transform .15s ease, box-shadow .15s ease}
+  .hover-lift:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="src/shared.jsx"></script>
+<script type="text/babel" src="src/dashboard.jsx"></script>
+<script type="text/babel" src="src/availability.jsx"></script>
+<script type="text/babel" src="src/calendar.jsx"></script>
+<script type="text/babel" src="src/partners.jsx"></script>
+<script type="text/babel" src="src/lobby.jsx"></script>
+<script type="text/babel" src="src/incall.jsx"></script>
+<script type="text/babel" src="src/bingo.jsx"></script>
+<script type="text/babel" src="src/trivia.jsx"></script>
+<script type="text/babel" src="src/recap.jsx"></script>
+<script type="text/babel" src="src/app.jsx"></script>
+</body>
+</html>
