@@ -1,4 +1,5 @@
 import { StudioLayout } from "@/components/StudioLayout";
+import { SurfaceHead } from "@/components/SurfaceHead";
 import { LedgerClient } from "./LedgerClient";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,14 +13,11 @@ export default async function LedgerPage() {
   return (
     <StudioLayout>
       <div className="mx-auto max-w-[980px] px-12 py-12">
-        <header className="mb-8 border-b border-black/5 pb-6">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink/45">
-            Overview
-          </p>
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-ink">
-            The ledger.
-          </h1>
-        </header>
+        <SurfaceHead
+          eyebrow="Overview"
+          title="The ledger."
+          subtitle="What's working. What isn't. Updated whenever you learn something real from a customer call, a build day, or a moment in the field. Pattern-match across companies."
+        />
         <LedgerClient initial={entries ?? []} />
       </div>
     </StudioLayout>

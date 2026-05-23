@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StudioLayout } from "@/components/StudioLayout";
+import { SurfaceHead } from "@/components/SurfaceHead";
 import { TeamCard } from "@/components/TeamCard";
 import { PhaseOneButton } from "@/components/PhaseOneButton";
 import { getTeamStats } from "@/lib/data";
@@ -39,27 +40,21 @@ export default async function OperationsPage({
   return (
     <StudioLayout>
       <div className="mx-auto max-w-[980px] px-12 py-12">
-        <header className="mb-8 border-b border-black/5 pb-6">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-ink/45">
-            Overview
-          </p>
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-ink">
-            Operations.
-          </h1>
-          <p className="mt-3 text-base text-ink/70">
-            Companies → teams → tools. Each team kind has its own dashboard.
-          </p>
-        </header>
+        <SurfaceHead
+          eyebrow="Overview"
+          title="Operations."
+          subtitle="Each company has teams. Each team has a dashboard scoped to its work. Click into a team to see leads, emails sent, templates, content scheduled — as you grow, you add teams (or hire someone into one)."
+        />
 
-        <div className="mb-8 flex gap-2">
+        <div className="mb-8 inline-flex gap-1 rounded-2xl border border-black/[0.08] bg-cream-deep p-1">
           {companies?.map((c) => (
             <Link
               key={c.id}
               href={`/operations?company=${c.slug}`}
-              className={`rounded-lg px-4 py-2 text-sm font-medium ${
+              className={`rounded-xl px-4 py-2 text-[12.5px] font-medium transition-all duration-300 ${
                 c.slug === activeSlug
-                  ? "bg-ink text-white"
-                  : "bg-black/5 text-ink hover:bg-black/10"
+                  ? "studio-pill-coral"
+                  : "text-ink/50 hover:bg-white/60 hover:text-ink"
               }`}
             >
               {c.name}
@@ -67,7 +62,7 @@ export default async function OperationsPage({
           ))}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="flex flex-col gap-3">
           {teamsWithStats.map((t) => (
             <TeamCard
               key={t.id}

@@ -5,7 +5,12 @@ export function getSiteOrigin(): string {
     return configured.replace(/\/$/, "");
   }
 
-  // Vercel sets this automatically — no need for NEXT_PUBLIC_SITE_URL on first deploy
+  // Stable production hostname (e.g. studio-rosy-mu.vercel.app), not per-deploy URLs
+  const production = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (production) {
+    return `https://${production}`;
+  }
+
   const vercel = process.env.VERCEL_URL?.trim();
   if (vercel) {
     return `https://${vercel}`;

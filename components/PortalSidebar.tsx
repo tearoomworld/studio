@@ -2,41 +2,22 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-
-const ASSET_TABS: Record<string, { label: string; src: string; eager?: boolean }[]> =
-  {
-    kindred: [
-      { label: "Build", src: "" },
-      { label: "Audit", src: "/kindred-portal.html#audit" },
-      { label: "Agents", src: "/kindred-portal.html#agents" },
-      { label: "Deck", src: "/kindred-deck.html" },
-      { label: "Pitch", src: "/pitch.html" },
-      { label: "Demo", src: "/demo.html" },
-      { label: "Website", src: "/website.html" },
-    ],
-    source: [
-      { label: "Build", src: "" },
-      { label: "Audit", src: "/source-portal.html#audit" },
-      { label: "Agents", src: "/source-portal.html#agents" },
-      { label: "Deck", src: "/source-deck.html" },
-      { label: "Pitch", src: "/source-pitch.html" },
-      { label: "Web", src: "/source-web.html", eager: true },
-      { label: "Mobile", src: "/source-mobile.html", eager: true },
-    ],
-  };
+import { getAssetTabs, tabKeyForLabel } from "@/lib/portal-tabs";
 
 export function PortalSidebar({
   slug,
   name,
   logo,
+  brand,
 }: {
   slug: string;
   name: string;
   logo: React.ReactNode;
+  brand?: Record<string, unknown> | null;
 }) {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") ?? "build";
-  const tabs = ASSET_TABS[slug] ?? ASSET_TABS.kindred;
+  const tabs = getAssetTabs(slug, brand);
 
   return (
     <aside className="flex h-screen w-56 flex-col border-r border-black/5 bg-soft-bg px-3 py-5">
@@ -49,12 +30,8 @@ export function PortalSidebar({
       <div className="mb-6 px-2">{logo}</div>
       <nav className="flex flex-col gap-0.5">
         {tabs.map((t, i) => {
-          const tabKey =
-            i === 0
-              ? "build"
-              : t.label.toLowerCase().replace(/\s+/g, "-");
-          const href =
-            i === 0 ? `/${slug}` : `/${slug}?tab=${tabKey}`;
+          const tabKey = i === 0 ? "build" : tabKeyForLabel(t.label);
+          const href = i === 0 ? `/${slug}` : `/${slug}?tab=${tabKey}`;
           const active = tab === tabKey || (i === 0 && tab === "build");
           return (
             <Link
@@ -76,26 +53,4 @@ export function PortalSidebar({
       </p>
     </aside>
   );
-}
-
-export function getPortalTabSrc(slug: string, tab: string): string | null {
-  const tabs = ASSET_TABS[slug];
-  if (!tabs) return null;
-  if (tab === "build") return null;
-  const match = tabs.find(
-    (t, i) =>
-      i > 0 &&
-      t.label.toLowerCase().replace(/\s+/g, "-") === tab,
-  );
-  return match?.src ?? null;
-}
-
-export function isEagerTab(slug: string, tab: string): boolean {
-  const tabs = ASSET_TABS[slug];
-  const match = tabs?.find(
-    (t, i) =>
-      i > 0 &&
-      t.label.toLowerCase().replace(/\s+/g, "-") === tab,
-  );
-  return !!match?.eager;
 }

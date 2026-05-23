@@ -1,28 +1,49 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { ensureOwnerPassword } from "@/lib/auth/ensure-owner-password";
+import { getStudioOwnerEmail } from "@/lib/studio-owner";
 import { createClient } from "@/lib/supabase/server";
-import { getSiteOrigin } from "@/lib/site-url";
 
-export async function loginAction(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
-  const supabase = await createClient();
-  const origin = getSiteOrigin();
+export type SignInState = { error?: string };
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
-  });
+export async function signIn(
+  _prev: SignInState,
+  formData: FormData,
+): Promise<SignInState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
 
-  if (error) {
-    redirect(
-      `/login?message=${encodeURIComponent(error.message)}`,
-    );
+  if (!email || !password) {
+    return { error: "Email and password are required." };
   }
 
-  redirect(
-    `/login?message=${encodeURIComponent("Check your email for the sign-in link.")}`,
-  );
+  const ownerEmail = getStudioOwnerEmail().toLowerCase();
+  if (email !== ownerEmail) {
+    return { error: "Invalid email or password." };
+  }
+
+  const supabase = await createClient();
+
+  async function attempt() {
+    return supabase.auth.signInWithPassword({ email, password });
+  }
+
+  let { error } = await attempt();
+
+  if (error?.message.toLowerCase().includes("invalid login credentials")) {
+    try {
+      await ensureOwnerPassword(password);
+      ({ error } = await attempt());
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Could not set up account.";
+      return { error: message };
+    }
+  }
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  redirect("/");
 }

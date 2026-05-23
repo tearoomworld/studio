@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Studio · Build portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d1821;
+    --ink-2: #1f2d3a;
+    --muted: #5a6573;
+    --faint: #8c95a0;
+    --hair: #e6e8eb;
+    --hair-2: #eff1f3;
+    --bg: #ffffff;
+    --paper: #ffffff;
+    --soft: #f3efe8;
+    --cream: #faf8f4;
+    --sage: #bfcc94;
+    --sage-deep: #97a570;
+    --sage-soft: #e9eed8;
+    --coral: #e29449;
+    --coral-deep: #b85e25;
+    --coral-soft: #fef0d9;
+    --blush-soft: #f6e2ee;
+    --radius-lg: 16px;
+    --font: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    line-height: 1.47;
+    height: 100vh;
+    overflow: hidden;
+  }
+  button { font: inherit; cursor: pointer; }
+  .shell { display: grid; grid-template-columns: 256px 1fr; height: 100vh; }
+  .sidebar {
+    background: var(--cream);
+    border-right: 1px solid var(--hair-2);
+    padding: 16px 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .back-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; margin-bottom: 14px;
+    font-size: 12px; color: var(--muted);
+    border-radius: 6px;
+    text-decoration: none;
+  }
+  .back-link:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
+  .portal-brand { padding: 8px 8px 18px; margin-bottom: 14px; border-bottom: 1px solid var(--hair-2); }
+  .portal-brand-logo {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 22px; font-weight: 600; letter-spacing: -0.03em;
+  }
+  .portal-brand-logo::before {
+    content: "";
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--coral);
+    box-shadow: 0 0 0 2px var(--cream);
+  }
+  .portal-brand-sub { font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.45; }
+  .nav-group { margin-bottom: 18px; }
+  .nav-group-label {
+    font-size: 10px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0 8px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 9px; border-radius: 7px;
+    color: var(--ink-2); font-size: 13.5px; font-weight: 500;
+    width: 100%; text-align: left; border: none; background: transparent;
+  }
+  .nav-item:hover { background: rgba(0,0,0,0.04); }
+  .nav-item.active { background: var(--coral-soft); color: var(--coral-deep); }
+  .nav-item-icon { width: 16px; text-align: center; color: var(--muted); font-size: 13px; }
+  .nav-item.active .nav-item-icon { color: var(--coral-deep); }
+  .sidebar-foot {
+    margin-top: auto; padding: 16px 8px 4px;
+    border-top: 1px solid var(--hair-2);
+    font-size: 11px; color: var(--muted); line-height: 1.5;
+  }
+  .main { overflow-y: auto; height: 100vh; background: var(--bg); }
+  .main-inner { max-width: 980px; margin: 0 auto; padding: 36px 48px 80px; }
+  .pane { display: none; }
+  .pane.on { display: block; }
+  .pane-head {
+    margin-bottom: 28px; padding-bottom: 20px;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .pane-eyebrow {
+    font-size: 11px; font-weight: 600; color: var(--coral-deep);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;
+  }
+  .pane-title {
+    font-size: 32px; font-weight: 700; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 10px;
+  }
+  .pane-sub { font-size: 15px; color: var(--ink-2); line-height: 1.55; max-width: 620px; }
+  .card-paper {
+    background: var(--paper); border: 1px solid var(--hair-2);
+    border-radius: var(--radius-lg); padding: 22px; margin-bottom: 12px;
+  }
+  .card-paper h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .card-paper p { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+  .strip-tabs {
+    display: flex; gap: 4px; margin-bottom: 22px;
+    background: var(--soft); padding: 4px; border-radius: 10px;
+    width: fit-content; flex-wrap: wrap;
+  }
+  .strip-tab {
+    padding: 7px 14px; border-radius: 7px; background: transparent;
+    color: var(--muted); border: none; font-size: 12.5px; font-weight: 500;
+  }
+  .strip-tab.active { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .strip-pane { display: none; }
+  .strip-pane.on { display: block; }
+  .phase-list { display: flex; flex-direction: column; gap: 10px; }
+  .phase-item {
+    border: 1px solid var(--hair-2); border-radius: var(--radius-lg);
+    padding: 18px 22px; background: var(--paper);
+  }
+  .phase-item strong { display: block; font-size: 15px; margin-bottom: 4px; }
+  .phase-item span { font-size: 13px; color: var(--muted); }
+  .flow-step {
+    display: flex; gap: 14px; padding: 14px 0;
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--sage-soft); color: var(--sage-deep);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .flow-step-body strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .flow-step-body span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  code { font-family: var(--mono); font-size: 12px; background: var(--soft); padding: 2px 6px; border-radius: 4px; }
+</style>
+<link rel="stylesheet" href="/embed.css" />
+<script src="/embed.js"></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <a href="/" class="back-link">← Studio</a>
+    <div class="portal-brand">
+      <div class="portal-brand-logo">Studio</div>
+      <div class="portal-brand-sub">Shared build layer for every prototype in flight.</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Build</div>
+      <button type="button" class="nav-item active" data-pane="buildplan">
+        <span class="nav-item-icon">▤</span> Build plan
+      </button>
+      <button type="button" class="nav-item" data-pane="audit">
+        <span class="nav-item-icon">○</span> v1 → v2 Audit
+      </button>
+      <button type="button" class="nav-item" data-pane="agents">
+        <span class="nav-item-icon">✦</span> Agents + Skills
+      </button>
+    </div>
+    <div class="sidebar-foot">
+      <strong>Studio motion</strong><br />
+      Intake → eight phases → ship → sell or sustain.<br />
+      Company-specific assets live in the tabs beside this shell.
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="pane on" id="pane-buildplan">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Studio · Build</div>
+          <h1 class="pane-title">The build plan.</h1>
+          <p class="pane-sub">Eight phases from idea to launched prototype. Per-prototype tasks and progress sync from Studio when you generate or seed a company; use this view as the shared playbook.</p>
+        </div>
+        <div class="phase-list">
+          <div class="phase-item"><strong>1 · Foundation</strong><span>Schema, auth, deploy pipeline, empty shells for v2 tables.</span></div>
+          <div class="phase-item"><strong>2 · Core loop</strong><span>The one workflow a paying user must complete in week one.</span></div>
+          <div class="phase-item"><strong>3 · Founder dashboard</strong><span>Internal tools: pipeline, compose, demos, build plan mirror.</span></div>
+          <div class="phase-item"><strong>4 · Go-to-market</strong><span>Outbound or content motion matching sprint vs marathon.</span></div>
+          <div class="phase-item"><strong>5 · Product polish</strong><span>Mocks, onboarding, error states, mobile if needed.</span></div>
+          <div class="phase-item"><strong>6 · Agents</strong><span>Skills, prompts, and rails where AI earns its keep.</span></div>
+          <div class="phase-item"><strong>7 · Pilot</strong><span>One real customer, one real transaction or commitment.</span></div>
+          <div class="phase-item"><strong>8 · Launch + learn</strong><span>Ship, ledger what worked, queue v2 behind flags.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-audit">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Studio · Audit</div>
+          <h1 class="pane-title">v1 → v2 compatibility audit.</h1>
+          <p class="pane-sub">Run this before you lock v1 schema or UI. The goal: v2 ships as flags and new writes, not painful migrations.</p>
+        </div>
+        <div class="strip-tabs">
+          <button type="button" class="strip-tab active" onclick="auditShow('risks', this)">Lock-in risks</button>
+          <button type="button" class="strip-tab" onclick="auditShow('schema', this)">Data model</button>
+          <button type="button" class="strip-tab" onclick="auditShow('deploy', this)">Deployment</button>
+        </div>
+        <div class="strip-pane on" id="audit-risks">
+          <div class="card-paper">
+            <h4>Dormant tables in v1</h4>
+            <p>Create empty tables for v2 entities now. No v1 queries should write to them — document that in Claude Skills so agents do not “helpfully” populate them early.</p>
+          </div>
+          <div class="card-paper">
+            <h4>Polymorphism from day one</h4>
+            <p>If v1 only uses one participant type, still model <code>type + id</code> pairs so v2 does not require a new sessions table.</p>
+          </div>
+          <div class="card-paper">
+            <h4>Feature flags on every v2 surface</h4>
+            <p>Ship v2 UI dark behind <code>flags.*</code> in jsonb. Flip per tenant when ready — never big-bang migrate live users.</p>
+          </div>
+        </div>
+        <div class="strip-pane" id="audit-schema">
+          <div class="card-paper">
+            <h4>Nullable + defaulted columns</h4>
+            <p>v2 fields added in v1 migrations should be nullable with safe defaults. v1 code paths ignore them.</p>
+          </div>
+          <div class="card-paper">
+            <h4>Auth multi-role</h4>
+            <p><code>user_type</code> or equivalent from v1 even if only one role logs in today.</p>
+          </div>
+        </div>
+        <div class="strip-pane" id="audit-deploy">
+          <div class="flow-step"><div class="flow-step-num">1</div><div class="flow-step-body"><strong>Ship v1 to first revenue signal</strong><span>Schema stubs for v2 already in place.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">2</div><div class="flow-step-body"><strong>Build v2 on a branch</strong><span>Hotfixes to main; v2 behind flags.</span></div></div>
+          <div class="flow-step"><div class="flow-step-num">3</div><div class="flow-step-body"><strong>Single-tenant alpha</strong><span>One flag flip, one end-to-end v2 journey.</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-agents">
+      <div class="main-inner">
+        <div class="pane-head">
+          <div class="pane-eyebrow">Studio · Agents</div>
+          <h1 class="pane-title">Agents + Claude Skills.</h1>
+          <p class="pane-sub">Where AI does real work — in-product, founder-facing, and in your repo. Encode conventions in Skills so every prototype inherits the same rails.</p>
+        </div>
+        <div class="strip-tabs">
+          <button type="button" class="strip-tab active" onclick="agentsShow('product', this)">In-product</button>
+          <button type="button" class="strip-tab" onclick="agentsShow('skills', this)">Claude Skills</button>
+          <button type="button" class="strip-tab" onclick="agentsShow('rails', this)">Safety rails</button>
+        </div>
+        <div class="strip-pane on" id="agents-product">
+          <div class="card-paper">
+            <h4>Only automate high-leverage loops</h4>
+            <p>Enrichment, drafting, ranking — not “AI everywhere.” Each agent should map to a task you do weekly as a solo founder.</p>
+          </div>
+        </div>
+        <div class="strip-pane" id="agents-skills">
+          <div class="card-paper">
+            <h4>One Skill per boundary</h4>
+            <p>Supabase conventions, design system, outbound voice, audit rules. Trigger Skills from file paths or task labels in Claude Code.</p>
+          </div>
+        </div>
+        <div class="strip-pane" id="agents-rails">
+          <div class="card-paper">
+            <h4>Cost caps on every model call</h4>
+            <p>Per-endpoint daily limits, weekly per-user caps, Slack alert at 80%. Non-negotiable for solo founders.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+document.querySelectorAll(".nav-item[data-pane]").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    var name = btn.dataset.pane;
+    document.querySelectorAll(".nav-item[data-pane]").forEach(function (b) {
+      b.classList.toggle("active", b === btn);
+    });
+    document.querySelectorAll(".pane").forEach(function (p) {
+      p.classList.toggle("on", p.id === "pane-" + name);
+    });
+  });
+});
+function auditShow(slice, btn) {
+  document.querySelectorAll("#pane-audit .strip-tab").forEach(function (t) { t.classList.remove("active"); });
+  btn.classList.add("active");
+  document.querySelectorAll("#pane-audit .strip-pane").forEach(function (p) {
+    p.classList.toggle("on", p.id === "audit-" + slice);
+  });
+}
+function agentsShow(slice, btn) {
+  document.querySelectorAll("#pane-agents .strip-tab").forEach(function (t) { t.classList.remove("active"); });
+  btn.classList.add("active");
+  document.querySelectorAll("#pane-agents .strip-pane").forEach(function (p) {
+    p.classList.toggle("on", p.id === "agents-" + slice);
+  });
+}
+</script>
+</body>
+</html>

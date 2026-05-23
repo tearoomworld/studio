@@ -1,23 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #faf8f4;
   --foreground: #0d1821;
   --ink: #0d1821;
+  --cream: #faf8f4;
+  --cream-deep: #f3efe8;
   --sage: #bfcc94;
   --sage-deep: #97a570;
   --blush: #e6aace;
-  --soft-bg: #f7f8f8;
+  --blush-deep: #c280a3;
+  --blush-soft: #f6e2ee;
+  --sage-soft: #e9eed8;
+  --soft-bg: #f3efe8;
+  --coral: #e29449;
+  --coral-deep: #b85e25;
+  --coral-soft: #fef0d9;
+  --sky-soft: #e4f0f5;
+  --lavender-soft: #ebe6f4;
+  --border-subtle: rgba(13, 24, 33, 0.08);
+  --radius-card: 28px;
+  --radius-tile: 24px;
+  --ease-fluid: cubic-bezier(0.34, 1.2, 0.64, 1);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-ink: var(--ink);
+  --color-cream: var(--cream);
+  --color-cream-deep: var(--cream-deep);
   --color-sage: var(--sage);
   --color-sage-deep: var(--sage-deep);
   --color-blush: var(--blush);
+  --color-blush-deep: var(--blush-deep);
+  --color-blush-soft: var(--blush-soft);
+  --color-sage-soft: var(--sage-soft);
   --color-soft-bg: var(--soft-bg);
+  --color-coral: var(--coral);
+  --color-coral-deep: var(--coral-deep);
+  --color-coral-soft: var(--coral-soft);
+  --color-sky-soft: var(--sky-soft);
+  --color-lavender-soft: var(--lavender-soft);
   --font-sans: var(--font-inter);
 }
 
@@ -25,4 +49,74 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.studio-workspace {
+  background-color: var(--cream);
+}
+
+.studio-card {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+}
+
+.studio-card-interactive {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+  transition:
+    transform 0.45s var(--ease-fluid),
+    box-shadow 0.45s var(--ease-fluid),
+    border-color 0.3s ease;
+}
+
+.studio-card-interactive:hover {
+  transform: translateY(-4px) scale(1.006);
+  border-color: rgba(13, 24, 33, 0.14);
+  box-shadow: 0 24px 48px -28px rgba(13, 24, 33, 0.22);
+}
+
+.studio-card-interactive:active {
+  transform: translateY(-1px) scale(1.002);
+  transition-duration: 0.15s;
+}
+
+.studio-tile {
+  border-radius: var(--radius-tile);
+  border: 1px solid var(--border-subtle);
+  transition:
+    transform 0.5s var(--ease-fluid),
+    box-shadow 0.4s ease,
+    border-color 0.3s ease;
+}
+
+.studio-tile:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(13, 24, 33, 0.12);
+  box-shadow: 0 20px 40px -24px rgba(13, 24, 33, 0.2);
+}
+
+.studio-tile:active {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.studio-tile-icon {
+  transition: transform 0.5s var(--ease-fluid);
+}
+
+.studio-tile:hover .studio-tile-icon {
+  transform: scale(1.08) rotate(-3deg);
+}
+
+.studio-pill-active {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(13, 24, 33, 0.08);
+}
+
+.studio-pill-coral {
+  background: var(--coral-soft);
+  color: var(--coral-deep);
+  box-shadow: 0 1px 3px rgba(184, 94, 37, 0.12);
 }

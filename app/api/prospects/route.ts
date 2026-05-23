@@ -11,6 +11,7 @@ export async function GET(request: Request) {
     .from("prospects")
     .select("*")
     .eq("team_id", teamId)
+    .order("fit_score", { ascending: false, nullsFirst: false })
     .order("updated_at", { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data);

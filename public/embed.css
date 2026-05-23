@@ -1,0 +1,20 @@
+html.embed .sidebar {
+  display: none !important;
+}
+
+html.embed .shell {
+  grid-template-columns: 1fr !important;
+}
+
+html.embed .back-link {
+  display: none !important;
+}
+
+html.embed body {
+  overflow: auto;
+}
+
+html.embed .main {
+  height: auto;
+  min-height: 100vh;
+}

@@ -20,12 +20,11 @@ Multi-company solo studio dashboard (Kindred + Source). Next.js 15, Supabase, An
 SUPABASE_SERVICE_ROLE_KEY=sb_secret_...
 ```
 
-### 3. Auth user + redirect URLs
+### 3. Auth (email + password)
 
-1. **Authentication** → **Users** → add `hq@tearoom.world` (or your email)
-2. **Authentication** → **URL configuration** → **Redirect URLs**:
-   - `http://localhost:3000/auth/callback`
-   - `https://YOUR_VERCEL_URL/auth/callback` (after deploy)
+1. Supabase → **Authentication** → **Providers** → enable **Email**, turn off **Confirm email** (no verification).
+2. Optional in `.env.local`: `STUDIO_OWNER_EMAIL` (defaults to `hq@tearoom.world`), `STUDIO_OWNER_PASSWORD` for `npm run ensure-owner`.
+3. First sign-in on `/login` creates/updates the owner password via the service role key (needs `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`).
 
 ### 4. Seed data
 
@@ -40,7 +39,7 @@ npm run seed
 npm run dev
 ```
 
-Open http://localhost:3000 → magic link login.
+Open http://localhost:3000/login → sign in with your owner email and password.
 
 ## Environment variables
 

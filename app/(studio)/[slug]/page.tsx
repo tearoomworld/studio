@@ -1,11 +1,9 @@
 import { Fraunces } from "next/font/google";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import {
-  PortalSidebar,
-  getPortalTabSrc,
-  isEagerTab,
-} from "@/components/PortalSidebar";
+import { PortalSidebar } from "@/components/PortalSidebar";
+import { resolveAssetIframeSrc } from "@/lib/company-pages";
+import { getAssetTabs, getPortalTabSrc, isEagerTab } from "@/lib/portal-tabs";
 import { IframeLoader } from "@/components/IframeLoader";
 import { BuildPlan } from "./BuildPlan";
 import { createClient } from "@/lib/supabase/server";
@@ -34,11 +32,22 @@ export default async function CompanyPortalPage({
 
   if (!company) notFound();
 
-  const iframeSrc = getPortalTabSrc(slug, tab);
-  const eager = isEagerTab(slug, tab);
+  const brand = company.brand as Record<string, unknown>;
+  const tabs = getAssetTabs(slug, brand);
+  const defaultSrc = getPortalTabSrc(slug, tab, brand);
+  const { src: iframeSrc, kind: replaceKind } = await resolveAssetIframeSrc(
+    supabase,
+    company.id,
+    slug,
+    tab,
+    defaultSrc,
+    brand,
+    tabs,
+  );
+  const eager = isEagerTab(slug, tab, brand);
 
   let buildContent = null;
-  if (tab === "build") {
+  if (tab === "build" && !iframeSrc) {
     const { data: phases } = await supabase
       .from("phases")
       .select("id, title, icon, description, order_index")
@@ -66,24 +75,39 @@ export default async function CompanyPortalPage({
   const logo =
     slug === "kindred" ? (
       <div
-        className={`${fraunces.className} text-2xl font-medium text-ink`}
+        className={`${fraunces.className} inline-flex items-center gap-3 text-[30px] font-medium tracking-[-0.025em] text-[#b85e25]`}
       >
-        Kin<span className="text-sage-deep">dred</span>
+        <span
+          className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#E29449]"
+          aria-hidden
+        />
+        Kin<em className="italic text-[#E29449]">dred</em>
       </div>
     ) : (
       <div className="text-2xl font-medium lowercase tracking-tight text-ink">
-        source<span className="text-sage-deep">.</span>
+        {company.name}
+        <span className="text-sage-deep">.</span>
       </div>
     );
 
   return (
     <div className="grid h-screen grid-cols-[224px_1fr]">
       <Suspense fallback={<div className="w-56 bg-soft-bg" />}>
-        <PortalSidebar slug={slug} name={company.name} logo={logo} />
+        <PortalSidebar
+          slug={slug}
+          name={company.name}
+          logo={logo}
+          brand={company.brand as Record<string, unknown>}
+        />
       </Suspense>
-      <div className="h-screen overflow-y-auto bg-white">
+      <div className="h-screen overflow-hidden bg-white">
         {iframeSrc ? (
-          <IframeLoader src={iframeSrc} eager={eager} />
+          <IframeLoader
+            src={iframeSrc}
+            eager={eager}
+            slug={slug}
+            replaceKind={replaceKind}
+          />
         ) : (
           buildContent ?? (
             <p className="p-8 text-sm text-ink/50">No content for this tab.</p>

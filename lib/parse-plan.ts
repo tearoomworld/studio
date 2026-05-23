@@ -31,7 +31,6 @@ export function parsePlanFromHtml(filePath: string, varName: string): PlanPhase[
   if (!match) {
     throw new Error(`Could not find ${varName} in ${filePath}`);
   }
-  // eslint-disable-next-line no-new-func
   const plan = new Function(`return (${match[1]});`)() as PlanPhase[];
   return plan;
 }

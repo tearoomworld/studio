@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:clean": "rm -rf .next && next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "ensure-owner": "tsx --env-file=.env.local scripts/ensure-owner.ts",
     "db:migrate": "node -e \"console.log('Paste studio/supabase/migrations/0001_initial.sql into Supabase SQL Editor and Run.')\""
   },
   "dependencies": {

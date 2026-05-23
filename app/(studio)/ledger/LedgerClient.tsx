@@ -11,16 +11,28 @@ type Entry = {
   company_slug: string | null;
 };
 
-const MARK: Record<string, string> = {
-  yes: "✓",
-  maybe: "?",
-  no: "×",
-};
+function LedgerMark({ status }: { status: string }) {
+  const mark = status === "yes" ? "✓" : status === "maybe" ? "?" : "×";
+  return (
+    <span
+      className={`mr-2.5 inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+        status === "yes"
+          ? "bg-sage text-ink"
+          : status === "maybe"
+            ? "bg-soft-bg text-ink"
+            : "border-[1.5px] border-ink bg-white text-ink"
+      }`}
+    >
+      {mark}
+    </span>
+  );
+}
 
 export function LedgerClient({ initial }: { initial: Entry[] }) {
   const router = useRouter();
   const [entries, setEntries] = useState(initial);
   const [editing, setEditing] = useState<Entry | null>(null);
+  const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     status: "yes",
     title: "",
@@ -60,6 +72,7 @@ export function LedgerClient({ initial }: { initial: Entry[] }) {
       });
     }
     setEditing(null);
+    setShowForm(false);
     setForm({ status: "yes", title: "", body: "", company_slug: "" });
     refresh();
   }
@@ -72,34 +85,28 @@ export function LedgerClient({ initial }: { initial: Entry[] }) {
 
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2">
         {entries.map((e) => (
-          <div
+          <article
             key={e.id}
-            className="rounded-2xl border border-black/5 p-5"
+            className="group rounded-2xl border border-black/[0.06] bg-white px-5 py-[18px]"
           >
-            <strong className="flex items-start gap-2 text-ink">
-              <span
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-xs ${
-                  e.status === "yes"
-                    ? "bg-sage"
-                    : e.status === "maybe"
-                      ? "bg-black/5"
-                      : "bg-blush/40"
-                }`}
-              >
-                {MARK[e.status] ?? "·"}
-              </span>
+            <strong className="flex items-start text-[13.5px] font-semibold leading-snug tracking-tight text-ink">
+              <LedgerMark status={e.status} />
               {e.title}
             </strong>
             {e.body && (
-              <p className="mt-3 text-sm leading-relaxed text-ink/70">{e.body}</p>
+              <p className="mt-1.5 pl-[28px] text-[12.5px] leading-relaxed text-ink/55">
+                {e.body}
+              </p>
             )}
-            <div className="mt-4 flex gap-3 text-xs">
+            <div className="mt-3 pl-[28px] flex gap-3 text-[11px] opacity-0 transition group-hover:opacity-100">
               <button
                 type="button"
+                className="text-ink/50 hover:text-ink"
                 onClick={() => {
                   setEditing(e);
+                  setShowForm(true);
                   setForm({
                     status: e.status,
                     title: e.title,
@@ -110,55 +117,83 @@ export function LedgerClient({ initial }: { initial: Entry[] }) {
               >
                 Edit
               </button>
-              <button type="button" onClick={() => remove(e.id)}>
+              <button
+                type="button"
+                className="text-ink/50 hover:text-ink"
+                onClick={() => remove(e.id)}
+              >
                 Delete
               </button>
             </div>
-          </div>
+          </article>
         ))}
       </div>
 
-      <form onSubmit={save} className="mt-10 max-w-lg space-y-3 rounded-2xl border border-black/5 p-6">
-        <h3 className="font-semibold">{editing ? "Edit entry" : "Add entry"}</h3>
-        <select
-          value={form.status}
-          onChange={(e) => setForm({ ...form, status: e.target.value })}
-          className="w-full rounded border border-black/10 px-3 py-2 text-sm"
-        >
-          <option value="yes">Yes — working</option>
-          <option value="maybe">Maybe</option>
-          <option value="no">No — not working</option>
-        </select>
-        <input
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-          placeholder="Title"
-          required
-          className="w-full rounded border border-black/10 px-3 py-2 text-sm"
-        />
-        <textarea
-          value={form.body}
-          onChange={(e) => setForm({ ...form, body: e.target.value })}
-          placeholder="Body"
-          rows={4}
-          className="w-full rounded border border-black/10 px-3 py-2 text-sm"
-        />
-        <button type="submit" className="rounded-lg bg-ink px-4 py-2 text-sm text-white">
-          {editing ? "Update" : "Add"}
-        </button>
-        {editing && (
+      <div className="mt-8">
+        {!showForm ? (
           <button
             type="button"
-            className="ml-2 text-sm text-ink/50"
             onClick={() => {
               setEditing(null);
               setForm({ status: "yes", title: "", body: "", company_slug: "" });
+              setShowForm(true);
             }}
+            className="rounded-lg border border-black/10 bg-white px-4 py-2 text-sm font-medium text-ink hover:bg-soft-bg"
           >
-            Cancel
+            + Add learning
           </button>
+        ) : (
+          <form
+            onSubmit={save}
+            className="max-w-xl space-y-3 rounded-2xl border border-black/[0.06] bg-soft-bg/40 p-6"
+          >
+            <h3 className="font-semibold text-ink">
+              {editing ? "Edit entry" : "Add to ledger"}
+            </h3>
+            <select
+              value={form.status}
+              onChange={(ev) => setForm({ ...form, status: ev.target.value })}
+              className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+            >
+              <option value="yes">✓ Yes — working</option>
+              <option value="maybe">? Maybe — untested</option>
+              <option value="no">× No — not working</option>
+            </select>
+            <input
+              value={form.title}
+              onChange={(ev) => setForm({ ...form, title: ev.target.value })}
+              placeholder="What's the pattern?"
+              required
+              className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+            />
+            <textarea
+              value={form.body}
+              onChange={(ev) => setForm({ ...form, body: ev.target.value })}
+              placeholder="Evidence, context, when to apply it…"
+              rows={4}
+              className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+            />
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="rounded-lg bg-ink px-4 py-2 text-sm text-white"
+              >
+                {editing ? "Update" : "Add"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditing(null);
+                }}
+                className="text-sm text-ink/50"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         )}
-      </form>
+      </div>
     </>
   );
 }

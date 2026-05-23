@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StudioLayout } from "@/components/StudioLayout";
+import { SurfaceHead } from "@/components/SurfaceHead";
 import { getTeamStats } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
 import { SalesTabs } from "./SalesTabs";
@@ -50,10 +51,15 @@ export default async function TeamDashboardPage({
         <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-ink/45">
           {team.kind}
         </p>
-        <h1 className="mt-1 text-4xl font-bold text-ink">{team.name}</h1>
-        {team.description && (
-          <p className="mt-3 max-w-xl text-base text-ink/70">{team.description}</p>
-        )}
+        <SurfaceHead
+          eyebrow="Overview"
+          title={`${team.name}.`}
+          subtitle={
+            team.kind === "sales"
+              ? "Outbound to Activities Directors — find leads, rank pipeline, email from templates, track every send. Demos sync to Calendar."
+              : `${company.name} marketing — content calendar and field presence.`
+          }
+        />
 
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           {stats.map((s) => (
